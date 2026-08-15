@@ -115,7 +115,7 @@ v0.1 does not define how a manifest is serialized or hashed, nor how a commitmen
 
 ### T11 — Nominal conformance
 
-**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported hard-screen failures, unsupported or misattributed findings, inconsistent eligibility timing, contradictory recusal state, unresolved conflicts, incomplete recusal provenance, false committee-authority inference, premature award or challenge state, or a declared AI commitment time after applications close.
+**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported hard-screen failures, unsupported or misattributed findings, inconsistent eligibility timing, a non-pending decision timestamp later than the record's own last-update time, contradictory recusal state, unresolved conflicts, incomplete recusal provenance, false committee-authority inference, premature award or challenge state, or a declared AI commitment time after applications close.
 
 **Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
 
@@ -149,9 +149,9 @@ A validator pass establishes internal consistency with the v0.1 profile. It does
 
 A decision record can be created after the decision it documents. v0.1 therefore permits `decision.decidedAt` to precede `timestamps.createdAt`.
 
-The temporal invariants are narrower: the governing policy must have been effective by the time of an adjudicated decision, the eligibility check supporting that adjudication cannot postdate it, and `updatedAt` cannot precede `createdAt`.
+The temporal invariants are narrower: the governing policy must have been effective by the time of an adjudicated decision; the eligibility check supporting that adjudication cannot postdate it; `updatedAt` cannot precede `createdAt`; and a non-pending `decision.decidedAt` cannot be later than `updatedAt`.
 
-This permits retrospective testing of historical decisions without misrepresenting record creation time.
+This permits retrospective testing of historical decisions without misrepresenting either record creation time or the record's last-update time.
 
 ## 8. Release integrity boundary
 
