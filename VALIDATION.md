@@ -11,11 +11,19 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects a pending record with a decision timestamp.
 - PASS — adversarial suite rejects approval without delivery conditions.
 - PASS — adversarial suite rejects a `supported-fact` without evidence.
+- PASS — `risk` is rejected as an epistemic material-finding classification; the allowed classifications are `supported-fact`, `judgment`, `uncertainty`, and `unverified-claim`.
 - PASS — material findings cannot be attributed to non-participating or recused evaluators (`EVAL003`).
 - PASS — non-public evidence with neither a URI nor a content hash is surfaced as `EVID003` without forcing disclosure.
 - PASS — non-public evidence with a retrievable URI remains usable without `EVID003`.
 - PASS — adversarial suite rejects broken evidence references.
 - PASS — adversarial suite rejects an eligible summary with failed eligibility rules.
+- PASS — a public governing-policy URI must occur in the declared governing source set (`POL002`).
+- PASS — the schema requires source mappings for mandate, eligibility, evaluation criteria, conflict rules, and decision procedure.
+- PASS — each decision-surface source must occur in the declared governing source set (`POL003`).
+- PASS — an in-round policy change must identify a prior version and that version cannot equal the active version (`POL004`).
+- PASS — an in-round policy-change notice must occur in the declared source set (`POL005`).
+- PASS — an in-round policy change must state whether prior evaluations were rerun.
+- PASS — a complete in-round policy-change record is accepted.
 - PASS — adversarial suite rejects a recused evaluator still marked as participating.
 - PASS — a recusal must identify the affected decision surface (`COI004`).
 - PASS — a recusal must explicitly state whether substitution occurred (`COI005`).
@@ -38,9 +46,8 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — suspension requires substantive rationale and attributable findings.
 - PASS — deferral requires a rationale without being treated as a merit judgment.
 - PASS — retrospective finalized records are permitted.
-- PASS — an in-round policy change must state whether prior evaluations were rerun.
-- PASS — a complete in-round policy-change record is accepted.
 - PASS — Marketplace example records the published August 5, 2026 23:59 UTC submission deadline.
+- PASS — Marketplace example maps the public rules URI and all five normative decision surfaces to declared governing sources.
 - PASS — Simocracy allocation arithmetic: `65 + 59 + 20 + 51 + 24 = 219`.
 - PASS — AI cannot occupy a decision-authority type, consistent with `CHARTER.md`.
 - PASS — AI materiality is represented against the grant recommendation, not the institutional decision.
