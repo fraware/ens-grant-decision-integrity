@@ -14,7 +14,7 @@ The request is for critique, not endorsement or funding.
 
 I used the recent ENS Simocracy experiment to test a narrow governance question: if grant evaluation becomes more structured and increasingly AI-assisted, what minimum record should exist so the DAO can reconstruct how a material decision was made?
 
-Five ENS Governance funding decisions allocated a cumulative $219 to the resulting proposal. Evaluators repeatedly identified the Grants Charter and commit–reveal treatment of AI-assisted screening as distinctive elements. I have implemented the first tranche as a small v0.1 package: a draft Grant Decision Integrity Charter, a machine-readable decision-record schema, and a non-evaluative mapping of the current Marketplace RFP into that schema.
+Five ENS Governance funding decisions allocated a cumulative $219 to the resulting proposal. Evaluators repeatedly identified the Grants Charter and commit–reveal treatment of AI-assisted screening as distinctive elements. I have implemented the proposal's first $200 budget item as a small v0.1 package: a draft Grant Decision Integrity Charter, a machine-readable decision-record schema, and a non-evaluative mapping of the current Marketplace RFP into that schema.
 
 The Marketplace mapping is diagnostic. It does not identify, score, or comment on any live applicant, and it does not propose changing the rules of the active review.
 
