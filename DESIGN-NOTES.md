@@ -18,7 +18,7 @@ The record therefore identifies one public governing-policy URI and maps five no
 
 The ratified SPP3 committee model defines committee roles, quorum, and the decision rule. Voting or ranking requires three of four Member seats to be active and participating. Decisions use a simple majority of participating Members; the Chair votes only as a tiebreaker.
 
-The schema therefore treats evaluator participation, recusals, quorum, and decision rule as first-class decision attributes.
+The schema therefore treats evaluator participation, recusals, quorum, and decision rule as first-class decision attributes. The conformance layer applies committee quorum and voting requirements only when `decision.authorityKind=committee`; advisory participation by a committee evaluator does not silently convert the final authority into a committee decision.
 
 ### Independent verification
 
@@ -30,7 +30,7 @@ The delivery-condition object models a target date or review window, verificatio
 
 The Marketplace RFP states that applications failing the hard eligibility gate are returned without scoring and that this is not a quality judgment. Its published gate contains seven conditions, including acknowledgment of the SPP3 Program Terms and Award Notice.
 
-The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Substantive findings are required for approval, rejection, and suspension; an ineligible disposition is linked to a failed eligibility rule, and a failed rule must identify supporting evidence. The worked example maps all seven published eligibility conditions.
+The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Substantive findings are required for approval, rejection, and suspension; an ineligible disposition is linked to a failed eligibility rule, and a failed rule must identify supporting evidence. An adjudicated decision cannot predate the eligibility check supporting it. The worked example maps all seven published eligibility conditions.
 
 ### Privacy and selective disclosure
 
@@ -67,9 +67,9 @@ v0.1 does not define how a manifest is serialized or hashed, nor how a commitmen
 
 ### T3 — Score aggregation obscures disagreement
 
-**Risk:** an aggregate score conceals material disagreement about security, eligibility, scope, budget, or delivery confidence.
+**Risk:** an aggregate score conceals material disagreement, or a disagreement is recorded without an attributable evaluator.
 
-**Control:** disagreement is recorded independently of aggregate scores, and any attributed disagreement must resolve to a participating, non-recused evaluator.
+**Control:** disagreement is recorded independently of aggregate scores. Every recorded disagreement identifies at least one participating, non-recused evaluator.
 
 ### T4 — Conflict disclosure without operational recusal
 
@@ -79,9 +79,9 @@ v0.1 does not define how a manifest is serialized or hashed, nor how a commitmen
 
 ### T5 — AI recommendation acquires de facto authority
 
-**Risk:** reviewers treat an AI score or recommendation as binding despite a policy that reserves authority to humans.
+**Risk:** reviewers treat an AI score or recommendation as binding, or the record retrospectively represents a departure from AI advice before an institutional disposition exists.
 
-**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type. An AI evaluator cannot materially inform a recommendation unless marked as participating, and a recorded departure cannot exist unless a participating AI evaluator materially informed that recommendation.
+**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type. An AI evaluator cannot materially inform a recommendation unless marked as participating. A departure requires materially influential AI evaluation, a rationale, and a non-pending institutional disposition.
 
 ### T6 — Award state outruns the decision
 
@@ -89,27 +89,33 @@ v0.1 does not define how a manifest is serialized or hashed, nor how a commitmen
 
 **Control:** positive `awardedAmount` is prohibited for pending, deferred, ineligible, and rejected states. Approval and suspension preserve the award amount; suspension also requires attributable findings and delivery conditions.
 
-### T7 — Milestones reduce to activity reports
+### T7 — Challenge state outruns the decision
+
+**Risk:** a record claims a challenge is active or resolved without a defined process, represents a post-decision challenge while the decision is still pending, or marks a challenge resolved without recording the resolution.
+
+**Control:** active/completed challenge states require a defined process; pending decisions cannot claim post-decision challenge activity; resolved challenges require a resolution.
+
+### T8 — Milestones reduce to activity reports
 
 **Risk:** funded work reports effort without establishing whether a delivery condition was met.
 
 **Control:** delivery conditions identify observable outputs or outcomes and a verification method.
 
-### T8 — Transparency exposes protected material
+### T9 — Transparency exposes protected material
 
 **Risk:** public auditability reveals private, security-sensitive, or commercially sensitive material.
 
 **Control:** disclosure classification and selective audit access. Hash commitments remain descriptive unless their mechanism and anchor are specified.
 
-### T9 — Administrative cost exceeds accountability value
+### T10 — Administrative cost exceeds accountability value
 
 **Risk:** full records impose disproportionate process cost on low-value or routine grants.
 
 **Control:** program-defined materiality tiers and simplified records that preserve the Section 4 invariants.
 
-### T10 — Nominal conformance
+### T11 — Nominal conformance
 
-**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported hard-screen failures, unsupported or misattributed findings, inconsistent eligibility, contradictory recusal state, unresolved conflicts, incomplete recusal provenance, premature award state, unattributed committee action, or a declared AI commitment time after applications close.
+**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported hard-screen failures, unsupported or misattributed findings, inconsistent eligibility timing, contradictory recusal state, unresolved conflicts, incomplete recusal provenance, false committee-authority inference, premature award or challenge state, or a declared AI commitment time after applications close.
 
 **Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
 
@@ -133,7 +139,7 @@ The reviewed public artifacts do not identify a post-decision factual/procedural
 
 ## 6. Structural validity and record conformance
 
-JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator attribution, weight completeness, governing-policy source traceability, policy-change lineage, eligibility consistency, decision-state transitions, conflict closure, reciprocal recusal state, recusal provenance, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and declared AI evaluator-manifest timing.
+JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator and disagreement attribution, weight completeness, governing-policy source traceability, policy-change lineage, eligibility consistency and timing, decision-state transitions, conflict closure, reciprocal recusal state, recusal provenance, committee authority, challenge lifecycle, timestamp ordering, delivery conditions, and declared AI evaluator-manifest timing.
 
 A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a commitment existed at its declared time without an external anchor, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
 
@@ -143,7 +149,7 @@ A validator pass establishes internal consistency with the v0.1 profile. It does
 
 A decision record can be created after the decision it documents. v0.1 therefore permits `decision.decidedAt` to precede `timestamps.createdAt`.
 
-The temporal invariant is narrower: the governing policy must have been effective by the time of the decision, and `updatedAt` cannot precede `createdAt`.
+The temporal invariants are narrower: the governing policy must have been effective by the time of an adjudicated decision, the eligibility check supporting that adjudication cannot postdate it, and `updatedAt` cannot precede `createdAt`.
 
 This permits retrospective testing of historical decisions without misrepresenting record creation time.
 
