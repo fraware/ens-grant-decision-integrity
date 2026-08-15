@@ -45,6 +45,8 @@ Material changes during an active review MUST be versioned and disclosed. The re
 
 Each failed eligibility determination used to support an ineligible disposition MUST identify supporting evidence.
 
+An adjudicated disposition MUST NOT be recorded earlier than the eligibility check supporting that disposition.
+
 Each material finding used to support approval, rejection, ranking, suspension, or payment MUST either:
 
 1. identify the evidence on which it relies; or
@@ -56,17 +58,19 @@ Evidence references SHOULD be independently retrievable where privacy, security,
 
 A final disposition MUST identify the decision authority and decision time.
 
-Where a committee acts collectively, the record MUST identify participating members, recusals, quorum status, and the applicable voting or consensus rule.
+Where a committee acts collectively as the decision authority, the record MUST identify participating human members, recusals, quorum status, and the applicable voting or consensus rule. A committee participating only as an evaluator does not by itself make the committee the decision authority.
 
 ### 4.4 Conflict handling
 
 Material conflicts of interest MUST be disclosed and resolved according to the governing conflict policy.
 
-A recusal MUST identify the affected evaluator or decision-maker and the decision surface from which they were excluded. If a substitution or alternate reviewer is used, the record MUST identify that substitution.
+A recusal MUST identify the affected evaluator or decision-maker and the decision surface from which they were excluded. If a substitution or alternate reviewer is used, the record MUST identify that substitution. Where the recused subject is represented as an evaluator in the record, the conflict state and evaluator participation state MUST agree.
 
 ### 4.5 Preserved disagreement
 
 Material disagreement among evaluators SHOULD remain visible when it affects risk, eligibility, security, scope, budget, or delivery confidence.
+
+Any disagreement represented in the decision record MUST identify at least one participating, non-recused evaluator to whom that disagreement is attributable.
 
 An aggregate score MUST NOT be treated as evidence that disagreement did not exist.
 
@@ -81,6 +85,8 @@ When an AI system materially informs a recommendation, the final decision record
 Applicants MUST have a defined process to identify factual errors or procedural deviations in an adjudicated decision.
 
 The challenge process MAY be limited in scope and time. It need not create a right to relitigate substantive judgment, but it MUST distinguish factual correction from substantive disagreement.
+
+A challenge represented as open, submitted, resolved, or expired MUST correspond to a defined process. A pending decision record MUST NOT represent a post-decision challenge as active or completed. A challenge marked resolved MUST record its resolution.
 
 ### 4.8 Delivery conditions
 
@@ -163,6 +169,8 @@ The v0.1 decision record stores declared commitment metadata, including `committ
 ### 5.4 Departures from AI recommendations
 
 A human decision that materially departs from an AI recommendation SHOULD record the departure and its rationale.
+
+A pending decision record MUST NOT mark an AI recommendation as overridden; such a departure is an attribute of an institutional disposition, not of an in-progress review.
 
 A departure is not presumptively an error. The record exists to preserve attribution and reviewability.
 
