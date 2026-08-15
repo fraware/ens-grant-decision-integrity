@@ -64,6 +64,33 @@ def valid_disagreement(record):
     }]
 
 
+def failed_eligibility_without_evidence(record):
+    record["eligibility"]["rules"][0]["result"] = "fail"
+    record["eligibility"]["rules"][0]["evidenceIds"] = []
+
+
+def conflict_claims_recusal_without_evaluator_recusal(record):
+    record["evaluators"].append({
+        "evaluatorId": "human-reviewer",
+        "displayName": "Illustrative reviewer",
+        "kind": "human",
+        "role": "reviewer",
+        "participated": True,
+        "recused": False,
+        "recusalReason": None,
+    })
+    record["conflicts"] = [{
+        "conflictId": "C1",
+        "subjectId": "human-reviewer",
+        "description": "Illustrative conflict.",
+        "status": "recused",
+        "resolution": "Illustrative recusal record.",
+        "affectedDecisionSurfaces": ["application scoring"],
+        "substitutionUsed": False,
+        "substituteEvaluatorId": None,
+    }]
+
+
 def stale_ai_departure_rationale(record):
     record["decision"]["aiRecommendationOverridden"] = False
     record["decision"]["aiOverrideRationale"] = "Stale departure rationale."
@@ -99,6 +126,8 @@ print("PASS Marketplace rubric mapping preserves published M1–M5 weights")
 
 expect("disagreement requires participating, non-recused attribution", "EVAL004", disagreement_from_nonparticipant)
 expect_no_errors("valid disagreement attribution", valid_disagreement)
+expect("failed eligibility gate requires evidence", "EVID004", failed_eligibility_without_evidence)
+expect("conflict recusal must agree with evaluator state", "COI009", conflict_claims_recusal_without_evaluator_recusal)
 expect("AI rationale requires a recorded departure", "AI009", stale_ai_departure_rationale)
 expect("no-change policy record rejects stale change metadata", "POL006", stale_policy_change_metadata)
 expect_no_errors("canonical no-change policy metadata", canonical_no_change)
