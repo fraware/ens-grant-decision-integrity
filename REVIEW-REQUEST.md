@@ -1,56 +1,80 @@
-# Review Request — Draft v0.1
-
-## Intended audience
-
-SPP3 committee or accountability participants and Lighthouse Labs contributors working on grant evaluation.
+# External Review Protocol — Draft v0.1
 
 ## Objective
 
-Obtain one concrete external judgment on whether the Charter and decision-record schema would improve an actual ENS funding process without adding disproportionate administrative cost.
+Test whether the Charter and decision-record schema improve an actual ENS funding workflow without creating disproportionate process cost.
 
-The request is for critique, not endorsement or funding.
+The request is for adversarial critique. It is not a request for endorsement, funding, or a decision on any live applicant.
 
-## Public forum note
+## Review boundary
 
-I used the recent ENS Simocracy experiment to test a narrow governance question: if grant evaluation becomes more structured and increasingly AI-assisted, what minimum record should exist so the DAO can reconstruct how a material decision was made?
+The package implements the proposal's first $200 work item: a draft Grants Charter and machine-readable decision-record schema. It does not implement the later full evaluator-manifest protocol, commitment anchoring, selective-disclosure proofs, evaluator replay, or a deterministic confidential-to-public record projection.
 
-Five ENS Governance funding decisions allocated a cumulative $219 to the resulting proposal. Evaluators repeatedly identified the Grants Charter and commit–reveal treatment of AI-assisted screening as distinctive elements. I have implemented the proposal's first $200 budget item as a small v0.1 package: a draft Grant Decision Integrity Charter, a machine-readable decision-record schema, and a non-evaluative mapping of the current Marketplace RFP into that schema.
+The Marketplace worked example is fictional and non-evaluative. It maps the published process only. It does not identify, score, recommend, or reject any live applicant, and it does not propose changing the rules of the active Marketplace review.
 
-The Marketplace mapping is diagnostic. It maps the seven published hard eligibility gates, the published M1–M5 weights, and the public decision-process sources. It does not identify, score, or comment on any live applicant, and it does not propose changing the rules of the active review.
+## Validation state
 
-The question I would value feedback on is narrow: **which fields would improve the committee or accountability workflow, and which would add process cost without enough audit value?**
+The executable surface at commit `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` was independently reconstructed from GitHub-backed file contents, byte-matched to the corresponding Git blob identities, and passed the full validation contract:
 
-I am especially interested in three boundaries:
+```bash
+python scripts/validate.py
+python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
+python scripts/test_conformance.py
+python scripts/test_final_consistency.py
+```
 
-1. public normative criteria versus operational AI evaluator details;
-2. public decision records versus selectively disclosed audit material;
-3. milestone verification versus substantive re-evaluation of the grantee.
+The current branch differs from that executable commit only in review/validation documentation. GitHub-hosted Actions is separately blocked by the repository owner's account billing/spending-limit condition; GitHub reports that the job never started.
 
-If a simpler record provides the same guarantees, I would prefer the simpler design.
+## Primary review question
 
-## Direct review request
+**What would you delete, what is missing, and what would make this impractical in a real ENS funding round?**
 
-I built a small v0.1 artifact from the ENS Simocracy proposal on grant decision integrity: a draft Charter plus a JSON decision-record schema. I mapped the public Marketplace RFP process into one fictional, pending record so the design could be tested against an actual ENS workflow without touching live applicant evaluation.
+A simpler mechanism is preferable wherever it preserves the same guarantees.
 
-Would you be willing to give it an adversarial read from the committee or accountability side? The useful question is: **what would you delete, what is missing, and what would make this impractical in an actual grant round?**
+## Review lenses
 
-For materially influential AI evaluation, v0.1 records a minimum provenance envelope and requires declared commitment metadata whose `committedAt` value precedes the submission deadline. v0.1 deliberately does not claim that this self-contained record proves the commitment existed at that time: it does not yet define or verify an external timestamp or publication anchor. I would especially value feedback on whether that is the correct boundary for this first artifact, and what independently verifiable anchor the later commit–reveal protocol should require.
+### Committee workflow
 
-## Review checklist
+- Does the distinction between evaluator participation and final decision authority match the actual SPP3 workflow?
+- Are quorum, decision-rule, recusal, and substitution records sufficient without duplicating internal committee administration?
+- Is the five-surface governing-policy map sufficient to reconstruct which public rules governed a review?
+- Which required fields would create process cost without enough audit value?
 
-A reviewer can respond to any subset:
+### Grants and accountability
 
-- Is policy versioning already captured elsewhere in a way that makes the schema field redundant?
-- Is an evidence link for every failed eligibility gate and material supported finding realistic?
-- Should individual evaluator identity remain internal in some programs?
-- Is attributed disagreement useful, or does it create avoidable process cost?
-- Does the existing SPP3 process already provide a factual/procedural correction route that the public Marketplace artifacts do not identify?
-- Which milestone fields match the accountability body's actual needs?
-- Where should confidential applicant evidence live?
-- Does v0.1 stop at the correct boundary for AI commitment metadata, and what anchor should the later protocol require to establish pre-deadline existence independently?
-- Are the challenge lifecycle and committee-authority invariants too strict for any real ENS workflow?
-- What is the minimum decision record you would actually use?
+- Is evidence linkage for failed hard-screen rules operationally realistic?
+- Does the challenge model correctly distinguish factual/procedural correction from relitigation of substantive judgment?
+- Does the existing SPP3 process already provide a correction route that the reviewed public Marketplace artifacts do not identify?
+- Do delivery-condition fields support accountability without giving the verifier authority to re-evaluate grant merit?
+- Which information should remain internal or selectively disclosed?
+
+### AI-assisted evaluation
+
+- Is `materiallyInformedRecommendation` the right threshold for triggering evaluator-manifest provenance?
+- Which evaluator-manifest elements must be fixed before applications close, and which should remain undisclosed until later?
+- Does requiring a declared pre-deadline commitment address configuration drift without implying stronger assurance than the record provides?
+- What independently verifiable timestamp or publication anchor would be acceptable in a later commit–reveal protocol?
+- Could the manifest or conformance rules create a new gaming surface?
+
+## Requested response format
+
+A useful review can be very short. For each issue:
+
+1. **Surface** — Charter section, schema field, or conformance rule.
+2. **Failure mode or cost** — what goes wrong in a real workflow.
+3. **Evidence or scenario** — concrete example if available.
+4. **Smallest change** — delete, add, weaken, strengthen, or leave unchanged.
 
 ## Success condition
 
-The review succeeds if it produces at least one concrete schema deletion, addition, constraint, or simplification grounded in an actual ENS review workflow.
+The review succeeds if it produces at least one concrete deletion, addition, constraint, or confirmed non-change grounded in an actual ENS review or accountability workflow.
+
+## Suggested first reviewers
+
+The first review round should remain small and cover distinct failure surfaces:
+
+- **SPP3 committee/process:** test committee authority, quorum, recusals, decision procedure, and operational burden.
+- **Grant administration/accountability:** test eligibility, correction paths, evidence handling, and delivery verification.
+- **AI screening:** test evaluator-manifest boundaries, prompt-gaming assumptions, and commitment semantics.
+
+Broader public review should follow only after these distinct lenses have produced concrete feedback.
