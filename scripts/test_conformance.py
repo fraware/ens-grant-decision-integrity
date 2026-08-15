@@ -159,4 +159,37 @@ def recused_but_participating(r):
     })
 expect("COI002", recused_but_participating)
 
+
+def final_without_challenge_process(r):
+    r["eligibility"]["status"] = "eligible"
+    for rule in r["eligibility"]["rules"]:
+        rule["result"] = "pass"
+    r["evaluators"].append({
+        "evaluatorId": "human-final",
+        "displayName": "Illustrative decision-maker",
+        "kind": "human",
+        "role": "decision authority",
+        "participated": True,
+        "recused": False,
+        "recusalReason": None,
+    })
+    r["evaluation"]["materialFindings"] = [{
+        "findingId": "F1",
+        "statement": "Illustrative final finding.",
+        "classification": "judgment",
+        "evidenceIds": [],
+        "evaluatorIds": ["human-final"],
+        "materiality": "high",
+    }]
+    r["decision"].update({
+        "status": "approved",
+        "authority": "Illustrative decision-maker",
+        "authorityKind": "human",
+        "decidedAt": "2026-08-16T13:00:00Z",
+        "awardedAmount": 100000,
+        "currency": "USD",
+        "rationale": "Illustrative decision rationale.",
+    })
+expect("CHAL002", final_without_challenge_process)
+
 print("PASS adversarial conformance suite")
