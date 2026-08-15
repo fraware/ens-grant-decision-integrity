@@ -15,6 +15,7 @@ This package implements the first $200 work item in the Simocracy proposal **“
 - `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP.
 - `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
 - `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
+- `REVIEW-REQUEST.md` — external adversarial-review protocol.
 - `RELEASE-INTEGRITY.md` — release-identity and archive-integrity procedure.
 - `VALIDATION.md` — validation contract and execution evidence.
 - `LICENSE` — MIT license.
@@ -83,9 +84,11 @@ Use `--strict` when warnings should also fail validation.
 
 ## Validation status
 
-The executable surface at commit `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` was independently reconstructed from GitHub-backed file contents, byte-matched to the corresponding Git blob identities, and passed the full four-command contract above. The canonical Marketplace example emitted only the intentional `CHAL003` warning.
+The current executable surface was independently reconstructed from GitHub-backed file contents, byte-matched to the corresponding Git blob identities, and passed the full four-command contract above at commit `dc3a86a8ec7c555b89865a4e6b37dc45ef443879`. The canonical Marketplace example emitted only the intentional `CHAL003` warning.
 
-The current branch head differs from that executable commit only in validation/documentation metadata. `VALIDATION.md` contains the execution record. GitHub-hosted Actions remains separately blocked by the account payment/spending-limit condition; GitHub reports that the job did not start, so the hosted red check is not a test failure.
+All commits after `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` are documentation/review metadata only; the executable inputs to the validation contract are unchanged. `VALIDATION.md` contains the execution record.
+
+GitHub-hosted Actions remains separately blocked by the account payment/spending-limit condition; GitHub reports that the job did not start, so the hosted red check is not a test failure.
 
 ## Fixed-policy traceability
 
@@ -116,6 +119,8 @@ The worked Marketplace RFP example maps all seven published hard eligibility gat
 **Draft v0.1 — implementation artifact, not adopted ENS policy.**
 
 This package does not claim ratification by ENS DAO, endorsement by the SPP3 committee, or adoption by the ENS Foundation.
+
+Semantics are frozen. Further semantic changes require one of three triggers: a concrete executable defect, a concrete external-review counterexample, or authoritative ENS process evidence that contradicts a mapped assumption.
 
 ## Suggested review questions
 
