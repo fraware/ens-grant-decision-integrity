@@ -14,6 +14,7 @@ This package implements the first funded tranche of the Simocracy proposal **“
 - `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP.
 - `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
 - `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
+- `RELEASE-INTEGRITY.md` — release-tag and archive-digest integrity model.
 - `VALIDATION.md` — validation contract and expected checks.
 - `LICENSE` — MIT license.
 
@@ -79,12 +80,13 @@ This package does not claim ratification by ENS DAO, endorsement by the SPP3 com
 
 1. Which fields are genuinely necessary for a material decision record?
 2. Which fields should be public, selectively disclosed, or retained only for audit?
-3. What monetary or risk threshold should trigger the full record?
-4. Which evaluator-manifest elements should be committed before review and disclosed after decisions?
-5. Can the schema represent experimental grants without forcing false precision?
-6. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
-7. Which semantic conformance rules would create unacceptable operational friction in a real ENS review?
-8. Should ENS define an explicit factual/procedural correction mechanism before the Marketplace RFP decision is finalized?
+3. Should v0.1 define a formal public projection of a confidential canonical record, or leave redaction/projection semantics to the adopting program?
+4. What monetary or risk threshold should trigger the full record?
+5. Which evaluator-manifest elements should be committed before review and disclosed after decisions?
+6. Can the schema represent experimental grants without forcing false precision?
+7. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
+8. Which semantic conformance rules would create unacceptable operational friction in a real ENS review?
+9. Should ENS define an explicit factual/procedural correction mechanism before the Marketplace RFP decision is finalized?
 
 ## Sources
 
