@@ -22,6 +22,18 @@ Non-public evidence can remain confidential. If it has neither a retrievable URI
 
 Criterion weights must either be omitted consistently or be specified for every criterion and sum to `1.0`.
 
+Material-finding classification is epistemic. The allowed values are `supported-fact`, `judgment`, `uncertainty`, and `unverified-claim`. A risk statement can be recorded as a finding, but `risk` is not itself an epistemic classification.
+
+### Governing-policy traceability
+
+The governing policy must identify a public rules URI and a source map for five decision surfaces: mandate, eligibility, evaluation criteria, conflict rules, and decision procedure.
+
+`governingPolicy.publicRulesUri` must also appear in `governingPolicy.sources`; otherwise the record fails as `POL002`. Every URI in `surfaceSources` must resolve to the same declared source set; an undeclared decision-surface source fails as `POL003`.
+
+If `changeDuringReview=true`, schema validation requires a change summary, prior version, disclosure URI, and a statement of whether prior evaluations were rerun. The prior version must differ from the active version (`POL004`), and the change notice URI must appear in the declared source set (`POL005`).
+
+These checks establish declared traceability. They do not establish that the published rule was substantively legitimate or correctly interpreted.
+
 ### Eligibility integrity
 
 `eligibility.status=eligible` requires every rule to be `pass` or `not-applicable`. `eligibility.status=ineligible` requires at least one failed rule.
@@ -85,11 +97,11 @@ The record states whether a factual or procedural correction process is defined.
 
 Public, mixed, and confidential classifications must agree with `publicRecord` and redaction state.
 
-### Temporal and policy-change integrity
+### Temporal integrity
 
 `updatedAt` cannot precede `createdAt`. The governing policy cannot take effect after the decision it governed.
 
-If `governingPolicy.changeDuringReview=true`, the record must state the change summary and whether evaluations completed under the prior version were rerun. The policy version's `effectiveAt` records the effective time of the governing version.
+The active policy version's `effectiveAt` records the effective time of that version; in-round change traceability is checked separately under Governing-policy traceability.
 
 ### Delivery and payment integrity
 
@@ -102,9 +114,9 @@ For Tier C approved or suspended awards, the validator warns when a delivery con
 
 ## Current worked example
 
-The SPP3 Marketplace RFP example is intentionally pending. The reviewed public artifacts define eligibility, evaluation, committee quorum and voting, confidentiality, milestones, the August 5, 2026 23:59 UTC submission deadline, and award publication. They do not identify a post-decision process for correcting factual errors or procedural deviations.
+The SPP3 Marketplace RFP example is intentionally pending. The reviewed public artifacts define eligibility, evaluation, committee quorum and voting, confidentiality, milestones, the August 5, 2026 23:59 UTC submission deadline, and award publication. The example maps the public governing-policy URI and each of the five normative decision surfaces to those declared sources.
 
-The example therefore records `challenge.processDefined=false` and emits `CHAL003`. This maps the reviewed public process. It does not assert the absence of an internal or unpublished procedure and does not propose changing rules during the active review.
+The reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example therefore records `challenge.processDefined=false` and emits `CHAL003`. This maps the reviewed public process. It does not assert the absence of an internal or unpublished procedure and does not propose changing rules during the active review.
 
 ## Commands
 
