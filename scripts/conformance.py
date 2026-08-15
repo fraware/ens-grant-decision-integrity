@@ -68,6 +68,7 @@ def check_semantics(record: dict) -> list[Finding]:
     eligibility_rules = record.get("eligibility", {}).get("rules", [])
 
     evaluator_ids = _check_unique(findings, evaluators, "evaluatorId", "evaluators", "REF001")
+    evaluator_by_id = {evaluator.get("evaluatorId"): evaluator for evaluator in evaluators if isinstance(evaluator.get("evaluatorId"), str)}
     evidence_ids = _check_unique(findings, evidence, "evidenceId", "evidence", "REF002")
     finding_ids = _check_unique(findings, material_findings, "findingId", "evaluation.materialFindings", "REF003")
     _check_unique(findings, criteria, "criterionId", "evaluation.criteria", "REF004")
@@ -88,6 +89,10 @@ def check_semantics(record: dict) -> list[Finding]:
         for ref in item.get("evaluatorIds", []):
             if ref not in evaluator_ids:
                 findings.append(Finding("error", "REF103", f"evaluation.materialFindings[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
+                continue
+            evaluator = evaluator_by_id[ref]
+            if not evaluator.get("participated") or evaluator.get("recused"):
+                findings.append(Finding("error", "EVAL003", f"evaluation.materialFindings[{i}].evaluatorIds", f"finding is attributed to non-participating or recused evaluator {ref!r}"))
         if item.get("classification") == "supported-fact" and not item.get("evidenceIds"):
             findings.append(Finding("error", "EVID001", f"evaluation.materialFindings[{i}]", "supported-fact requires at least one evidence reference"))
 
@@ -111,13 +116,35 @@ def check_semantics(record: dict) -> list[Finding]:
                 findings.append(Finding("error", "REF106", f"deliveryConditions[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
 
     for i, evaluator in enumerate(evaluators):
+        evaluator_id = evaluator.get("evaluatorId")
+        if evaluator.get("kind") == "ai" and evaluator.get("materiallyInformedRecommendation") and not evaluator.get("participated"):
+            findings.append(Finding("error", "AI008", f"evaluators[{i}].materiallyInformedRecommendation", "an AI evaluator cannot materially inform the recommendation without participating"))
         if evaluator.get("recused") and evaluator.get("participated"):
             findings.append(Finding("error", "COI002", f"evaluators[{i}]", "recused evaluator cannot also be marked as participating"))
         if evaluator.get("recused"):
-            evaluator_id = evaluator.get("evaluatorId")
             linked = [conflict for conflict in conflicts if conflict.get("subjectId") == evaluator_id and conflict.get("status") in {"recused", "resolved"}]
             if not linked:
                 findings.append(Finding("error", "COI003", f"evaluators[{i}]", "recusal requires a linked conflict record in recused or resolved state"))
+                continue
+            for conflict in linked:
+                conflict_id = conflict.get("conflictId")
+                if not conflict.get("affectedDecisionSurfaces"):
+                    findings.append(Finding("error", "COI004", f"conflicts[{conflict_id!r}].affectedDecisionSurfaces", "recusal must identify the decision surface from which the evaluator was excluded"))
+                if not isinstance(conflict.get("substitutionUsed"), bool):
+                    findings.append(Finding("error", "COI005", f"conflicts[{conflict_id!r}].substitutionUsed", "recusal must state whether a substitute evaluator was used"))
+                    continue
+                substitute_id = conflict.get("substituteEvaluatorId")
+                if conflict.get("substitutionUsed"):
+                    if substitute_id not in evaluator_ids:
+                        findings.append(Finding("error", "REF107", f"conflicts[{conflict_id!r}].substituteEvaluatorId", f"unknown substitute evaluatorId {substitute_id!r}"))
+                    elif substitute_id == evaluator_id:
+                        findings.append(Finding("error", "COI006", f"conflicts[{conflict_id!r}].substituteEvaluatorId", "recused evaluator cannot substitute for itself"))
+                    else:
+                        substitute = evaluator_by_id[substitute_id]
+                        if not substitute.get("participated") or substitute.get("recused"):
+                            findings.append(Finding("error", "COI007", f"conflicts[{conflict_id!r}].substituteEvaluatorId", "substitute evaluator must participate and must not be recused"))
+                elif substitute_id is not None:
+                    findings.append(Finding("error", "COI008", f"conflicts[{conflict_id!r}].substituteEvaluatorId", "substituteEvaluatorId is inconsistent with substitutionUsed=false"))
 
     weights = [criterion.get("weight") for criterion in criteria]
     populated_weights = [weight for weight in weights if weight is not None]
@@ -162,6 +189,9 @@ def check_semantics(record: dict) -> list[Finding]:
             findings.append(Finding("error", "DEC010", "decision.rationale", "ineligible decision requires a rationale identifying the failed eligibility gate"))
         if decision.get("awardedAmount") not in (None, 0):
             findings.append(Finding("error", "DEC011", "decision.awardedAmount", "ineligible decision cannot carry a positive award"))
+
+    if status in {"pending", "deferred"} and decision.get("awardedAmount") not in (None, 0):
+        findings.append(Finding("error", "DEC013", "decision.awardedAmount", f"{status} record cannot carry a positive award"))
 
     if status in {"approved", "suspended"}:
         if not isinstance(decision.get("awardedAmount"), (int, float)) or decision.get("awardedAmount", 0) <= 0:
