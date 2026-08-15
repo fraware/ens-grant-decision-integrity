@@ -85,6 +85,7 @@ def finalize_human(record, include_committee_evaluator=False):
         "processDefined": True,
         "resolution": None,
     })
+    record["timestamps"]["updatedAt"] = "2026-08-16T13:00:00Z"
 
 
 def disagreement_from_nonparticipant(record):
@@ -175,6 +176,11 @@ def eligibility_check_after_adjudication(record):
     record["eligibility"]["checkedAt"] = "2026-08-17T13:00:00Z"
 
 
+def decision_after_last_update(record):
+    finalize_human(record)
+    record["timestamps"]["updatedAt"] = "2026-08-15T13:00:00Z"
+
+
 def stale_ai_departure_rationale(record):
     record["decision"]["aiRecommendationOverridden"] = False
     record["decision"]["aiOverrideRationale"] = "Stale departure rationale."
@@ -218,6 +224,7 @@ expect("active challenge requires a defined process", "CHAL004", active_challeng
 expect("pending decision cannot claim submitted challenge", "CHAL005", pending_with_submitted_challenge)
 expect("resolved challenge requires resolution", "CHAL006", resolved_challenge_without_resolution)
 expect("eligibility check cannot postdate adjudication", "TIME004", eligibility_check_after_adjudication)
+expect("decision cannot postdate record update", "TIME005", decision_after_last_update)
 expect("AI rationale requires a recorded departure", "AI009", stale_ai_departure_rationale)
 expect("no-change policy record rejects stale change metadata", "POL006", stale_policy_change_metadata)
 expect_no_errors("canonical no-change policy metadata", canonical_no_change)

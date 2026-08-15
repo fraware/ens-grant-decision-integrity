@@ -58,6 +58,7 @@ def make_approved(record):
     record["evaluation"]["materialFindings"] = [{"findingId":"F1","statement":"Illustrative final finding.","classification":"judgment","evidenceIds":[],"evaluatorIds":["human-final"],"materiality":"high"}]
     record["decision"].update({"status":"approved","authority":"Illustrative decision-maker","authorityKind":"human","decidedAt":"2026-08-16T13:00:00Z","awardedAmount":100000,"currency":"USD","rationale":"Illustrative decision rationale.","aiRecommendationOverridden":False,"aiOverrideRationale":None,"quorum":None,"decisionRule":None})
     record["challenge"].update({"status":"not-open","scope":"Factual and procedural correction only.","processDefined":True})
+    record["timestamps"]["updatedAt"] = "2026-08-16T13:00:00Z"
 
 
 def add_material_ai(record):
@@ -225,6 +226,7 @@ def valid_ineligible(record):
     record["evaluators"] = [{"evaluatorId":"human-gate","displayName":"Illustrative eligibility reviewer","kind":"human","role":"eligibility review","participated":True,"recused":False,"recusalReason":None}]
     record["decision"].update({"status":"ineligible","authority":"Illustrative eligibility reviewer","authorityKind":"human","decidedAt":"2026-08-16T13:00:00Z","rationale":"Returned without scoring after failing eligibility rule E1.","awardedAmount":None,"quorum":None,"decisionRule":None})
     record["challenge"].update({"scope":"Correction of factual or procedural eligibility errors.","processDefined":True})
+    record["timestamps"]["updatedAt"] = "2026-08-16T13:00:00Z"
 
 
 def pending_with_positive_award(record):

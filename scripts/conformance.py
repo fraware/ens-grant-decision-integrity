@@ -340,6 +340,8 @@ def check_semantics(record: dict) -> list[Finding]:
         findings.append(Finding("error", "TIME003", "governingPolicy.effectiveAt", "governing policy became effective after the recorded decision"))
     if status in ADJUDICATED_STATUSES and eligibility_checked and decided and eligibility_checked > decided:
         findings.append(Finding("error", "TIME004", "eligibility.checkedAt", "eligibility check cannot occur after the adjudicated decision it supports"))
+    if status in DECIDED_STATUSES and updated and decided and decided > updated:
+        findings.append(Finding("error", "TIME005", "timestamps.updatedAt", "record cannot contain a non-pending decision that occurs after its last-update timestamp"))
 
     if governing_policy.get("changeDuringReview") and not (governing_policy.get("changeSummary") or "").strip():
         findings.append(Finding("error", "POL001", "governingPolicy.changeSummary", "policy change during review requires a change summary"))
