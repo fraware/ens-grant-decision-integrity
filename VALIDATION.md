@@ -11,6 +11,8 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects a pending record with a decision timestamp.
 - PASS — adversarial suite rejects approval without delivery conditions.
 - PASS — adversarial suite rejects a `supported-fact` without evidence.
+- PASS — non-public evidence with neither a URI nor a content hash is surfaced as `EVID003` without forcing disclosure.
+- PASS — non-public evidence with a retrievable URI remains usable without `EVID003`.
 - PASS — adversarial suite rejects broken evidence references.
 - PASS — adversarial suite rejects an eligible summary with failed eligibility rules.
 - PASS — adversarial suite rejects a recused evaluator still marked as participating.
