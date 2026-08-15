@@ -91,6 +91,10 @@ def check_semantics(record: dict) -> list[Finding]:
         if item.get("classification") == "supported-fact" and not item.get("evidenceIds"):
             findings.append(Finding("error", "EVID001", f"evaluation.materialFindings[{i}]", "supported-fact requires at least one evidence reference"))
 
+    for i, item in enumerate(evidence):
+        if item.get("disclosure") != "public" and not item.get("uri") and not item.get("contentHash"):
+            findings.append(Finding("warning", "EVID003", f"evidence[{i}]", "non-public evidence has neither a retrievable URI nor a content hash"))
+
     for i, criterion in enumerate(criteria):
         for ref in criterion.get("findingIds", []):
             if ref not in finding_ids:
