@@ -34,7 +34,7 @@ The record model therefore distinguishes `decision.status=ineligible` from `deci
 
 The Marketplace RFP stores applications confidentially during review. The Charter distinguishes public decision records, selectively disclosed audit material, and confidential source material.
 
-v0.1 does not define a deterministic public projection of a confidential canonical record. That boundary is retained as an explicit review question.
+v0.1 does not define a deterministic public projection of a confidential canonical record. That boundary is retained as an explicit review question. Non-public evidence without a URI or content hash is surfaced as a warning, preserving privacy without treating an unlocatable evidence reference as fully auditable.
 
 ## 3. AI-assisted screening
 
@@ -53,15 +53,15 @@ v0.1 does not define how a manifest is serialized or hashed. It records the mani
 
 ### T1 — Criteria or evaluator drift during review
 
-**Risk:** criteria or AI evaluator configuration changes after applications are observed.
+**Risk:** criteria or AI evaluator configuration changes after applications are observed, or an in-round policy change is applied inconsistently to evaluations already completed.
 
-**Control:** versioned governing policy plus a versioned evaluator manifest committed strictly before the submission deadline when AI materially informs a recommendation.
+**Control:** versioned governing policy, effective time, change summary, explicit record of whether prior evaluations were rerun, and a versioned evaluator manifest committed strictly before the submission deadline when AI materially informs a recommendation.
 
-### T2 — Unsupported findings
+### T2 — Unsupported or misattributed findings
 
-**Risk:** a material finding cannot be traced to evidence or an explicit judgment classification.
+**Risk:** a material finding cannot be traced to evidence, an explicit judgment classification, or an evaluator who actually participated.
 
-**Control:** evidence-linked material findings and explicit classification of judgment, uncertainty, risk, or unverified claims.
+**Control:** evidence-linked material findings, explicit classification of judgment, uncertainty, risk, or unverified claims, and evaluator-attribution checks against participation and recusal state.
 
 ### T3 — Score aggregation obscures disagreement
 
@@ -69,41 +69,47 @@ v0.1 does not define how a manifest is serialized or hashed. It records the mani
 
 **Control:** disagreement is recorded independently of aggregate scores.
 
-### T4 — Conflict disclosure without resolution
+### T4 — Conflict disclosure without operational recusal
 
-**Risk:** a disclosed material relationship continues to affect an adjudicated decision.
+**Risk:** a disclosed material relationship continues to affect an adjudicated decision, or a nominal recusal does not identify the decision surface or replacement reviewer.
 
-**Control:** adjudicated records cannot leave a material conflict in disclosed or unresolved state; recusals remain attributable.
+**Control:** adjudicated records cannot leave a material conflict in disclosed or unresolved state. A recusal identifies the affected decision surface, explicitly states whether substitution occurred, and resolves any substitute identifier to an active, non-recused evaluator.
 
 ### T5 — AI recommendation acquires de facto authority
 
 **Risk:** reviewers treat an AI score or recommendation as binding despite a policy that reserves authority to humans.
 
-**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type. A recorded departure from an AI recommendation cannot exist unless a participating AI evaluator materially informed that recommendation.
+**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type. An AI evaluator cannot materially inform a recommendation unless marked as participating, and a recorded departure cannot exist unless a participating AI evaluator materially informed that recommendation.
 
-### T6 — Milestones reduce to activity reports
+### T6 — Award state outruns the decision
+
+**Risk:** a pending or deferred record carries a positive award and thereby encodes funding before an approving disposition.
+
+**Control:** positive `awardedAmount` is prohibited for pending, deferred, ineligible, and rejected states. Approval and suspension preserve the award amount; suspension also requires attributable findings and delivery conditions.
+
+### T7 — Milestones reduce to activity reports
 
 **Risk:** funded work reports effort without establishing whether a delivery condition was met.
 
 **Control:** delivery conditions identify observable outputs or outcomes and a verification method.
 
-### T7 — Transparency exposes protected material
+### T8 — Transparency exposes protected material
 
 **Risk:** public auditability reveals private, security-sensitive, or commercially sensitive material.
 
 **Control:** disclosure classification and selective audit access. Hash commitments remain descriptive unless their mechanism and anchor are specified.
 
-### T8 — Administrative cost exceeds accountability value
+### T9 — Administrative cost exceeds accountability value
 
 **Risk:** full records impose disproportionate process cost on low-value or routine grants.
 
 **Control:** program-defined materiality tiers and simplified records that preserve the Section 4 invariants.
 
-### T9 — Nominal conformance
+### T10 — Nominal conformance
 
-**Risk:** a schema-valid record contains cross-field contradictions such as unsupported factual findings, dangling references, inconsistent eligibility, unresolved conflicts, unattributed committee action, or an AI manifest committed after applications close.
+**Risk:** a schema-valid record contains cross-field contradictions such as unsupported or misattributed findings, inconsistent eligibility, unresolved conflicts, incomplete recusal provenance, premature award state, unattributed committee action, or an AI manifest committed after applications close.
 
-**Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial cases in CI.
+**Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
 
 ## 5. Marketplace RFP worked example
 
@@ -125,7 +131,7 @@ The reviewed public artifacts do not identify a post-decision factual/procedural
 
 ## 6. Structural validity and record conformance
 
-JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, weight completeness, eligibility consistency, decision-state transitions, conflict closure, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and AI evaluator-manifest timing.
+JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator attribution, weight completeness, eligibility consistency, decision-state transitions, conflict closure, recusal provenance, committee attribution, correction-path declaration, policy-change treatment, timestamp ordering, delivery conditions, and AI evaluator-manifest timing.
 
 A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
 
