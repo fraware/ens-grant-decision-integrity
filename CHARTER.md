@@ -58,6 +58,8 @@ Evidence references SHOULD be independently retrievable where privacy, security,
 
 A final disposition MUST identify the decision authority and decision time.
 
+Any non-pending disposition represented in a record MUST occur at or before the record's last-update time. Retrospective documentation MAY be created after the disposition, but a record MUST NOT claim to contain a disposition that occurs after its own last recorded update.
+
 Where a committee acts collectively as the decision authority, the record MUST identify participating human members, recusals, quorum status, and the applicable voting or consensus rule. A committee participating only as an evaluator does not by itself make the committee the decision authority.
 
 ### 4.4 Conflict handling
