@@ -16,6 +16,7 @@ The repository validates both representation and institutional conformance.
 - PASS — adversarial suite rejects a recused evaluator still marked as participating.
 - PASS — adversarial suite rejects a finalized decision with an unresolved conflict.
 - PASS — adversarial suite rejects a final committee decision without participating human members.
+- PASS — adversarial suite rejects finalization without a defined factual/procedural correction path (`CHAL002`).
 - PASS — materially used automated evaluation without an evaluator manifest is surfaced.
 - PASS — Simocracy allocation arithmetic: `65 + 59 + 20 + 51 + 24 = 219`.
 - PASS — unilateral automated funding authority is prohibited by `CHARTER.md` and excluded from typed decision-authority values.
