@@ -32,8 +32,11 @@ decision_statuses = schema["properties"]["decision"]["properties"]["status"]["en
 evaluator_properties = schema["properties"]["evaluators"]["items"]["properties"]
 manifest_schema = schema["properties"]["evaluatorManifest"]
 decision_properties = schema["properties"]["decision"]["properties"]
-governing_policy_properties = schema["properties"]["governingPolicy"]["properties"]
+governing_policy_schema = schema["properties"]["governingPolicy"]
+governing_policy_properties = governing_policy_schema["properties"]
+policy_surface_schema = governing_policy_properties["surfaceSources"]
 conflict_properties = schema["properties"]["conflicts"]["items"]["properties"]
+finding_classifications = schema["properties"]["evaluation"]["properties"]["materialFindings"]["items"]["properties"]["classification"]["enum"]
 
 if "ai" in authority_values:
     raise SystemExit("FAIL AI must not be a decision-authority type")
@@ -47,13 +50,27 @@ if set(manifest_schema.get("required", [])) != {"manifestVersion", "commitment",
     raise SystemExit("FAIL evaluator manifest minimum provenance envelope changed")
 if "aiRecommendationOverridden" not in decision_properties or "humanOverride" in decision_properties:
     raise SystemExit("FAIL AI departure field is missing or stale generic override field remains")
-if "priorEvaluationsRerun" not in governing_policy_properties:
-    raise SystemExit("FAIL in-round policy changes cannot record whether prior evaluations were rerun")
+for required_policy_field in {"publicRulesUri", "surfaceSources", "previousVersion", "changeNoticeUri", "priorEvaluationsRerun"}:
+    if required_policy_field not in governing_policy_properties:
+        raise SystemExit(f"FAIL governing-policy traceability field missing: {required_policy_field}")
+expected_policy_surfaces = {"mandate", "eligibility", "evaluationCriteria", "conflictRules", "decisionProcedure"}
+if set(policy_surface_schema.get("required", [])) != expected_policy_surfaces:
+    raise SystemExit("FAIL governing-policy decision-surface map changed")
+if set(finding_classifications) != {"supported-fact", "judgment", "uncertainty", "unverified-claim"}:
+    raise SystemExit("FAIL material-finding classification must remain epistemic")
 for required_conflict_field in {"affectedDecisionSurfaces", "substitutionUsed", "substituteEvaluatorId"}:
     if required_conflict_field not in conflict_properties:
         raise SystemExit(f"FAIL recusal provenance field missing: {required_conflict_field}")
 if example["program"].get("submissionDeadline") != "2026-08-05T23:59:00Z":
     raise SystemExit("FAIL Marketplace example submission deadline changed from the published process")
+if example["governingPolicy"].get("publicRulesUri") not in example["governingPolicy"].get("sources", []):
+    raise SystemExit("FAIL Marketplace publicRulesUri is not declared as a governing source")
+if set(example["governingPolicy"].get("surfaceSources", {})) != expected_policy_surfaces:
+    raise SystemExit("FAIL Marketplace example does not map every governing decision surface")
+if "The governing policy for an active review MUST be publicly available" not in charter:
+    raise SystemExit("FAIL Charter no longer requires a public governing policy for active review")
+if "MUST identify the prior version and the disclosure record" not in charter:
+    raise SystemExit("FAIL Charter no longer requires traceability for in-round policy changes")
 if "An AI system MUST NOT exercise unilateral authority" not in charter:
     raise SystemExit("FAIL Charter no longer contains the AI unilateral-authority prohibition")
 if "MUST maintain a versioned evaluator manifest" not in charter:
@@ -78,9 +95,13 @@ print("PASS hard-screen ineligibility is distinct from merit rejection")
 print("PASS AI materiality is defined against the recommendation")
 print("PASS evaluator manifest has the minimum provenance envelope")
 print("PASS AI recommendation departure field is explicit")
-print("PASS in-round policy changes can record prior-evaluation rerun status")
+print("PASS governing policy exposes public rules and all five decision surfaces")
+print("PASS in-round policy changes can identify prior version, disclosure, and rerun status")
+print("PASS material-finding classification remains epistemic")
 print("PASS recusal decision-surface and substitution provenance are representable")
 print("PASS Marketplace submission deadline matches the published process")
+print("PASS Marketplace governing-policy surface mapping is complete")
+print("PASS Charter preserves fixed-policy traceability requirements")
 print("PASS Charter preserves the AI unilateral-authority prohibition")
 print("PASS Charter requires a versioned AI evaluator manifest")
 print("PASS Charter requires pre-deadline evaluator-manifest commitment")
