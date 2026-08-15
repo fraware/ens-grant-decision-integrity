@@ -77,7 +77,7 @@ if "MUST maintain a versioned evaluator manifest" not in charter:
     raise SystemExit("FAIL Charter no longer requires a versioned evaluator manifest for material AI use")
 if "MUST cryptographically commit to the evaluator manifest before applications close" not in charter:
     raise SystemExit("FAIL Charter no longer requires pre-deadline evaluator-manifest commitment")
-if "It does not establish that the evaluator used that manifest" not in charter:
+if "does not establish that the evaluator used that manifest" not in charter:
     raise SystemExit("FAIL Charter commitment limitation is missing")
 
 allocations = [decision["allocationUsd"] for decision in provenance["decisions"]]
