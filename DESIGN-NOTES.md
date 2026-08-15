@@ -2,9 +2,9 @@
 
 ## 1. Scope
 
-Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same funded mechanism. Marginal value declined after roughly the first $200 of cumulative funding.
+Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same proposal mechanism. Marginal value declined after roughly the first $200 of cumulative funding.
 
-v0.1 therefore implements the funded core. Commitment generation, selective disclosure proofs, and evaluator replay remain outside this release.
+v0.1 implements the proposal's $200 Charter and decision-record schema work item. Commitment generation, selective disclosure proofs, and evaluator replay remain outside this release.
 
 ## 2. Existing ENS practices preserved
 
