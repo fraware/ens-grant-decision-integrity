@@ -43,6 +43,8 @@ Material changes during an active review MUST be versioned and disclosed. The re
 
 ### 4.2 Evidence-linked material findings
 
+Each failed eligibility determination used to support an ineligible disposition MUST identify supporting evidence.
+
 Each material finding used to support approval, rejection, ranking, suspension, or payment MUST either:
 
 1. identify the evidence on which it relies; or
@@ -156,7 +158,7 @@ Exact operational evaluator details MAY remain undisclosed during the applicatio
 
 After the decision, the program SHOULD disclose the committed manifest or an appropriate audit representation, subject to applicant privacy, security, licensing, and legal constraints.
 
-A commitment can establish that a subsequently disclosed manifest matches the value committed at the recorded time, assuming the commitment and its time anchor are trustworthy. It does not establish that the evaluator used that manifest, that the review was complete, or that the resulting judgment was correct.
+The v0.1 decision record stores declared commitment metadata, including `committedAt`; it does not define or verify an external timestamp or publication anchor. A later commitment protocol must specify how the digest is bound to independently verifiable pre-deadline existence. Where such an anchor is trustworthy, a commitment can establish that a subsequently disclosed manifest matches the value committed at the anchored time. It still does not establish that the evaluator used that manifest, that the review was complete, or that the resulting judgment was correct.
 
 ### 5.4 Departures from AI recommendations
 
