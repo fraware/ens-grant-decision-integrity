@@ -289,6 +289,8 @@ def check_semantics(record: dict) -> list[Finding]:
                 findings.append(Finding("error", "AI005", "evaluatorManifest.commitment.committedAt", "evaluator manifest must be committed before applications close"))
 
     if decision.get("aiRecommendationOverridden"):
+        if status == "pending":
+            findings.append(Finding("error", "AI010", "decision.aiRecommendationOverridden", "pending decision cannot record an institutional departure from an AI recommendation"))
         if not material_ai:
             findings.append(Finding("error", "AI006", "decision.aiRecommendationOverridden", "AI recommendation cannot be marked as overridden when no AI evaluator materially informed the recommendation"))
         if not (decision.get("aiOverrideRationale") or "").strip():

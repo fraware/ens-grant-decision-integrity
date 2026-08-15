@@ -185,11 +185,19 @@ def late_ai_commitment(record):
 
 
 def override_without_material_ai(record):
+    make_approved(record)
     record["decision"]["aiRecommendationOverridden"] = True
     record["decision"]["aiOverrideRationale"] = "Illustrative departure rationale."
 
 
+def pending_ai_override(record):
+    valid_material_ai(record)
+    record["decision"]["aiRecommendationOverridden"] = True
+    record["decision"]["aiOverrideRationale"] = "Premature departure rationale."
+
+
 def valid_ai_override(record):
+    make_approved(record)
     valid_material_ai(record)
     record["decision"]["aiRecommendationOverridden"] = True
     record["decision"]["aiOverrideRationale"] = "Human reviewers disagreed with the AI recommendation for documented reasons."
@@ -309,8 +317,9 @@ expect("empty AI manifest cannot satisfy provenance", "SCHEMA", material_ai_with
 expect("material AI use requires a submission deadline", "AI004", material_ai_without_deadline)
 expect("AI manifest commitment must precede the deadline", "AI005", late_ai_commitment)
 expect("AI departure requires material AI use", "AI006", override_without_material_ai)
+expect("pending decision cannot record AI departure", "AI010", pending_ai_override)
 expect_no_errors("valid material AI provenance", valid_material_ai)
-expect_no_errors("valid AI recommendation departure", valid_ai_override)
+expect_no_errors("valid finalized AI recommendation departure", valid_ai_override)
 expect("adjudication requires a correction path", "CHAL002", final_without_challenge_process)
 expect("ineligible summary requires a failed rule", "ELIG002", ineligible_without_failed_rule)
 expect_no_errors("valid ineligible hard-screen record", valid_ineligible)
