@@ -79,6 +79,24 @@ def canonical_no_change(record):
     pass
 
 
+expected_eligibility_rule_ids = ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]
+actual_eligibility_rule_ids = [rule["ruleId"] for rule in BASE["eligibility"]["rules"]]
+if actual_eligibility_rule_ids != expected_eligibility_rule_ids:
+    raise AssertionError(
+        f"Marketplace eligibility mapping drifted: expected {expected_eligibility_rule_ids}, got {actual_eligibility_rule_ids}"
+    )
+if BASE["eligibility"]["rules"][-1]["description"] != "Application acknowledges the SPP3 Program Terms and Award Notice":
+    raise AssertionError("Marketplace eligibility mapping is missing the Program Terms/Award Notice acknowledgment gate")
+print("PASS Marketplace eligibility mapping preserves all seven published gates")
+
+expected_rubric_weights = {"M1": 0.25, "M2": 0.20, "M3": 0.35, "M4": 0.10, "M5": 0.10}
+actual_rubric_weights = {criterion["criterionId"]: criterion.get("weight") for criterion in BASE["evaluation"]["criteria"]}
+if actual_rubric_weights != expected_rubric_weights:
+    raise AssertionError(
+        f"Marketplace rubric mapping drifted: expected {expected_rubric_weights}, got {actual_rubric_weights}"
+    )
+print("PASS Marketplace rubric mapping preserves published M1–M5 weights")
+
 expect("disagreement requires participating, non-recused attribution", "EVAL004", disagreement_from_nonparticipant)
 expect_no_errors("valid disagreement attribution", valid_disagreement)
 expect("AI rationale requires a recorded departure", "AI009", stale_ai_departure_rationale)
