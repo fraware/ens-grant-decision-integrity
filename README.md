@@ -35,18 +35,25 @@ The semantic layer detects, among other cases:
 
 - a `supported-fact` without evidence;
 - dangling evidence, evaluator, or finding references;
+- a material finding attributed to a non-participating or recused evaluator;
+- non-public evidence with neither a URI nor a content hash;
 - partially specified criterion weights or weights that do not sum to `1.0`;
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
+- a pending or deferred record that claims a positive award;
 - an approval, rejection, or suspension without attributable material findings and rationale;
 - an approved or suspended award without a positive amount or delivery conditions;
 - a recused evaluator still marked as participating;
+- a recusal that omits the affected decision surface or substitution state;
+- a substitute evaluator reference that does not resolve to an active, non-recused evaluator;
 - an adjudicated decision with an unresolved material conflict;
 - a non-pending committee decision that omits participating human members, quorum, or decision rule;
+- an in-round policy change that does not state whether prior evaluations were rerun;
 - an adjudicated decision without a defined factual or procedural correction path;
 - material AI use without the minimum evaluator-manifest provenance envelope;
 - a missing submission deadline when AI materially informs a recommendation;
 - an evaluator manifest committed at or after the application deadline;
+- an AI evaluator claiming material influence without participation;
 - an AI-recommendation departure recorded without materially influential AI evaluation.
 
 The profile also represents an eligibility hard-screen separately from a merit rejection. This matches the Marketplace RFP's published rule that an ineligible application is returned without scoring.
