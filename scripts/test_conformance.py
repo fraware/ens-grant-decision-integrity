@@ -89,6 +89,11 @@ def supported_fact_without_evidence(record):
     record["evaluation"]["materialFindings"] = [{"findingId":"F1","statement":"Claim presented as fact.","classification":"supported-fact","evidenceIds":[],"evaluatorIds":["committee"],"materiality":"high"}]
 
 
+def invalid_risk_classification(record):
+    make_approved(record)
+    record["evaluation"]["materialFindings"][0]["classification"] = "risk"
+
+
 def finding_from_nonparticipant(record):
     record["evaluation"]["materialFindings"] = [{"findingId":"F1","statement":"Illustrative judgment.","classification":"judgment","evidenceIds":[],"evaluatorIds":["committee"],"materiality":"high"}]
 
@@ -242,19 +247,50 @@ def deferred_without_rationale(record):
     record["decision"].update({"status":"deferred","authority":"Illustrative decision-maker","authorityKind":"human","decidedAt":"2026-08-16T13:00:00Z","rationale":None,"quorum":None,"decisionRule":None})
 
 
+def undeclared_public_rules_uri(record):
+    record["governingPolicy"]["publicRulesUri"] = "https://example.invalid/undeclared-policy"
+
+
+def missing_surface_source(record):
+    record["governingPolicy"]["surfaceSources"].pop("conflictRules")
+
+
+def undeclared_surface_source(record):
+    record["governingPolicy"]["surfaceSources"]["evaluationCriteria"] = "https://example.invalid/undeclared-rubric"
+
+
 def policy_change_without_rerun_statement(record):
-    record["governingPolicy"]["changeDuringReview"] = True
-    record["governingPolicy"]["changeSummary"] = "Illustrative in-round policy correction."
+    record["governingPolicy"].update({
+        "changeDuringReview": True,
+        "changeSummary": "Illustrative in-round policy correction.",
+        "previousVersion": "public-artifacts-2026-07-19",
+        "changeNoticeUri": record["governingPolicy"]["publicRulesUri"],
+    })
+
+
+def self_referential_previous_version(record):
+    valid_policy_change(record)
+    record["governingPolicy"]["previousVersion"] = record["governingPolicy"]["version"]
+
+
+def undeclared_change_notice(record):
+    valid_policy_change(record)
+    record["governingPolicy"]["changeNoticeUri"] = "https://example.invalid/undeclared-change-notice"
 
 
 def valid_policy_change(record):
-    record["governingPolicy"]["changeDuringReview"] = True
-    record["governingPolicy"]["changeSummary"] = "Illustrative in-round policy correction."
-    record["governingPolicy"]["priorEvaluationsRerun"] = False
+    record["governingPolicy"].update({
+        "changeDuringReview": True,
+        "changeSummary": "Illustrative in-round policy correction.",
+        "priorEvaluationsRerun": False,
+        "previousVersion": "public-artifacts-2026-07-19",
+        "changeNoticeUri": record["governingPolicy"]["publicRulesUri"],
+    })
 
 
 expect("approval requires delivery conditions", "SCHEMA", approved_without_delivery)
 expect("supported fact requires evidence", "SCHEMA", supported_fact_without_evidence)
+expect("risk is not an epistemic finding classification", "SCHEMA", invalid_risk_classification)
 expect("finding cannot be attributed to a non-participant", "EVAL003", finding_from_nonparticipant)
 expect("non-public evidence without locator is surfaced", "EVID003", nonpublic_evidence_without_locator)
 expect_no_errors("non-public evidence with a URI remains usable", nonpublic_evidence_with_uri)
@@ -283,7 +319,12 @@ expect("deferred record cannot carry a positive award", "DEC013", deferred_with_
 expect_no_errors("retrospective finalized record", retrospective_final_record)
 expect("suspension requires attributable findings", "DEC008", suspended_without_findings)
 expect("deferral requires a rationale", "DEC012", deferred_without_rationale)
+expect("public governing-policy URI must be declared", "POL002", undeclared_public_rules_uri)
+expect("all five governing-policy surfaces are required", "SCHEMA", missing_surface_source)
+expect("decision-surface source must be declared", "POL003", undeclared_surface_source)
 expect("in-round policy change requires rerun statement", "SCHEMA", policy_change_without_rerun_statement)
+expect("previous policy version must differ from active version", "POL004", self_referential_previous_version)
+expect("policy change notice must be a declared source", "POL005", undeclared_change_notice)
 expect_no_errors("valid in-round policy change record", valid_policy_change)
 
 print("PASS adversarial conformance suite")
