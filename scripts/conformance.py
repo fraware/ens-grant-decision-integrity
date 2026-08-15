@@ -153,6 +153,20 @@ def check_semantics(record: dict) -> list[Finding]:
     elif populated_weights and abs(sum(populated_weights) - 1.0) > 1e-9:
         findings.append(Finding("error", "EVAL002", "evaluation.criteria", f"criterion weights sum to {sum(populated_weights)!r}, expected 1.0"))
 
+    governing_policy = record.get("governingPolicy", {})
+    policy_sources = set(governing_policy.get("sources", []))
+    public_rules_uri = governing_policy.get("publicRulesUri")
+    if public_rules_uri not in policy_sources:
+        findings.append(Finding("error", "POL002", "governingPolicy.publicRulesUri", "publicRulesUri must also appear in governingPolicy.sources"))
+    for surface, source_uri in governing_policy.get("surfaceSources", {}).items():
+        if source_uri not in policy_sources:
+            findings.append(Finding("error", "POL003", f"governingPolicy.surfaceSources.{surface}", "decision-surface source must also appear in governingPolicy.sources"))
+    if governing_policy.get("changeDuringReview"):
+        if governing_policy.get("previousVersion") == governing_policy.get("version"):
+            findings.append(Finding("error", "POL004", "governingPolicy.previousVersion", "previousVersion must differ from the active governing-policy version"))
+        if governing_policy.get("changeNoticeUri") not in policy_sources:
+            findings.append(Finding("error", "POL005", "governingPolicy.changeNoticeUri", "changeNoticeUri must also appear in governingPolicy.sources"))
+
     decision = record.get("decision", {})
     status = decision.get("status")
     decided_at = decision.get("decidedAt")
@@ -280,13 +294,12 @@ def check_semantics(record: dict) -> list[Finding]:
     created = _iso(record.get("timestamps", {}).get("createdAt"))
     updated = _iso(record.get("timestamps", {}).get("updatedAt"))
     decided = _iso(decided_at)
-    effective = _iso(record.get("governingPolicy", {}).get("effectiveAt"))
+    effective = _iso(governing_policy.get("effectiveAt"))
     if created and updated and updated < created:
         findings.append(Finding("error", "TIME001", "timestamps.updatedAt", "updatedAt precedes createdAt"))
     if effective and decided and effective > decided:
         findings.append(Finding("error", "TIME003", "governingPolicy.effectiveAt", "governing policy became effective after the recorded decision"))
 
-    governing_policy = record.get("governingPolicy", {})
     if governing_policy.get("changeDuringReview") and not (governing_policy.get("changeSummary") or "").strip():
         findings.append(Finding("error", "POL001", "governingPolicy.changeSummary", "policy change during review requires a change summary"))
 
