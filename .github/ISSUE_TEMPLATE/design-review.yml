@@ -1,0 +1,33 @@
+name: Design review
+about: Challenge a requirement, field, or trust assumption
+labels: ["design-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This project improves through adversarial review. Please identify a concrete failure mode, unnecessary requirement, missing invariant, or implementation burden.
+  - type: input
+    id: surface
+    attributes:
+      label: Decision surface
+      description: Which charter section, schema field, or example does this concern?
+      placeholder: e.g. CHARTER §5.3 or evaluation.materialFindings
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What fails, becomes ambiguous, or creates excess burden?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or scenario
+      description: Give a concrete workflow, counterexample, or source if available.
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      description: What is the smallest change that fixes the problem?
