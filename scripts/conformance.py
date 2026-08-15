@@ -78,9 +78,12 @@ def check_semantics(record: dict) -> list[Finding]:
     _check_unique(findings, eligibility_rules, "ruleId", "eligibility.rules", "REF008")
 
     for i, rule in enumerate(eligibility_rules):
-        for ref in rule.get("evidenceIds", []):
+        evidence_refs = rule.get("evidenceIds", [])
+        for ref in evidence_refs:
             if ref not in evidence_ids:
                 findings.append(Finding("error", "REF101", f"eligibility.rules[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
+        if rule.get("result") == "fail" and not evidence_refs:
+            findings.append(Finding("error", "EVID004", f"eligibility.rules[{i}].evidenceIds", "failed eligibility rule requires at least one evidence reference"))
 
     for i, item in enumerate(material_findings):
         for ref in item.get("evidenceIds", []):
@@ -118,6 +121,13 @@ def check_semantics(record: dict) -> list[Finding]:
         for ref in item.get("evidenceIds", []):
             if ref not in evidence_ids:
                 findings.append(Finding("error", "REF106", f"deliveryConditions[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
+
+    for i, conflict in enumerate(conflicts):
+        subject_id = conflict.get("subjectId")
+        if conflict.get("status") == "recused" and subject_id in evaluator_by_id:
+            subject = evaluator_by_id[subject_id]
+            if not subject.get("recused") or subject.get("participated"):
+                findings.append(Finding("error", "COI009", f"conflicts[{i}].status", f"conflict records evaluator {subject_id!r} as recused but evaluator state is inconsistent with recusal"))
 
     for i, evaluator in enumerate(evaluators):
         evaluator_id = evaluator.get("evaluatorId")
