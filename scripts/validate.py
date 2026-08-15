@@ -32,6 +32,8 @@ decision_statuses = schema["properties"]["decision"]["properties"]["status"]["en
 evaluator_properties = schema["properties"]["evaluators"]["items"]["properties"]
 manifest_schema = schema["properties"]["evaluatorManifest"]
 decision_properties = schema["properties"]["decision"]["properties"]
+governing_policy_properties = schema["properties"]["governingPolicy"]["properties"]
+conflict_properties = schema["properties"]["conflicts"]["items"]["properties"]
 
 if "ai" in authority_values:
     raise SystemExit("FAIL AI must not be a decision-authority type")
@@ -45,6 +47,11 @@ if set(manifest_schema.get("required", [])) != {"manifestVersion", "commitment",
     raise SystemExit("FAIL evaluator manifest minimum provenance envelope changed")
 if "aiRecommendationOverridden" not in decision_properties or "humanOverride" in decision_properties:
     raise SystemExit("FAIL AI departure field is missing or stale generic override field remains")
+if "priorEvaluationsRerun" not in governing_policy_properties:
+    raise SystemExit("FAIL in-round policy changes cannot record whether prior evaluations were rerun")
+for required_conflict_field in {"affectedDecisionSurfaces", "substitutionUsed", "substituteEvaluatorId"}:
+    if required_conflict_field not in conflict_properties:
+        raise SystemExit(f"FAIL recusal provenance field missing: {required_conflict_field}")
 if example["program"].get("submissionDeadline") != "2026-08-05T23:59:00Z":
     raise SystemExit("FAIL Marketplace example submission deadline changed from the published process")
 if "An AI system MUST NOT exercise unilateral authority" not in charter:
@@ -54,7 +61,7 @@ if "MUST maintain a versioned evaluator manifest" not in charter:
 if "MUST cryptographically commit to the evaluator manifest before applications close" not in charter:
     raise SystemExit("FAIL Charter no longer requires pre-deadline evaluator-manifest commitment")
 if "It does not establish that the evaluator used that manifest" not in charter:
-    raise SystemExit("FAIL Charter commit–reveal limitation is missing")
+    raise SystemExit("FAIL Charter commitment limitation is missing")
 
 allocations = [decision["allocationUsd"] for decision in provenance["decisions"]]
 recorded_total = provenance["confirmedCumulativeAllocationUsd"]
@@ -71,6 +78,8 @@ print("PASS hard-screen ineligibility is distinct from merit rejection")
 print("PASS AI materiality is defined against the recommendation")
 print("PASS evaluator manifest has the minimum provenance envelope")
 print("PASS AI recommendation departure field is explicit")
+print("PASS in-round policy changes can record prior-evaluation rerun status")
+print("PASS recusal decision-surface and substitution provenance are representable")
 print("PASS Marketplace submission deadline matches the published process")
 print("PASS Charter preserves the AI unilateral-authority prohibition")
 print("PASS Charter requires a versioned AI evaluator manifest")
