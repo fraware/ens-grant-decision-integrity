@@ -37,9 +37,9 @@ Every covered material decision MUST satisfy the following invariants.
 
 ### 4.1 Fixed governing policy
 
-The record MUST identify the exact version of the mandate, eligibility rules, evaluation criteria, conflict rules, and decision procedure governing the active review.
+The governing policy for an active review MUST be publicly available. The record MUST identify its exact version and the source governing each of the mandate, eligibility rules, evaluation criteria, conflict rules, and decision procedure.
 
-Material changes during an active review MUST be versioned and disclosed. A change affecting applicant treatment MUST state its effective time and whether prior evaluations were rerun.
+Material changes during an active review MUST be versioned and disclosed. The record MUST identify the prior version and the disclosure record. A change affecting applicant treatment MUST state its effective time and whether prior evaluations were rerun.
 
 ### 4.2 Evidence-linked material findings
 
