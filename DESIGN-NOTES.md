@@ -12,6 +12,8 @@ v0.1 implements the proposal's $200 Charter and decision-record schema work item
 
 SPP3 publishes eligibility rules, evaluation criteria, program terms, and committee process. The Marketplace RFP adds a marketplace-specific hard eligibility gate and weighted rubric.
 
+The record therefore identifies one public governing-policy URI and maps five normative decision surfaces—mandate, eligibility, evaluation criteria, conflict rules, and decision procedure—to declared source URIs. This permits reconstruction of which public artifact governed each surface without collapsing several documents into an invented single policy text.
+
 ### Committee attribution and voting
 
 The ratified SPP3 committee model defines committee roles, quorum, and the decision rule. Voting or ranking requires three of four Member seats to be active and participating. Decisions use a simple majority of participating Members; the Chair votes only as a tiebreaker.
@@ -55,13 +57,13 @@ v0.1 does not define how a manifest is serialized or hashed. It records the mani
 
 **Risk:** criteria or AI evaluator configuration changes after applications are observed, or an in-round policy change is applied inconsistently to evaluations already completed.
 
-**Control:** versioned governing policy, effective time, change summary, explicit record of whether prior evaluations were rerun, and a versioned evaluator manifest committed strictly before the submission deadline when AI materially informs a recommendation.
+**Control:** a public governing-policy URI, explicit source mapping for each normative decision surface, version and effective time, change summary, prior-version and change-notice traceability, explicit record of whether prior evaluations were rerun, and a versioned evaluator manifest committed strictly before the submission deadline when AI materially informs a recommendation.
 
 ### T2 — Unsupported or misattributed findings
 
-**Risk:** a material finding cannot be traced to evidence, an explicit judgment classification, or an evaluator who actually participated.
+**Risk:** a material finding cannot be traced to evidence, an explicit epistemic classification, or an evaluator who actually participated.
 
-**Control:** evidence-linked material findings, explicit classification of judgment, uncertainty, risk, or unverified claims, and evaluator-attribution checks against participation and recusal state.
+**Control:** evidence-linked material findings; explicit classification as `supported-fact`, `judgment`, `uncertainty`, or `unverified-claim`; and evaluator-attribution checks against participation and recusal state. Risk can be the subject of a finding without functioning as an epistemic classification.
 
 ### T3 — Score aggregation obscures disagreement
 
@@ -107,7 +109,7 @@ v0.1 does not define how a manifest is serialized or hashed. It records the mani
 
 ### T10 — Nominal conformance
 
-**Risk:** a schema-valid record contains cross-field contradictions such as unsupported or misattributed findings, inconsistent eligibility, unresolved conflicts, incomplete recusal provenance, premature award state, unattributed committee action, or an AI manifest committed after applications close.
+**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported or misattributed findings, inconsistent eligibility, unresolved conflicts, incomplete recusal provenance, premature award state, unattributed committee action, or an AI manifest committed after applications close.
 
 **Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
 
@@ -125,13 +127,13 @@ The RFP is a useful test case. It contains:
 - independently verifiable and on-chain traction requirements;
 - a defined award threshold.
 
-The example does not identify, score, recommend, or reject any real applicant. It maps the public process into a fictional pending record.
+The example does not identify, score, recommend, or reject any real applicant. It maps the public process into a fictional pending record, including the public rules URI and the source governing each of the five normative decision surfaces.
 
 The reviewed public artifacts do not identify a post-decision factual/procedural correction process. The example records that documentation gap as `challenge.processDefined=false`. This does not assert that no internal or unpublished process exists, and it does not propose a rule change during the active review.
 
 ## 6. Structural validity and record conformance
 
-JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator attribution, weight completeness, eligibility consistency, decision-state transitions, conflict closure, recusal provenance, committee attribution, correction-path declaration, policy-change treatment, timestamp ordering, delivery conditions, and AI evaluator-manifest timing.
+JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator attribution, weight completeness, governing-policy source traceability, policy-change lineage, eligibility consistency, decision-state transitions, conflict closure, recusal provenance, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and AI evaluator-manifest timing.
 
 A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
 
