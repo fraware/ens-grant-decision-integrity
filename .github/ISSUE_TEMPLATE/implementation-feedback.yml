@@ -1,0 +1,22 @@
+name: Implementation feedback
+about: Report friction from using the charter or decision schema in a real review process
+labels: ["implementation"]
+body:
+  - type: input
+    id: workflow
+    attributes:
+      label: Workflow
+      placeholder: e.g. grant committee review, milestone verification, appeal handling
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: What was difficult or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: minimum
+    attributes:
+      label: Minimum viable correction
+      description: What change would make the artifact practical for this workflow?
