@@ -2,7 +2,7 @@
 
 A compact governance artifact for making material ENS grant decisions inspectable with human decision authority preserved.
 
-This package implements the first funded tranche of the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to the proposal. The first proposed tranche was $200 for a draft Grants Charter and a machine-readable decision-record schema.
+This package implements the first $200 work item in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed”**: a draft Grants Charter and a machine-readable decision-record schema. Five ENS Governance funding decisions allocated a cumulative **$219** to the proposal.
 
 ## Included
 
@@ -38,12 +38,13 @@ The semantic layer detects, among other cases:
 - partially specified criterion weights or weights that do not sum to `1.0`;
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
-- a merit decision without attributable material findings and rationale;
+- an approval, rejection, or suspension without attributable material findings and rationale;
 - an approved award without a positive amount or delivery conditions;
 - a recused evaluator still marked as participating;
 - an adjudicated decision with an unresolved material conflict;
 - a non-pending committee decision that omits participating human members, quorum, or decision rule;
 - an adjudicated decision without a defined factual or procedural correction path;
+- an AI evaluator manifest that omits its minimum provenance fields;
 - inconsistent evaluator-manifest commitment/reveal states.
 
 The profile also represents an eligibility hard-screen separately from a merit rejection. This matches the Marketplace RFP's published rule that an ineligible application is returned without scoring.
