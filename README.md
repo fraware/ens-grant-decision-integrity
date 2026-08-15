@@ -39,13 +39,15 @@ The semantic layer detects, among other cases:
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
 - an approval, rejection, or suspension without attributable material findings and rationale;
-- an approved award without a positive amount or delivery conditions;
+- an approved or suspended award without a positive amount or delivery conditions;
 - a recused evaluator still marked as participating;
 - an adjudicated decision with an unresolved material conflict;
 - a non-pending committee decision that omits participating human members, quorum, or decision rule;
 - an adjudicated decision without a defined factual or procedural correction path;
-- an AI evaluator manifest that omits its minimum provenance fields;
-- inconsistent evaluator-manifest commitment/reveal states.
+- material AI use without the minimum evaluator-manifest provenance envelope;
+- a missing submission deadline when AI materially informs a recommendation;
+- an evaluator manifest committed at or after the application deadline;
+- an AI-recommendation departure recorded without materially influential AI evaluation.
 
 The profile also represents an eligibility hard-screen separately from a merit rejection. This matches the Marketplace RFP's published rule that an ineligible application is returned without scoring.
 
@@ -59,6 +61,12 @@ python scripts/test_conformance.py
 ```
 
 Use `--strict` when warnings should also fail validation.
+
+## AI provenance boundary
+
+When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and a cryptographic commitment recorded strictly before the submission deadline. The record captures the minimum provenance envelope: manifest version, model identity, human-review policy, commitment metadata, and reveal state.
+
+v0.1 does **not** define manifest serialization, commitment generation, proof verification, selective-disclosure proofs, or evaluator replay. A conforming record therefore establishes declared timing and cross-field consistency; it does not prove that a committed evaluator configuration actually ran or that its judgment was correct.
 
 ## Current ENS fit
 
@@ -84,7 +92,7 @@ This package does not claim ratification by ENS DAO, endorsement by the SPP3 com
 2. Which fields should be public, selectively disclosed, or retained only for audit?
 3. Should v0.1 define a formal public projection of a confidential canonical record, or leave projection semantics to the adopting program?
 4. What value or risk threshold should trigger the full record?
-5. Which AI evaluator-manifest elements should be committed prior to review and disclosed after decisions?
+5. Is the minimum AI provenance envelope sufficient to make the pre-deadline commitment rule auditable without importing the later full evaluator-manifest protocol?
 6. Can the schema represent experimental grants without forcing false precision?
 7. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
 8. Which conformance rules would create disproportionate operational cost in an actual ENS review?
