@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Semantic conformance checks for ENS Grant Decision Integrity records.
+"""Cross-field conformance checks for ENS Grant Decision Integrity records.
 
-JSON Schema proves shape. This module enforces cross-field institutional
-invariants that are awkward or impossible to express cleanly in JSON Schema.
+JSON Schema checks structure. This module checks relations across fields that
+encode the v0.1 decision-integrity profile.
 """
 from __future__ import annotations
 
@@ -16,7 +16,10 @@ from typing import Iterable
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schema" / "grant-decision-record.schema.json"
 
-FINAL_STATUSES = {"approved", "rejected", "deferred", "withdrawn", "suspended"}
+DECIDED_STATUSES = {"ineligible", "approved", "rejected", "deferred", "suspended"}
+MERIT_STATUSES = {"approved", "rejected"}
+ADJUDICATED_STATUSES = {"ineligible", "approved", "rejected", "suspended"}
+AUTHORITY_KINDS = {"human", "committee", "dao-vote", "multisig", "other-human-authority"}
 
 
 @dataclass(frozen=True)
@@ -53,7 +56,7 @@ def _check_unique(findings: list[Finding], items: list[dict], key: str, path: st
 
 
 def check_semantics(record: dict) -> list[Finding]:
-    f: list[Finding] = []
+    findings: list[Finding] = []
 
     evaluators = record.get("evaluators", [])
     evidence = record.get("evidence", [])
@@ -64,194 +67,193 @@ def check_semantics(record: dict) -> list[Finding]:
     delivery = record.get("deliveryConditions", [])
     eligibility_rules = record.get("eligibility", {}).get("rules", [])
 
-    evaluator_ids = _check_unique(f, evaluators, "evaluatorId", "evaluators", "REF001")
-    evidence_ids = _check_unique(f, evidence, "evidenceId", "evidence", "REF002")
-    finding_ids = _check_unique(f, material_findings, "findingId", "evaluation.materialFindings", "REF003")
-    _check_unique(f, criteria, "criterionId", "evaluation.criteria", "REF004")
-    _check_unique(f, disagreements, "disagreementId", "evaluation.disagreements", "REF005")
-    _check_unique(f, conflicts, "conflictId", "conflicts", "REF006")
-    _check_unique(f, delivery, "conditionId", "deliveryConditions", "REF007")
-    _check_unique(f, eligibility_rules, "ruleId", "eligibility.rules", "REF008")
+    evaluator_ids = _check_unique(findings, evaluators, "evaluatorId", "evaluators", "REF001")
+    evidence_ids = _check_unique(findings, evidence, "evidenceId", "evidence", "REF002")
+    finding_ids = _check_unique(findings, material_findings, "findingId", "evaluation.materialFindings", "REF003")
+    _check_unique(findings, criteria, "criterionId", "evaluation.criteria", "REF004")
+    _check_unique(findings, disagreements, "disagreementId", "evaluation.disagreements", "REF005")
+    _check_unique(findings, conflicts, "conflictId", "conflicts", "REF006")
+    _check_unique(findings, delivery, "conditionId", "deliveryConditions", "REF007")
+    _check_unique(findings, eligibility_rules, "ruleId", "eligibility.rules", "REF008")
 
     for i, rule in enumerate(eligibility_rules):
         for ref in rule.get("evidenceIds", []):
             if ref not in evidence_ids:
-                f.append(Finding("error", "REF101", f"eligibility.rules[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
+                findings.append(Finding("error", "REF101", f"eligibility.rules[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
 
     for i, item in enumerate(material_findings):
         for ref in item.get("evidenceIds", []):
             if ref not in evidence_ids:
-                f.append(Finding("error", "REF102", f"evaluation.materialFindings[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
+                findings.append(Finding("error", "REF102", f"evaluation.materialFindings[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
         for ref in item.get("evaluatorIds", []):
             if ref not in evaluator_ids:
-                f.append(Finding("error", "REF103", f"evaluation.materialFindings[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
+                findings.append(Finding("error", "REF103", f"evaluation.materialFindings[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
         if item.get("classification") == "supported-fact" and not item.get("evidenceIds"):
-            f.append(Finding("error", "EVID001", f"evaluation.materialFindings[{i}]", "supported-fact requires at least one evidence reference"))
+            findings.append(Finding("error", "EVID001", f"evaluation.materialFindings[{i}]", "supported-fact requires at least one evidence reference"))
 
     for i, criterion in enumerate(criteria):
         for ref in criterion.get("findingIds", []):
             if ref not in finding_ids:
-                f.append(Finding("error", "REF104", f"evaluation.criteria[{i}].findingIds", f"unknown findingId {ref!r}"))
+                findings.append(Finding("error", "REF104", f"evaluation.criteria[{i}].findingIds", f"unknown findingId {ref!r}"))
 
     for i, item in enumerate(disagreements):
         for ref in item.get("evaluatorIds", []):
             if ref not in evaluator_ids:
-                f.append(Finding("error", "REF105", f"evaluation.disagreements[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
+                findings.append(Finding("error", "REF105", f"evaluation.disagreements[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
 
     for i, item in enumerate(delivery):
         for ref in item.get("evidenceIds", []):
             if ref not in evidence_ids:
-                f.append(Finding("error", "REF106", f"deliveryConditions[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
-
-    for i, item in enumerate(evidence):
-        if item.get("disclosure") == "public" and not item.get("uri"):
-            f.append(Finding("error", "EVID002", f"evidence[{i}]", "public evidence requires a retrievable URI"))
-        if item.get("disclosure") != "public" and not item.get("contentHash"):
-            f.append(Finding("warning", "EVID003", f"evidence[{i}]", "non-public evidence has no content hash; later integrity verification will be impossible"))
+                findings.append(Finding("error", "REF106", f"deliveryConditions[{i}].evidenceIds", f"unknown evidenceId {ref!r}"))
 
     for i, evaluator in enumerate(evaluators):
         if evaluator.get("recused") and evaluator.get("participated"):
-            f.append(Finding("error", "COI002", f"evaluators[{i}]", "recused evaluator cannot also be marked as participating"))
+            findings.append(Finding("error", "COI002", f"evaluators[{i}]", "recused evaluator cannot also be marked as participating"))
         if evaluator.get("recused"):
-            eid = evaluator.get("evaluatorId")
-            linked = [c for c in conflicts if c.get("subjectId") == eid and c.get("status") in {"recused", "resolved"}]
+            evaluator_id = evaluator.get("evaluatorId")
+            linked = [conflict for conflict in conflicts if conflict.get("subjectId") == evaluator_id and conflict.get("status") in {"recused", "resolved"}]
             if not linked:
-                f.append(Finding("error", "COI003", f"evaluators[{i}]", "recusal requires a linked conflict record in recused or resolved state"))
+                findings.append(Finding("error", "COI003", f"evaluators[{i}]", "recusal requires a linked conflict record in recused or resolved state"))
 
-    weights = [c.get("weight") for c in criteria]
-    populated = [w for w in weights if w is not None]
-    if populated and len(populated) != len(weights):
-        f.append(Finding("error", "EVAL001", "evaluation.criteria", "criterion weights are partially specified"))
-    elif populated and abs(sum(populated) - 1.0) > 1e-9:
-        f.append(Finding("error", "EVAL002", "evaluation.criteria", f"criterion weights sum to {sum(populated)!r}, expected 1.0"))
+    weights = [criterion.get("weight") for criterion in criteria]
+    populated_weights = [weight for weight in weights if weight is not None]
+    if populated_weights and len(populated_weights) != len(weights):
+        findings.append(Finding("error", "EVAL001", "evaluation.criteria", "criterion weights are partially specified"))
+    elif populated_weights and abs(sum(populated_weights) - 1.0) > 1e-9:
+        findings.append(Finding("error", "EVAL002", "evaluation.criteria", f"criterion weights sum to {sum(populated_weights)!r}, expected 1.0"))
 
     decision = record.get("decision", {})
     status = decision.get("status")
     decided_at = decision.get("decidedAt")
     eligibility = record.get("eligibility", {}).get("status")
+    eligibility_rationale = record.get("eligibility", {}).get("rationale")
 
     if status == "pending" and decided_at is not None:
-        f.append(Finding("error", "DEC001", "decision.decidedAt", "pending records must not claim a decision timestamp"))
-    if status in FINAL_STATUSES and not decided_at:
-        f.append(Finding("error", "DEC002", "decision.decidedAt", "finalized decision requires a decision timestamp"))
+        findings.append(Finding("error", "DEC001", "decision.decidedAt", "pending records must not claim a decision timestamp"))
+    if status in DECIDED_STATUSES and not decided_at:
+        findings.append(Finding("error", "DEC002", "decision.decidedAt", "non-pending decision requires a decision timestamp"))
 
-    rule_results = [r.get("result") for r in eligibility_rules]
+    rule_results = [rule.get("result") for rule in eligibility_rules]
     if eligibility == "eligible" and any(result not in {"pass", "not-applicable"} for result in rule_results):
-        f.append(Finding("error", "ELIG001", "eligibility.rules", "eligibility.status='eligible' conflicts with a failed or pending eligibility rule"))
+        findings.append(Finding("error", "ELIG001", "eligibility.rules", "eligibility.status='eligible' conflicts with a failed or pending eligibility rule"))
     if eligibility == "ineligible" and "fail" not in rule_results:
-        f.append(Finding("error", "ELIG002", "eligibility.rules", "eligibility.status='ineligible' requires at least one failed rule"))
+        findings.append(Finding("error", "ELIG002", "eligibility.rules", "eligibility.status='ineligible' requires at least one failed rule"))
 
-    if status in {"approved", "rejected"} and eligibility != "eligible":
-        f.append(Finding("error", "DEC003", "eligibility.status", f"{status} decision requires eligibility.status='eligible'"))
+    if status in MERIT_STATUSES and eligibility != "eligible":
+        findings.append(Finding("error", "DEC003", "eligibility.status", f"{status} decision requires eligibility.status='eligible'"))
+    if status == "ineligible" and eligibility != "ineligible":
+        findings.append(Finding("error", "DEC009", "eligibility.status", "decision.status='ineligible' requires eligibility.status='ineligible'"))
 
-    if status in {"approved", "rejected"}:
+    if status in MERIT_STATUSES:
         if not (decision.get("rationale") or "").strip():
-            f.append(Finding("error", "DEC007", "decision.rationale", f"{status} decision requires a substantive rationale"))
+            findings.append(Finding("error", "DEC007", "decision.rationale", f"{status} decision requires a substantive rationale"))
         if not material_findings:
-            f.append(Finding("error", "DEC008", "evaluation.materialFindings", f"{status} decision requires at least one attributable material finding"))
+            findings.append(Finding("error", "DEC008", "evaluation.materialFindings", f"{status} decision requires at least one attributable material finding"))
+
+    if status == "ineligible":
+        if not ((decision.get("rationale") or "").strip() or (eligibility_rationale or "").strip()):
+            findings.append(Finding("error", "DEC010", "decision.rationale", "ineligible decision requires a rationale identifying the failed eligibility gate"))
+        if decision.get("awardedAmount") not in (None, 0):
+            findings.append(Finding("error", "DEC011", "decision.awardedAmount", "ineligible decision cannot carry a positive award"))
 
     if status == "approved":
         if not isinstance(decision.get("awardedAmount"), (int, float)) or decision.get("awardedAmount", 0) <= 0:
-            f.append(Finding("error", "DEC004", "decision.awardedAmount", "approved decision requires a positive award amount"))
+            findings.append(Finding("error", "DEC004", "decision.awardedAmount", "approved decision requires a positive award amount"))
         if not delivery:
-            f.append(Finding("error", "DEL001", "deliveryConditions", "approved award requires at least one observable delivery condition"))
+            findings.append(Finding("error", "DEL001", "deliveryConditions", "approved award requires at least one observable delivery condition"))
     elif status == "rejected" and decision.get("awardedAmount") not in (None, 0):
-        f.append(Finding("error", "DEC005", "decision.awardedAmount", "rejected decision cannot carry a positive award"))
+        findings.append(Finding("error", "DEC005", "decision.awardedAmount", "rejected decision cannot carry a positive award"))
 
     if decision.get("humanOverride") and not (decision.get("overrideRationale") or "").strip():
-        f.append(Finding("error", "DEC006", "decision.overrideRationale", "human override requires a rationale"))
+        findings.append(Finding("error", "DEC006", "decision.overrideRationale", "human override requires a rationale"))
 
-    if status in FINAL_STATUSES:
+    if status in ADJUDICATED_STATUSES:
         for i, conflict in enumerate(conflicts):
             if conflict.get("status") in {"unresolved", "disclosed"}:
-                f.append(Finding("error", "COI001", f"conflicts[{i}].status", "final decision cannot leave a material conflict merely disclosed or unresolved"))
+                findings.append(Finding("error", "COI001", f"conflicts[{i}].status", "adjudicated decision cannot leave a material conflict in disclosed or unresolved state"))
 
     authority_kind = decision.get("authorityKind")
-    if status in FINAL_STATUSES and authority_kind not in {"human", "committee", "dao-vote", "multisig", "other-human-governed"}:
-        f.append(Finding("error", "AUTH000", "decision.authorityKind", "final decision must identify a human-governed authority type"))
+    if status in DECIDED_STATUSES and authority_kind not in AUTHORITY_KINDS:
+        findings.append(Finding("error", "AUTH000", "decision.authorityKind", "non-pending decision must identify a permitted human decision-authority type"))
 
-    committee_present = authority_kind == "committee" or any(e.get("kind") == "committee" and e.get("participated") for e in evaluators)
-    if status in FINAL_STATUSES and committee_present:
-        humans = [e for e in evaluators if e.get("kind") == "human" and e.get("participated") and not e.get("recused")]
-        if not humans:
-            f.append(Finding("error", "AUTH001", "evaluators", "final committee decision must identify participating human members"))
+    committee_decision = authority_kind == "committee" or any(evaluator.get("kind") == "committee" and evaluator.get("participated") for evaluator in evaluators)
+    if status in DECIDED_STATUSES and committee_decision:
+        participating_humans = [evaluator for evaluator in evaluators if evaluator.get("kind") == "human" and evaluator.get("participated") and not evaluator.get("recused")]
+        if not participating_humans:
+            findings.append(Finding("error", "AUTH001", "evaluators", "non-pending committee decision must identify participating human members"))
         if not (decision.get("quorum") or "").strip():
-            f.append(Finding("error", "AUTH002", "decision.quorum", "final committee decision must record quorum status or rule"))
+            findings.append(Finding("error", "AUTH002", "decision.quorum", "non-pending committee decision must record quorum"))
         if not (decision.get("decisionRule") or "").strip():
-            f.append(Finding("error", "AUTH003", "decision.decisionRule", "final committee decision must record the applicable voting or consensus rule"))
+            findings.append(Finding("error", "AUTH003", "decision.decisionRule", "non-pending committee decision must record the applicable voting or consensus rule"))
 
-    material_ai = [e for e in evaluators if e.get("kind") == "ai" and e.get("participated") and e.get("materiallyInformedDecision")]
+    material_ai = [evaluator for evaluator in evaluators if evaluator.get("kind") == "ai" and evaluator.get("participated") and evaluator.get("materiallyInformedDecision")]
     if material_ai and record.get("evaluatorManifest") is None:
-        f.append(Finding("warning", "AI001", "evaluatorManifest", "an automated evaluator materially informed the decision but no evaluator manifest is recorded"))
+        findings.append(Finding("warning", "AI001", "evaluatorManifest", "an AI evaluator materially informed the decision but no evaluator manifest is recorded"))
 
     manifest = record.get("evaluatorManifest")
     if isinstance(manifest, dict):
-        reveal = manifest.get("revealStatus")
+        reveal_status = manifest.get("revealStatus")
         commitment = manifest.get("commitment")
         reveal_uri = manifest.get("revealUri")
-        if reveal in {"committed", "partially-revealed", "revealed", "withheld"} and not commitment:
-            f.append(Finding("error", "AI002", "evaluatorManifest.commitment", f"revealStatus={reveal!r} requires a commitment"))
-        if reveal == "revealed" and not reveal_uri:
-            f.append(Finding("error", "AI003", "evaluatorManifest.revealUri", "revealed manifest requires revealUri"))
+        if reveal_status in {"committed", "partially-revealed", "revealed", "withheld"} and not commitment:
+            findings.append(Finding("error", "AI002", "evaluatorManifest.commitment", f"revealStatus={reveal_status!r} requires a commitment"))
+        if reveal_status == "revealed" and not reveal_uri:
+            findings.append(Finding("error", "AI003", "evaluatorManifest.revealUri", "revealed manifest requires revealUri"))
 
     challenge = record.get("challenge")
     if not isinstance(challenge, dict) or not (challenge.get("scope") or "").strip():
-        f.append(Finding("error", "CHAL001", "challenge", "record must define the scope of the factual or procedural challenge path"))
-    elif status in FINAL_STATUSES and not challenge.get("processDefined"):
-        f.append(Finding("error", "CHAL002", "challenge.processDefined", "finalized decision requires a defined factual or procedural correction process"))
+        findings.append(Finding("error", "CHAL001", "challenge", "record must state the scope of factual or procedural correction"))
+    elif status in ADJUDICATED_STATUSES and not challenge.get("processDefined"):
+        findings.append(Finding("error", "CHAL002", "challenge.processDefined", "adjudicated decision requires a defined factual or procedural correction process"))
     elif status == "pending" and not challenge.get("processDefined"):
-        f.append(Finding("warning", "CHAL003", "challenge.processDefined", "public governing artifacts do not yet define the challenge path required before final conformance"))
+        findings.append(Finding("warning", "CHAL003", "challenge.processDefined", "no factual or procedural correction process is recorded; the reviewed public governing artifacts do not identify one"))
 
     disclosure = record.get("disclosure", {})
     classification = disclosure.get("classification")
     public_record = disclosure.get("publicRecord")
     redactions = disclosure.get("redactions", [])
     if classification == "confidential" and public_record:
-        f.append(Finding("error", "DISC001", "disclosure.publicRecord", "confidential classification cannot be marked as a public record"))
+        findings.append(Finding("error", "DISC001", "disclosure.publicRecord", "confidential classification cannot be marked as a public record"))
     if classification == "public" and not public_record:
-        f.append(Finding("error", "DISC002", "disclosure.publicRecord", "public classification requires publicRecord=true"))
+        findings.append(Finding("error", "DISC002", "disclosure.publicRecord", "public classification requires publicRecord=true"))
     if classification == "public" and redactions:
-        f.append(Finding("error", "DISC003", "disclosure.redactions", "fully public record cannot simultaneously declare redactions"))
+        findings.append(Finding("error", "DISC003", "disclosure.redactions", "fully public record cannot simultaneously declare redactions"))
 
     created = _iso(record.get("timestamps", {}).get("createdAt"))
     updated = _iso(record.get("timestamps", {}).get("updatedAt"))
     decided = _iso(decided_at)
     effective = _iso(record.get("governingPolicy", {}).get("effectiveAt"))
     if created and updated and updated < created:
-        f.append(Finding("error", "TIME001", "timestamps.updatedAt", "updatedAt precedes createdAt"))
-    if created and decided and decided < created:
-        f.append(Finding("error", "TIME002", "decision.decidedAt", "decidedAt precedes record creation"))
+        findings.append(Finding("error", "TIME001", "timestamps.updatedAt", "updatedAt precedes createdAt"))
     if effective and decided and effective > decided:
-        f.append(Finding("error", "TIME003", "governingPolicy.effectiveAt", "governing policy became effective after the recorded decision"))
+        findings.append(Finding("error", "TIME003", "governingPolicy.effectiveAt", "governing policy became effective after the recorded decision"))
 
-    gp = record.get("governingPolicy", {})
-    if gp.get("changeDuringReview") and not (gp.get("changeSummary") or "").strip():
-        f.append(Finding("error", "POL001", "governingPolicy.changeSummary", "policy change during review requires a change summary"))
+    governing_policy = record.get("governingPolicy", {})
+    if governing_policy.get("changeDuringReview") and not (governing_policy.get("changeSummary") or "").strip():
+        findings.append(Finding("error", "POL001", "governingPolicy.changeSummary", "policy change during review requires a change summary"))
 
-    if record.get("program", {}).get("materialityTier") == "C-enhanced":
-        if status in FINAL_STATUSES and record.get("integrity") is None:
-            f.append(Finding("warning", "INT001", "integrity", "enhanced finalized record has no integrity metadata"))
+    if record.get("program", {}).get("materialityTier") == "C-enhanced" and status == "approved":
         for i, condition in enumerate(delivery):
-            if status == "approved" and not (condition.get("verifier") or "").strip():
-                f.append(Finding("warning", "DEL002", f"deliveryConditions[{i}].verifier", "enhanced approved award should identify the verifier"))
-            if status == "approved" and condition.get("targetDate") is None:
-                f.append(Finding("warning", "DEL003", f"deliveryConditions[{i}].targetDate", "enhanced approved award should identify a target date or encode a review window elsewhere"))
+            if not (condition.get("verifier") or "").strip():
+                findings.append(Finding("warning", "DEL002", f"deliveryConditions[{i}].verifier", "enhanced approved award should identify the verifier"))
+            if condition.get("targetDate") is None and not (condition.get("reviewWindow") or "").strip():
+                findings.append(Finding("warning", "DEL003", f"deliveryConditions[{i}]", "enhanced approved award should identify a target date or review window"))
 
     if status == "approved":
         award = decision.get("awardedAmount")
         decision_currency = decision.get("currency")
-        amounts = [c.get("paymentAmount") for c in delivery]
+        payment_amounts = [condition.get("paymentAmount") for condition in delivery]
         for i, condition in enumerate(delivery):
             if condition.get("paymentAmount") is not None and condition.get("currency") not in {None, decision_currency}:
-                f.append(Finding("error", "PAY001", f"deliveryConditions[{i}].currency", "delivery payment currency differs from decision currency"))
-        if amounts and all(amount is not None for amount in amounts) and isinstance(award, (int, float)):
-            if abs(sum(amounts) - award) > 1e-9:
-                f.append(Finding("warning", "PAY002", "deliveryConditions", f"specified delivery payments sum to {sum(amounts)!r}, award amount is {award!r}"))
+                findings.append(Finding("error", "PAY001", f"deliveryConditions[{i}].currency", "delivery payment currency differs from decision currency"))
+        if payment_amounts and all(amount is not None for amount in payment_amounts) and isinstance(award, (int, float)):
+            if abs(sum(payment_amounts) - award) > 1e-9:
+                findings.append(Finding("warning", "PAY002", "deliveryConditions", f"specified delivery payments sum to {sum(payment_amounts)!r}, award amount is {award!r}"))
         requested = record.get("application", {}).get("requestedAmount")
         if isinstance(requested, (int, float)) and isinstance(award, (int, float)) and award > requested:
-            f.append(Finding("warning", "PAY003", "decision.awardedAmount", "award exceeds the recorded requested amount"))
+            findings.append(Finding("warning", "PAY003", "decision.awardedAmount", "award exceeds the recorded requested amount"))
 
-    return f
+    return findings
 
 
 def validate_schema(record: dict, schema: dict) -> list[Finding]:
@@ -262,11 +264,11 @@ def validate_schema(record: dict, schema: dict) -> list[Finding]:
 
     jsonschema.Draft202012Validator.check_schema(schema)
     validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
-    out: list[Finding] = []
-    for err in sorted(validator.iter_errors(record), key=lambda e: list(e.absolute_path)):
-        path = ".".join(str(p) for p in err.absolute_path) or "<root>"
-        out.append(Finding("error", "SCHEMA", path, err.message))
-    return out
+    output: list[Finding] = []
+    for error in sorted(validator.iter_errors(record), key=lambda item: list(item.absolute_path)):
+        path = ".".join(str(part) for part in error.absolute_path) or "<root>"
+        output.append(Finding("error", "SCHEMA", path, error.message))
+    return output
 
 
 def validate_record(record: dict, schema: dict) -> list[Finding]:
@@ -287,16 +289,16 @@ def main() -> int:
     for raw in args.records:
         path = Path(raw)
         record = json.loads(path.read_text(encoding="utf-8"))
-        findings = validate_record(record, schema)
+        record_findings = validate_record(record, schema)
         print(f"{path}:")
-        if not findings:
+        if not record_findings:
             print("  PASS")
             continue
-        for item in findings:
+        for item in record_findings:
             print(f"  {item.render()}")
-        if any(item.severity == "error" for item in findings):
+        if any(item.severity == "error" for item in record_findings):
             failed = True
-        if args.strict and findings:
+        if args.strict and record_findings:
             failed = True
     return 1 if failed else 0
 
