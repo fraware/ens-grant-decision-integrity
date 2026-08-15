@@ -6,11 +6,13 @@ A record passes the v0.1 profile when it has no schema or conformance errors. Wa
 
 ## Conformance checks
 
-### Reference integrity
+### Reference and attribution integrity
 
 Identifiers for evaluators, evidence, findings, criteria, disagreements, conflicts, delivery conditions, and eligibility rules must be unique. Cross-references must resolve within the record.
 
-### Evidence and finding integrity
+A material finding can be attributed only to an evaluator marked as participating and not recused. A finding attributed to a known evaluator who did not participate, or who was recused, fails as `EVAL003`.
+
+### Evidence integrity
 
 A finding classified as `supported-fact` must reference evidence. Every material finding must identify at least one evaluator. A scored criterion must reference at least one finding. Public evidence must expose a retrievable URI.
 
@@ -32,11 +34,23 @@ A pending record cannot claim a decision timestamp. A non-pending decision requi
 
 Approval, rejection, and suspension require an eligible application, substantive rationale, and attributable material findings. Approval and suspension also require a positive award amount and observable delivery conditions. A deferral requires a rationale but does not imply a merit judgment.
 
+Pending and deferred records cannot carry a positive `awardedAmount`. The requested amount belongs in `application.requestedAmount`; an award is recorded only after an approving disposition.
+
 Retrospective records are permitted: a decision can predate creation of the record that documents it.
 
 ### Conflict and recusal integrity
 
-A recused evaluator cannot remain marked as participating. A recusal must link to a conflict record in `recused` or `resolved` state. An adjudicated decision cannot leave a material conflict in `disclosed` or `unresolved` state.
+A recused evaluator cannot remain marked as participating. A recusal must link to a conflict record in `recused` or `resolved` state.
+
+For each recused evaluator, the linked record must identify:
+
+- at least one affected decision surface;
+- whether a substitute evaluator was used;
+- the substitute evaluator identifier when substitution occurred.
+
+A substitute identifier must resolve to a distinct evaluator who participated and was not recused. If `substitutionUsed=false`, a substitute identifier must not be present.
+
+An adjudicated decision cannot leave a material conflict in `disclosed` or `unresolved` state.
 
 ### Authority integrity
 
@@ -47,6 +61,8 @@ A non-pending committee decision must identify participating human members, quor
 ### AI evaluator provenance
 
 AI materiality is recorded against the **grant recommendation**, not the institutional decision.
+
+An AI evaluator cannot claim to have materially informed a recommendation unless it is also marked as participating (`AI008`).
 
 If a participating AI evaluator materially informed the recommendation:
 
@@ -69,9 +85,11 @@ The record states whether a factual or procedural correction process is defined.
 
 Public, mixed, and confidential classifications must agree with `publicRecord` and redaction state.
 
-### Temporal integrity
+### Temporal and policy-change integrity
 
 `updatedAt` cannot precede `createdAt`. The governing policy cannot take effect after the decision it governed.
+
+If `governingPolicy.changeDuringReview=true`, the record must state the change summary and whether evaluations completed under the prior version were rerun. The policy version's `effectiveAt` records the effective time of the governing version.
 
 ### Delivery and payment integrity
 
