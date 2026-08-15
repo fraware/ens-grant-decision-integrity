@@ -1,6 +1,6 @@
 # ENS Grant Decision Integrity — v0.1
 
-A compact, vendor-neutral governance artifact for making material ENS grant decisions inspectable without delegating final authority to automated systems.
+A compact governance artifact for making material ENS grant decisions inspectable with human decision authority preserved.
 
 This package implements the first funded tranche of the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to the proposal. The first proposed tranche was $200 for a draft Grants Charter and a machine-readable decision-record schema.
 
@@ -8,44 +8,45 @@ This package implements the first funded tranche of the Simocracy proposal **“
 
 - `CHARTER.md` — draft institutional charter for grant decision integrity.
 - `schema/grant-decision-record.schema.json` — JSON Schema (Draft 2020-12) for a versioned decision record.
-- `CONFORMANCE.md` — machine-checkable cross-field invariants and severity model.
+- `CONFORMANCE.md` — cross-field conformance rules and severity model.
 - `scripts/conformance.py` — semantic conformance validator.
-- `scripts/test_conformance.py` — adversarial negative tests proving invalid institutional states are rejected.
+- `scripts/test_conformance.py` — adversarial tests for specified invalid states and valid edge cases.
 - `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP.
 - `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
 - `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
-- `RELEASE-INTEGRITY.md` — release-tag and archive-digest integrity model.
+- `RELEASE-INTEGRITY.md` — release-identity and archive-integrity procedure.
 - `VALIDATION.md` — validation contract and expected checks.
 - `LICENSE` — MIT license.
 
 ## Design objective
 
-The charter does not try to automate grant judgment. It makes the decision procedure attributable and reviewable.
+The Charter does not automate grant judgment. It makes the decision procedure attributable and reviewable.
 
-> A third party should be able to determine which rules governed a material funding decision, which evidence supported its material findings, who exercised authority, where conflicts or disagreement existed, and what conditions govern challenge and delivery.
+> A third party should be able to determine which rules governed a material funding decision, which evidence supported its material findings, who exercised authority, where conflicts or disagreement existed, and which conditions govern challenge and delivery.
 
 ## Two-layer validation
 
-A structurally valid JSON document can still encode a broken governance state. v0.1 therefore uses two validation layers:
+A structurally valid record can still contain cross-field inconsistencies that defeat the Charter's guarantees. v0.1 therefore uses two validation layers:
 
 1. **JSON Schema** checks types, required fields, allowed states, and local conditional constraints.
-2. **Semantic conformance** checks cross-references and institutional invariants across the record.
+2. **Semantic conformance** checks cross-references and decision-integrity relations across the record.
 
-The semantic layer rejects, among other cases:
+The semantic layer detects, among other cases:
 
 - a `supported-fact` without evidence;
 - dangling evidence, evaluator, or finding references;
-- criterion weights that are partial or do not sum to `1.0`;
+- partially specified criterion weights or weights that do not sum to `1.0`;
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
-- approval or rejection without attributable material findings and rationale;
+- a merit decision without attributable material findings and rationale;
 - an approved award without a positive amount or delivery conditions;
 - a recused evaluator still marked as participating;
-- a finalized decision with an unresolved material conflict;
-- a final committee decision that omits participating human members, quorum, or decision rule;
-- a final decision without a typed human-governed authority;
-- inconsistent evaluator-manifest commitment/reveal states;
-- a finalized decision with no defined factual or procedural correction path.
+- an adjudicated decision with an unresolved material conflict;
+- a non-pending committee decision that omits participating human members, quorum, or decision rule;
+- an adjudicated decision without a defined factual or procedural correction path;
+- inconsistent evaluator-manifest commitment/reveal states.
+
+The profile also represents an eligibility hard-screen separately from a merit rejection. This matches the Marketplace RFP's published rule that an ineligible application is returned without scoring.
 
 Run:
 
@@ -60,37 +61,37 @@ Use `--strict` when warnings should also fail validation.
 
 ## Current ENS fit
 
-The design is intentionally compatible with current ENS practice:
+The design maps directly onto current ENS practices:
 
-- SPP3 uses published rubrics and structured evaluation.
+- SPP3 uses published eligibility rules, rubrics, and a named committee process.
 - The Marketplace RFP requires output-defined, independently verifiable milestones.
-- Committee conflict and quorum rules are explicit.
-- The Marketplace RFP uses milestone-gated payment and on-chain traction evidence.
-- ENS has separately experimented with automated grant screening and identified useful screening capabilities alongside evaluator-gaming and agreeableness risks.
+- The SPP3 committee model defines quorum and voting rules.
+- The Marketplace RFP uses milestone-gated payment and independently verifiable traction evidence.
+- ENS has separately tested AI-assisted grant screening and identified both useful screening capabilities and risks from prompt gaming and model agreeableness.
 
-The worked Marketplace RFP example also exposes one current public-process gap: the reviewed RFP artifacts do not specify a post-decision factual or procedural correction path. The example records `challenge.processDefined=false`, producing warning `CHAL003` while the decision remains pending. A finalized record would fail conformance until the gap is resolved.
+The worked Marketplace RFP example records one unresolved documentation question without inferring an answer: the reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example sets `challenge.processDefined=false`, which produces warning `CHAL003` for the pending record. It does not assert that no internal or unpublished process exists, and it does not propose changing the rules of the active review.
 
 ## Status
 
-**Draft v0.1 — implementation artifact, not an adopted ENS policy.**
+**Draft v0.1 — implementation artifact, not adopted ENS policy.**
 
 This package does not claim ratification by ENS DAO, endorsement by the SPP3 committee, or adoption by the ENS Foundation.
 
 ## Suggested review questions
 
-1. Which fields are genuinely necessary for a material decision record?
+1. Which fields are necessary for a material decision record?
 2. Which fields should be public, selectively disclosed, or retained only for audit?
-3. Should v0.1 define a formal public projection of a confidential canonical record, or leave redaction/projection semantics to the adopting program?
-4. What monetary or risk threshold should trigger the full record?
-5. Which evaluator-manifest elements should be committed before review and disclosed after decisions?
+3. Should v0.1 define a formal public projection of a confidential canonical record, or leave projection semantics to the adopting program?
+4. What value or risk threshold should trigger the full record?
+5. Which AI evaluator-manifest elements should be committed prior to review and disclosed after decisions?
 6. Can the schema represent experimental grants without forcing false precision?
 7. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
-8. Which semantic conformance rules would create unacceptable operational friction in a real ENS review?
-9. Should ENS define an explicit factual/procedural correction mechanism before the Marketplace RFP decision is finalized?
+8. Which conformance rules would create disproportionate operational cost in an actual ENS review?
+9. Does the existing SPP3 process already provide a factual/procedural correction route that the reviewed Marketplace RFP artifacts do not identify? If so, how should the record represent it?
 
 ## Sources
 
 - ENS SPP3 Marketplace RFP: https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263
 - Marketplace RFP submission timeline and rubric: https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309
-- SPP3 cohort recommendation and committee process: https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237
-- ENS automated grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939
+- SPP3 program authorization and committee model: https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086
+- ENS AI grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939
