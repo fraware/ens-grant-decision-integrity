@@ -47,6 +47,7 @@ The semantic layer detects, among other cases:
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
 - an adjudicated decision recorded before its supporting eligibility check;
+- a non-pending decision recorded after the record's own last-update timestamp;
 - a pending or deferred record that claims a positive award;
 - an approval, rejection, or suspension without attributable material findings and rationale;
 - an approved or suspended award without a positive amount or delivery conditions;
