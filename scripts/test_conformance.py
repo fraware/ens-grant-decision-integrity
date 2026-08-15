@@ -13,8 +13,12 @@ SCHEMA = json.loads((ROOT / "schema" / "grant-decision-record.schema.json").read
 BASE = json.loads((ROOT / "examples" / "spp3-marketplace-rfp.example.json").read_text(encoding="utf-8"))
 
 
+def findings(record):
+    return validate_record(record, SCHEMA)
+
+
 def codes(record):
-    return {finding.code for finding in validate_record(record, SCHEMA)}
+    return {finding.code for finding in findings(record)}
 
 
 def expect(code, mutate):
@@ -26,9 +30,12 @@ def expect(code, mutate):
     print(f"PASS rejects {code}")
 
 
-if validate_record(BASE, SCHEMA):
-    raise AssertionError("canonical example must pass")
-print("PASS canonical example")
+base_findings = findings(BASE)
+if any(item.severity == "error" for item in base_findings):
+    raise AssertionError(f"canonical example has errors: {[x.render() for x in base_findings]}")
+if "CHAL003" not in {item.code for item in base_findings}:
+    raise AssertionError("canonical pending example should expose missing public challenge process")
+print("PASS canonical example: no errors; expected CHAL003 warning exposed")
 
 expect("SCHEMA", lambda r: r["decision"].update({"decidedAt": "2026-08-15T13:00:00Z"}))
 
@@ -68,12 +75,22 @@ def unresolved_conflict(r):
     r["eligibility"]["status"] = "eligible"
     for rule in r["eligibility"]["rules"]:
         rule["result"] = "pass"
+    r["evaluation"]["materialFindings"] = [{
+        "findingId": "F1",
+        "statement": "Illustrative final finding.",
+        "classification": "judgment",
+        "evidenceIds": [],
+        "evaluatorIds": ["committee"],
+        "materiality": "high",
+    }]
     r["decision"].update({
         "status": "approved",
         "decidedAt": "2026-08-16T13:00:00Z",
         "awardedAmount": 100000,
         "currency": "USD",
+        "rationale": "Illustrative decision rationale.",
     })
+    r["challenge"]["processDefined"] = True
     r["conflicts"] = [{
         "conflictId": "C1",
         "subjectId": "committee",
@@ -89,14 +106,24 @@ def committee_without_members(r):
     for rule in r["eligibility"]["rules"]:
         rule["result"] = "pass"
     r["evaluators"][0]["participated"] = True
+    r["evaluation"]["materialFindings"] = [{
+        "findingId": "F1",
+        "statement": "Illustrative final finding.",
+        "classification": "judgment",
+        "evidenceIds": [],
+        "evaluatorIds": ["committee"],
+        "materiality": "high",
+    }]
     r["decision"].update({
         "status": "approved",
         "decidedAt": "2026-08-16T13:00:00Z",
         "awardedAmount": 100000,
         "currency": "USD",
+        "rationale": "Illustrative decision rationale.",
         "quorum": "3 of 4",
         "decisionRule": "majority",
     })
+    r["challenge"]["processDefined"] = True
 expect("AUTH001", committee_without_members)
 
 
@@ -112,5 +139,24 @@ def material_ai_without_manifest(r):
         "materiallyInformedDecision": True,
     })
 expect("AI001", material_ai_without_manifest)
+
+
+def eligible_with_failed_rule(r):
+    r["eligibility"]["status"] = "eligible"
+    r["eligibility"]["rules"][0]["result"] = "fail"
+expect("ELIG001", eligible_with_failed_rule)
+
+
+def recused_but_participating(r):
+    r["evaluators"].append({
+        "evaluatorId": "human-1",
+        "displayName": "Illustrative reviewer",
+        "kind": "human",
+        "role": "reviewer",
+        "participated": True,
+        "recused": True,
+        "recusalReason": "Illustrative conflict.",
+    })
+expect("COI002", recused_but_participating)
 
 print("PASS adversarial conformance suite")
