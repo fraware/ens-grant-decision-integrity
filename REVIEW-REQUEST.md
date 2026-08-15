@@ -2,39 +2,39 @@
 
 ## Intended audience
 
-SPP3 committee / accountability participants and Lighthouse Labs contributors working on grant evaluation.
+SPP3 committee or accountability participants and Lighthouse Labs contributors working on grant evaluation.
 
 ## Objective
 
-Obtain one concrete external judgment on whether the Charter and decision-record schema would improve an actual ENS funding process without adding disproportionate administrative overhead.
+Obtain one concrete external judgment on whether the Charter and decision-record schema would improve an actual ENS funding process without adding disproportionate administrative cost.
 
-The request is deliberately for critique, not endorsement or funding.
+The request is for critique, not endorsement or funding.
 
 ## Public forum note
 
-I used the recent ENS Simocracy experiment to test a narrow governance question: if grant evaluation becomes more structured and increasingly AI-assisted, what minimum record should exist so the DAO can still reconstruct how a material decision was made?
+I used the recent ENS Simocracy experiment to test a narrow governance question: if grant evaluation becomes more structured and increasingly AI-assisted, what minimum record should exist so the DAO can reconstruct how a material decision was made?
 
-Five ENS Governance funding decisions allocated a cumulative $219 to the resulting proposal, with evaluators repeatedly identifying the Grants Charter and commit–reveal treatment of AI-assisted screening as the distinctive pieces. I have now implemented the first tranche as a small v0.1 package: a draft Grant Decision Integrity Charter, a machine-readable decision-record schema, and a non-evaluative mapping of the current Marketplace RFP into that schema.
+Five ENS Governance funding decisions allocated a cumulative $219 to the resulting proposal. Evaluators repeatedly identified the Grants Charter and commit–reveal treatment of AI-assisted screening as distinctive elements. I have implemented the first tranche as a small v0.1 package: a draft Grant Decision Integrity Charter, a machine-readable decision-record schema, and a non-evaluative mapping of the current Marketplace RFP into that schema.
 
-I deliberately used the Marketplace RFP only as a process example. The example does not identify, score, or comment on any live applicant.
+The Marketplace mapping is diagnostic. It does not identify, score, or comment on any live applicant, and it does not propose changing the rules of the active review.
 
-The question I would value feedback on is narrow: **which fields would actually improve the committee/accountability workflow, and which fields would create process cost without enough audit value?**
+The question I would value feedback on is narrow: **which fields would improve the committee or accountability workflow, and which would add process cost without enough audit value?**
 
-In particular, I would be interested in reactions to three boundaries:
+I am especially interested in three boundaries:
 
-1. public normative criteria versus operational evaluator details;
+1. public normative criteria versus operational AI evaluator details;
 2. public decision records versus selectively disclosed audit material;
 3. milestone verification versus substantive re-evaluation of the grantee.
 
-If the schema is useful, I can revise it against the committee's actual workflow. If a simpler record provides the same guarantees, I would prefer the simpler design.
+If a simpler record provides the same guarantees, I would prefer the simpler design.
 
 ## Direct review request
 
-I built a small v0.1 artifact from the ENS Simocracy proposal on grant decision integrity: a draft Charter plus a JSON decision-record schema. I mapped the public Marketplace RFP process into one fictional, pending record so the design could be tested against a real ENS workflow without touching live applicant evaluation.
+I built a small v0.1 artifact from the ENS Simocracy proposal on grant decision integrity: a draft Charter plus a JSON decision-record schema. I mapped the public Marketplace RFP process into one fictional, pending record so the design could be tested against an actual ENS workflow without touching live applicant evaluation.
 
-Would you be willing to give it a quick adversarial read from the committee/accountability side? The useful question for me is not “do you like the idea?” It is: **what would you delete, what is missing, and what would make this impractical to use in an actual grant round?**
+Would you be willing to give it an adversarial read from the committee or accountability side? The useful question is: **what would you delete, what is missing, and what would make this impractical in an actual grant round?**
 
-I am especially interested in whether the proposed boundary between public criteria and committed/revealed operational evaluator details addresses the prompt-gaming concern raised in the AI screening experiment without creating unnecessary process overhead.
+I am especially interested in whether the boundary between public criteria and committed/revealed operational AI evaluator details addresses the prompt-gaming concern raised in the AI screening experiment without adding unnecessary process overhead.
 
 ## Review checklist
 
@@ -43,11 +43,11 @@ A reviewer can respond to any subset:
 - Is policy versioning already captured elsewhere in a way that makes the schema field redundant?
 - Is an evidence link for every material finding realistic?
 - Should individual evaluator identity remain internal in some programs?
-- Is preserved disagreement valuable, or would it create noise?
-- Is the proposed factual-correction challenge path too broad or too narrow?
+- Is preserved disagreement useful, or does it create avoidable noise?
+- Does the existing SPP3 process already provide a factual/procedural correction route that the public Marketplace artifacts do not identify?
 - Which milestone fields match the accountability body's actual needs?
 - Where should confidential applicant evidence live?
-- Is commit–reveal worth implementing, or is simple evaluator versioning sufficient?
+- Is commit–reveal worth implementing, or is evaluator versioning sufficient?
 - What is the minimum decision record you would actually use?
 
 ## Success condition
