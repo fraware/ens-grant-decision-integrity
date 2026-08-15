@@ -21,6 +21,8 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects broken evidence references.
 - PASS — adversarial suite rejects an eligible summary with failed eligibility rules.
 - PASS — an adjudicated disposition cannot precede its recorded eligibility check (`TIME004`).
+- PASS — a non-pending decision cannot occur after the record's last-update timestamp (`TIME005`).
+- PASS — retrospective finalized records remain valid when the decision predates record creation but not the record's last update.
 - PASS — a public governing-policy URI must occur in the declared governing source set (`POL002`).
 - PASS — the schema requires source mappings for mandate, eligibility, evaluation criteria, conflict rules, and decision procedure.
 - PASS — each decision-surface source must occur in the declared governing source set (`POL003`).
@@ -57,7 +59,6 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — pending and deferred records cannot carry a positive award (`DEC013`).
 - PASS — suspension requires substantive rationale and attributable findings.
 - PASS — deferral requires a rationale without being treated as a merit judgment.
-- PASS — retrospective finalized records are permitted.
 - PASS — Marketplace example records the published August 5, 2026 23:59 UTC submission deadline.
 - PASS — Marketplace example maps all seven published hard eligibility gates, including acknowledgment of the SPP3 Program Terms and Award Notice.
 - PASS — Marketplace example preserves the published M1–M5 weights: `25% / 20% / 35% / 10% / 10%`.
