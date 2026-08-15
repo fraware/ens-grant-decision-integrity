@@ -89,6 +89,16 @@ def supported_fact_without_evidence(record):
     record["evaluation"]["materialFindings"] = [{"findingId":"F1","statement":"Claim presented as fact.","classification":"supported-fact","evidenceIds":[],"evaluatorIds":["committee"],"materiality":"high"}]
 
 
+def nonpublic_evidence_without_locator(record):
+    record["evidence"][0]["disclosure"] = "confidential"
+    record["evidence"][0].pop("uri", None)
+    record["evidence"][0].pop("contentHash", None)
+
+
+def nonpublic_evidence_with_uri(record):
+    record["evidence"][0]["disclosure"] = "confidential"
+
+
 def broken_reference(record):
     record["eligibility"]["rules"][0]["evidenceIds"] = ["DOES-NOT-EXIST"]
 
@@ -194,6 +204,8 @@ def deferred_without_rationale(record):
 
 expect("approval requires delivery conditions", "SCHEMA", approved_without_delivery)
 expect("supported fact requires evidence", "SCHEMA", supported_fact_without_evidence)
+expect("non-public evidence without locator is surfaced", "EVID003", nonpublic_evidence_without_locator)
+expect_no_errors("non-public evidence with a URI remains usable", nonpublic_evidence_with_uri)
 expect("broken evidence reference is rejected", "REF101", broken_reference)
 expect("eligible summary cannot contain a failed rule", "ELIG001", eligible_with_failed_rule)
 expect("recused evaluator cannot participate", "COI002", recused_but_participating)
