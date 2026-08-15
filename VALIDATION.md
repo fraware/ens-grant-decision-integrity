@@ -11,14 +11,21 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects a pending record with a decision timestamp.
 - PASS — adversarial suite rejects approval without delivery conditions.
 - PASS — adversarial suite rejects a `supported-fact` without evidence.
+- PASS — material findings cannot be attributed to non-participating or recused evaluators (`EVAL003`).
 - PASS — non-public evidence with neither a URI nor a content hash is surfaced as `EVID003` without forcing disclosure.
 - PASS — non-public evidence with a retrievable URI remains usable without `EVID003`.
 - PASS — adversarial suite rejects broken evidence references.
 - PASS — adversarial suite rejects an eligible summary with failed eligibility rules.
 - PASS — adversarial suite rejects a recused evaluator still marked as participating.
+- PASS — a recusal must identify the affected decision surface (`COI004`).
+- PASS — a recusal must explicitly state whether substitution occurred (`COI005`).
+- PASS — a substitute evaluator identifier must resolve (`REF107`).
+- PASS — a valid recusal without substitution is accepted.
+- PASS — a valid recusal with an active, non-recused substitute is accepted.
 - PASS — adversarial suite rejects an adjudicated decision with an unresolved conflict.
 - PASS — adversarial suite rejects a non-pending committee decision without participating human members.
 - PASS — adversarial suite rejects adjudication without a defined factual/procedural correction path (`CHAL002`).
+- PASS — an AI evaluator cannot materially inform the recommendation without participating (`AI008`).
 - PASS — material AI use without an evaluator manifest fails as `AI001`.
 - PASS — an empty evaluator manifest cannot satisfy schema provenance requirements.
 - PASS — material AI use without a recorded submission deadline fails as `AI004`.
@@ -27,9 +34,12 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — a valid pre-deadline AI provenance envelope is accepted.
 - PASS — a valid human departure from a materially influential AI recommendation is accepted.
 - PASS — hard-screen ineligibility is represented separately from merit rejection.
+- PASS — pending and deferred records cannot carry a positive award (`DEC013`).
 - PASS — suspension requires substantive rationale and attributable findings.
 - PASS — deferral requires a rationale without being treated as a merit judgment.
 - PASS — retrospective finalized records are permitted.
+- PASS — an in-round policy change must state whether prior evaluations were rerun.
+- PASS — a complete in-round policy-change record is accepted.
 - PASS — Marketplace example records the published August 5, 2026 23:59 UTC submission deadline.
 - PASS — Simocracy allocation arithmetic: `65 + 59 + 20 + 51 + 24 = 219`.
 - PASS — AI cannot occupy a decision-authority type, consistent with `CHARTER.md`.
