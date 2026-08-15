@@ -11,6 +11,7 @@ This package implements the first $200 work item in the Simocracy proposal **“
 - `CONFORMANCE.md` — cross-field conformance rules and severity model.
 - `scripts/conformance.py` — semantic conformance validator.
 - `scripts/test_conformance.py` — adversarial tests for specified invalid states and valid edge cases.
+- `scripts/test_final_consistency.py` — focused source-fidelity and cross-field regression checks from the final hardening pass.
 - `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP.
 - `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
 - `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
@@ -34,9 +35,10 @@ A structurally valid record can still contain cross-field inconsistencies that d
 The semantic layer detects, among other cases:
 
 - a `supported-fact` without evidence;
+- a failed eligibility gate without supporting evidence;
 - use of `risk` as an epistemic classification instead of `supported-fact`, `judgment`, `uncertainty`, or `unverified-claim`;
 - dangling evidence, evaluator, or finding references;
-- a material finding attributed to a non-participating or recused evaluator;
+- a material finding or disagreement attributed to a non-participating or recused evaluator;
 - non-public evidence with neither a URI nor a content hash;
 - partially specified criterion weights or weights that do not sum to `1.0`;
 - a public governing-policy URI outside the declared governing source set;
@@ -48,6 +50,7 @@ The semantic layer detects, among other cases:
 - an approval, rejection, or suspension without attributable material findings and rationale;
 - an approved or suspended award without a positive amount or delivery conditions;
 - a recused evaluator still marked as participating;
+- a conflict record that claims a known evaluator was recused when the evaluator state contradicts that claim;
 - a recusal that omits the affected decision surface or substitution state;
 - a substitute evaluator reference that does not resolve to an active, non-recused evaluator;
 - an adjudicated decision with an unresolved material conflict;
@@ -55,9 +58,10 @@ The semantic layer detects, among other cases:
 - an adjudicated decision without a defined factual or procedural correction path;
 - material AI use without the minimum evaluator-manifest provenance envelope;
 - a missing submission deadline when AI materially informs a recommendation;
-- an evaluator manifest committed at or after the application deadline;
+- a declared evaluator-manifest commitment time at or after the application deadline;
 - an AI evaluator claiming material influence without participation;
-- an AI-recommendation departure recorded without materially influential AI evaluation.
+- an AI-recommendation departure recorded without materially influential AI evaluation;
+- stale AI-departure rationale when no departure is recorded.
 
 The profile also represents an eligibility hard-screen separately from a merit rejection. This matches the Marketplace RFP's published rule that an ineligible application is returned without scoring.
 
@@ -68,6 +72,7 @@ python -m pip install -r requirements-dev.txt
 python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
+python scripts/test_final_consistency.py
 ```
 
 Use `--strict` when warnings should also fail validation.
@@ -80,9 +85,9 @@ If policy changes during review, the record additionally identifies the prior ve
 
 ## AI provenance boundary
 
-When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and a cryptographic commitment recorded strictly before the submission deadline. The record captures the minimum provenance envelope: manifest version, model identity, human-review policy, commitment metadata, and reveal state.
+When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and records commitment metadata whose declared `committedAt` value must precede the submission deadline. The record captures the minimum provenance envelope: manifest version, model identity, human-review policy, commitment metadata, and reveal state.
 
-v0.1 does **not** define manifest serialization, commitment generation, proof verification, selective-disclosure proofs, or evaluator replay. A conforming record therefore establishes declared timing and cross-field consistency; it does not prove that a committed evaluator configuration actually ran or that its judgment was correct.
+v0.1 does **not** define manifest serialization, commitment generation, an external timestamp/publication anchor, proof verification, selective-disclosure proofs, or evaluator replay. The current validator therefore establishes only the internal ordering of declared timestamps and cross-field consistency. It does not prove that the commitment existed before the deadline, that a committed evaluator configuration actually ran, or that its judgment was correct. Independently verifiable anchoring belongs to the later evaluator-manifest/commit–reveal protocol.
 
 ## Current ENS fit
 
@@ -94,7 +99,7 @@ The design maps directly onto current ENS practices:
 - The Marketplace RFP uses milestone-gated payment and independently verifiable traction evidence.
 - ENS has separately tested AI-assisted grant screening and identified both useful screening capabilities and risks from prompt gaming and model agreeableness.
 
-The worked Marketplace RFP example maps the public governing-policy URI and each of the five normative decision surfaces to the reviewed public sources. It also records one unresolved documentation question without inferring an answer: the reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example sets `challenge.processDefined=false`, which produces warning `CHAL003` for the pending record. It does not assert that no internal or unpublished process exists, and it does not propose changing the rules of the active review.
+The worked Marketplace RFP example maps all seven published hard eligibility gates, preserves the published M1–M5 weights, and maps the public governing-policy URI and each of the five normative decision surfaces to the reviewed public sources. It also records one unresolved documentation question without inferring an answer: the reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example sets `challenge.processDefined=false`, which produces warning `CHAL003` for the pending record. It does not assert that no internal or unpublished process exists, and it does not propose changing the rules of the active review.
 
 ## Status
 
@@ -109,7 +114,7 @@ This package does not claim ratification by ENS DAO, endorsement by the SPP3 com
 3. Should v0.1 define a formal public projection of a confidential canonical record, or leave projection semantics to the adopting program?
 4. Is the five-surface governing-policy map sufficient to reconstruct the rules of a review without duplicating the policy text?
 5. What value or risk threshold should trigger the full record?
-6. Is the minimum AI provenance envelope sufficient to make the pre-deadline commitment rule auditable without importing the later full evaluator-manifest protocol?
+6. Does v0.1 stop at the correct boundary for AI commitment metadata, and what independently verifiable anchor should the later commit–reveal protocol require to establish pre-deadline existence?
 7. Can the schema represent experimental grants without forcing false precision?
 8. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
 9. Which conformance rules would create disproportionate operational cost in an actual ENS review?
