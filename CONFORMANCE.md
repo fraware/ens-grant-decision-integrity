@@ -12,6 +12,8 @@ Identifiers for evaluators, evidence, findings, criteria, disagreements, conflic
 
 A material finding can be attributed only to an evaluator marked as participating and not recused. A finding attributed to a known evaluator who did not participate, or who was recused, fails as `EVAL003`.
 
+A disagreement follows the same attribution rule. A disagreement attributed to a known evaluator who did not participate, or who was recused, fails as `EVAL004`. This prevents a record from manufacturing apparent dissent from an actor who was outside the review surface.
+
 ### Evidence integrity
 
 A finding classified as `supported-fact` must reference evidence. Every material finding must identify at least one evaluator. A scored criterion must reference at least one finding. Public evidence must expose a retrievable URI.
@@ -31,6 +33,8 @@ The governing policy must identify a public rules URI and a source map for five 
 `governingPolicy.publicRulesUri` must also appear in `governingPolicy.sources`; otherwise the record fails as `POL002`. Every URI in `surfaceSources` must resolve to the same declared source set; an undeclared decision-surface source fails as `POL003`.
 
 If `changeDuringReview=true`, schema validation requires a change summary, prior version, disclosure URI, and a statement of whether prior evaluations were rerun. The prior version must differ from the active version (`POL004`), and the change notice URI must appear in the declared source set (`POL005`).
+
+If `changeDuringReview=false`, the change summary, prior version, change-notice URI, and rerun state must remain empty. Populated change metadata under a no-change declaration fails as `POL006`.
 
 These checks establish declared traceability. They do not establish that the published rule was substantively legitimate or correctly interpreted.
 
@@ -85,7 +89,7 @@ If a participating AI evaluator materially informed the recommendation:
 
 An empty manifest fails schema validation. A missing manifest produces `AI001`. A missing submission deadline produces `AI004`. A commitment at or after the deadline produces `AI005`.
 
-If the final human decision departs from a materially influential AI recommendation, `decision.aiRecommendationOverridden=true` records that fact and requires `aiOverrideRationale`. Marking an AI departure when no AI evaluator materially informed the recommendation produces `AI006`.
+If the final human decision departs from a materially influential AI recommendation, `decision.aiRecommendationOverridden=true` records that fact and requires `aiOverrideRationale`. Marking an AI departure when no AI evaluator materially informed the recommendation produces `AI006`. Conversely, populating `aiOverrideRationale` when `aiRecommendationOverridden=false` fails as `AI009`; the rationale cannot exist without the event it purports to explain.
 
 The validator checks commitment timing and record consistency. It does not verify the commitment digest, prove that the committed configuration was executed, or replay the evaluator.
 
@@ -124,6 +128,7 @@ The reviewed public artifacts do not identify a post-decision process for correc
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/conformance.py --strict examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
+python scripts/test_final_consistency.py
 ```
 
 ## Scope boundary
