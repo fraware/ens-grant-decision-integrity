@@ -18,6 +18,8 @@ A disagreement follows the same attribution rule. A disagreement attributed to a
 
 A finding classified as `supported-fact` must reference evidence. Every material finding must identify at least one evaluator. A scored criterion must reference at least one finding. Public evidence must expose a retrievable URI.
 
+A failed eligibility rule must also reference evidence. A hard-screen failure with an empty `evidenceIds` array fails as `EVID004`; this prevents an ineligible disposition from bypassing the evidence-linkage requirement simply because merit scoring never occurred.
+
 Non-public evidence can remain confidential. If it has neither a retrievable URI nor a content hash, the validator emits `EVID003` as an auditability warning. A private URI is sufficient to avoid this warning; v0.1 does not require every confidential artifact to be publicly disclosed or cryptographically committed.
 
 ### Evaluation integrity
@@ -42,7 +44,7 @@ These checks establish declared traceability. They do not establish that the pub
 
 `eligibility.status=eligible` requires every rule to be `pass` or `not-applicable`. `eligibility.status=ineligible` requires at least one failed rule.
 
-The decision model distinguishes a hard-screen ineligibility disposition from a merit rejection. `decision.status=ineligible` requires `eligibility.status=ineligible`, at least one failed eligibility rule, and a decision or eligibility rationale. It does not require merit findings.
+The decision model distinguishes a hard-screen ineligibility disposition from a merit rejection. `decision.status=ineligible` requires `eligibility.status=ineligible`, at least one failed eligibility rule, and a decision or eligibility rationale. It does not require merit findings. The failed rule itself must carry evidence under `EVID004`.
 
 ### Decision-state integrity
 
@@ -66,6 +68,8 @@ For each recused evaluator, the linked record must identify:
 
 A substitute identifier must resolve to a distinct evaluator who participated and was not recused. If `substitutionUsed=false`, a substitute identifier must not be present.
 
+Recusal state is reciprocal for known evaluators. If a conflict record marks a known evaluator as `recused` but that evaluator remains participating or is not itself marked recused, the record fails as `COI009`.
+
 An adjudicated decision cannot leave a material conflict in `disclosed` or `unresolved` state.
 
 ### Authority integrity
@@ -85,13 +89,13 @@ If a participating AI evaluator materially informed the recommendation:
 - a versioned evaluator manifest is mandatory;
 - the manifest must contain the v0.1 minimum provenance envelope: version, commitment, reveal state, model identity, and human-review policy;
 - the program must record the submission deadline;
-- the manifest commitment time must be strictly earlier than that deadline.
+- the declared manifest commitment time must be strictly earlier than that deadline.
 
-An empty manifest fails schema validation. A missing manifest produces `AI001`. A missing submission deadline produces `AI004`. A commitment at or after the deadline produces `AI005`.
+An empty manifest fails schema validation. A missing manifest produces `AI001`. A missing submission deadline produces `AI004`. A declared commitment time at or after the deadline produces `AI005`.
 
 If the final human decision departs from a materially influential AI recommendation, `decision.aiRecommendationOverridden=true` records that fact and requires `aiOverrideRationale`. Marking an AI departure when no AI evaluator materially informed the recommendation produces `AI006`. Conversely, populating `aiOverrideRationale` when `aiRecommendationOverridden=false` fails as `AI009`; the rationale cannot exist without the event it purports to explain.
 
-The validator checks commitment timing and record consistency. It does not verify the commitment digest, prove that the committed configuration was executed, or replay the evaluator.
+The validator checks the internal ordering of the declared `committedAt` timestamp and submission deadline. v0.1 does not define or verify an external timestamp/publication anchor, verify the commitment digest, prove that the committed configuration was executed, or replay the evaluator. A later commitment protocol is required to establish independently verifiable pre-deadline existence.
 
 ### Challenge integrity
 
@@ -118,7 +122,7 @@ For Tier C approved or suspended awards, the validator warns when a delivery con
 
 ## Current worked example
 
-The SPP3 Marketplace RFP example is intentionally pending. The reviewed public artifacts define eligibility, evaluation, committee quorum and voting, confidentiality, milestones, the August 5, 2026 23:59 UTC submission deadline, and award publication. The example maps the public governing-policy URI and each of the five normative decision surfaces to those declared sources.
+The SPP3 Marketplace RFP example is intentionally pending. The reviewed public artifacts define seven hard eligibility gates, the M1–M5 weighted rubric, committee quorum and voting, confidentiality, milestones, the August 5, 2026 23:59 UTC submission deadline, and award publication. The example maps all seven eligibility gates, preserves the published rubric weights, and maps the public governing-policy URI and each of the five normative decision surfaces to declared sources.
 
 The reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example therefore records `challenge.processDefined=false` and emits `CHAL003`. This maps the reviewed public process. It does not assert the absence of an internal or unpublished procedure and does not propose changing rules during the active review.
 
@@ -133,4 +137,4 @@ python scripts/test_final_consistency.py
 
 ## Scope boundary
 
-The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, whether a committed evaluator configuration actually ran, or whether the governing policy itself is legitimate.
+The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, whether a commitment existed at the declared time without an external anchor, whether a committed evaluator configuration actually ran, or whether the governing policy itself is legitimate.
