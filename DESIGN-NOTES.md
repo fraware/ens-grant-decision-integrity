@@ -4,7 +4,7 @@
 
 Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same proposal mechanism. Marginal value declined after roughly the first $200 of cumulative funding.
 
-v0.1 implements the proposal's $200 Charter and decision-record schema work item. It records the minimum evaluator-provenance envelope needed to enforce the Charter's pre-deadline commitment rule. Commitment generation, a complete evaluator-manifest format, selective disclosure proofs, and evaluator replay remain outside this release.
+v0.1 implements the proposal's $200 Charter and decision-record schema work item. It records the minimum evaluator-provenance envelope needed to represent the Charter's pre-deadline commitment rule. Commitment generation, external timestamp or publication anchoring, a complete evaluator-manifest format, selective disclosure proofs, and evaluator replay remain outside this release.
 
 ## 2. Existing ENS practices preserved
 
@@ -28,9 +28,9 @@ The delivery-condition object models a target date or review window, verificatio
 
 ### Eligibility and merit are distinct
 
-The Marketplace RFP states that applications failing the hard eligibility gate are returned without scoring and that this is not a quality judgment.
+The Marketplace RFP states that applications failing the hard eligibility gate are returned without scoring and that this is not a quality judgment. Its published gate contains seven conditions, including acknowledgment of the SPP3 Program Terms and Award Notice.
 
-The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Substantive findings are required for approval, rejection, and suspension; an ineligible disposition is linked to the failed eligibility rule.
+The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Substantive findings are required for approval, rejection, and suspension; an ineligible disposition is linked to a failed eligibility rule, and a failed rule must identify supporting evidence. The worked example maps all seven published eligibility conditions.
 
 ### Privacy and selective disclosure
 
@@ -49,7 +49,7 @@ The same experiment identified two material risks:
 
 The Charter addresses the first by keeping public normative rules distinct from operational evaluator details and requiring a commitment to the versioned evaluator manifest before applications close whenever AI materially informs a recommendation. It addresses the second through evidence-linked findings, preserved disagreement, explicit human authority, and attributable departures from AI recommendations.
 
-v0.1 does not define how a manifest is serialized or hashed. It records the manifest version, model identity, human-review policy, commitment metadata, and reveal state so timing and record consistency can be checked without overstating cryptographic guarantees.
+v0.1 does not define how a manifest is serialized or hashed, nor how a commitment is externally anchored. It records the manifest version, model identity, human-review policy, commitment metadata, and reveal state. The validator can compare the declared `committedAt` value with the submission deadline, but that comparison does not prove that the commitment existed at that time. Independently verifiable pre-deadline existence requires the later commitment protocol to specify a trustworthy timestamp or publication anchor.
 
 ## 4. Threat model
 
@@ -57,25 +57,25 @@ v0.1 does not define how a manifest is serialized or hashed. It records the mani
 
 **Risk:** criteria or AI evaluator configuration changes after applications are observed, or an in-round policy change is applied inconsistently to evaluations already completed.
 
-**Control:** a public governing-policy URI, explicit source mapping for each normative decision surface, version and effective time, change summary, prior-version and change-notice traceability, explicit record of whether prior evaluations were rerun, and a versioned evaluator manifest committed strictly before the submission deadline when AI materially informs a recommendation.
+**Control:** a public governing-policy URI, explicit source mapping for each normative decision surface, version and effective time, change summary, prior-version and change-notice traceability, explicit record of whether prior evaluations were rerun, and declared pre-deadline evaluator-manifest commitment metadata when AI materially informs a recommendation. External proof of the commitment's pre-deadline existence remains part of the later commit–reveal protocol.
 
 ### T2 — Unsupported or misattributed findings
 
-**Risk:** a material finding cannot be traced to evidence, an explicit epistemic classification, or an evaluator who actually participated.
+**Risk:** a material finding cannot be traced to evidence, an explicit epistemic classification, or an evaluator who actually participated; or a hard-screen failure records ineligibility without evidence supporting the failed gate.
 
-**Control:** evidence-linked material findings; explicit classification as `supported-fact`, `judgment`, `uncertainty`, or `unverified-claim`; and evaluator-attribution checks against participation and recusal state. Risk can be the subject of a finding without functioning as an epistemic classification.
+**Control:** failed eligibility rules require evidence; material findings are evidence-linked or explicitly classified as `judgment`, `uncertainty`, or `unverified-claim`; and evaluator-attribution checks enforce participation and recusal state. Risk can be the subject of a finding without functioning as an epistemic classification.
 
 ### T3 — Score aggregation obscures disagreement
 
 **Risk:** an aggregate score conceals material disagreement about security, eligibility, scope, budget, or delivery confidence.
 
-**Control:** disagreement is recorded independently of aggregate scores.
+**Control:** disagreement is recorded independently of aggregate scores, and any attributed disagreement must resolve to a participating, non-recused evaluator.
 
 ### T4 — Conflict disclosure without operational recusal
 
-**Risk:** a disclosed material relationship continues to affect an adjudicated decision, or a nominal recusal does not identify the decision surface or replacement reviewer.
+**Risk:** a disclosed material relationship continues to affect an adjudicated decision, a nominal recusal does not identify the decision surface or replacement reviewer, or the conflict record and evaluator record disagree about whether recusal occurred.
 
-**Control:** adjudicated records cannot leave a material conflict in disclosed or unresolved state. A recusal identifies the affected decision surface, explicitly states whether substitution occurred, and resolves any substitute identifier to an active, non-recused evaluator.
+**Control:** adjudicated records cannot leave a material conflict in disclosed or unresolved state. A recusal identifies the affected decision surface, explicitly states whether substitution occurred, resolves any substitute identifier to an active, non-recused evaluator, and must agree with the recused evaluator's own participation state.
 
 ### T5 — AI recommendation acquires de facto authority
 
@@ -109,7 +109,7 @@ v0.1 does not define how a manifest is serialized or hashed. It records the mani
 
 ### T10 — Nominal conformance
 
-**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported or misattributed findings, inconsistent eligibility, unresolved conflicts, incomplete recusal provenance, premature award state, unattributed committee action, or an AI manifest committed after applications close.
+**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported hard-screen failures, unsupported or misattributed findings, inconsistent eligibility, contradictory recusal state, unresolved conflicts, incomplete recusal provenance, premature award state, unattributed committee action, or a declared AI commitment time after applications close.
 
 **Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
 
@@ -119,23 +119,23 @@ As of August 15, 2026, the Marketplace RFP submission window is closed. The publ
 
 The RFP is a useful test case. It contains:
 
-- a hard eligibility gate;
-- a five-criterion weighted rubric;
+- seven hard eligibility conditions;
+- a five-criterion weighted rubric (M1 25%, M2 20%, M3 35%, M4 10%, M5 10%);
 - a named committee process with published quorum and voting rules;
 - confidential application handling;
 - milestone-gated payment;
 - independently verifiable and on-chain traction requirements;
 - a defined award threshold.
 
-The example does not identify, score, recommend, or reject any real applicant. It maps the public process into a fictional pending record, including the public rules URI and the source governing each of the five normative decision surfaces.
+The example does not identify, score, recommend, or reject any real applicant. It maps the public process into a fictional pending record, including all seven eligibility gates, the published rubric weights, the public rules URI, and the source governing each of the five normative decision surfaces.
 
 The reviewed public artifacts do not identify a post-decision factual/procedural correction process. The example records that documentation gap as `challenge.processDefined=false`. This does not assert that no internal or unpublished process exists, and it does not propose a rule change during the active review.
 
 ## 6. Structural validity and record conformance
 
-JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator attribution, weight completeness, governing-policy source traceability, policy-change lineage, eligibility consistency, decision-state transitions, conflict closure, recusal provenance, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and AI evaluator-manifest timing.
+JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator attribution, weight completeness, governing-policy source traceability, policy-change lineage, eligibility consistency, decision-state transitions, conflict closure, reciprocal recusal state, recusal provenance, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and declared AI evaluator-manifest timing.
 
-A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
+A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a commitment existed at its declared time without an external anchor, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
 
 `CONFORMANCE.md` defines the checks and severity model.
 
