@@ -29,12 +29,30 @@ if warnings != {"CHAL003"}:
 charter = (ROOT / "CHARTER.md").read_text(encoding="utf-8")
 authority_values = schema["properties"]["decision"]["properties"]["authorityKind"]["enum"]
 decision_statuses = schema["properties"]["decision"]["properties"]["status"]["enum"]
+evaluator_properties = schema["properties"]["evaluators"]["items"]["properties"]
+manifest_schema = schema["properties"]["evaluatorManifest"]
+decision_properties = schema["properties"]["decision"]["properties"]
+
 if "ai" in authority_values:
     raise SystemExit("FAIL AI must not be a decision-authority type")
 if "ineligible" not in decision_statuses:
     raise SystemExit("FAIL schema must distinguish hard-screen ineligibility from merit rejection")
+if "materiallyInformedRecommendation" not in evaluator_properties:
+    raise SystemExit("FAIL AI evaluator materiality must be expressed against the recommendation")
+if "materiallyInformedDecision" in evaluator_properties:
+    raise SystemExit("FAIL stale materiallyInformedDecision field remains in the schema")
+if set(manifest_schema.get("required", [])) != {"manifestVersion", "commitment", "revealStatus", "models", "humanReviewPolicy"}:
+    raise SystemExit("FAIL evaluator manifest minimum provenance envelope changed")
+if "aiRecommendationOverridden" not in decision_properties or "humanOverride" in decision_properties:
+    raise SystemExit("FAIL AI departure field is missing or stale generic override field remains")
+if example["program"].get("submissionDeadline") != "2026-08-05T23:59:00Z":
+    raise SystemExit("FAIL Marketplace example submission deadline changed from the published process")
 if "An AI system MUST NOT exercise unilateral authority" not in charter:
     raise SystemExit("FAIL Charter no longer contains the AI unilateral-authority prohibition")
+if "MUST maintain a versioned evaluator manifest" not in charter:
+    raise SystemExit("FAIL Charter no longer requires a versioned evaluator manifest for material AI use")
+if "MUST cryptographically commit to the evaluator manifest before applications close" not in charter:
+    raise SystemExit("FAIL Charter no longer requires pre-deadline evaluator-manifest commitment")
 if "It does not establish that the evaluator used that manifest" not in charter:
     raise SystemExit("FAIL Charter commit–reveal limitation is missing")
 
@@ -50,6 +68,12 @@ print("PASS SPP3 example has no conformance errors")
 print("PASS SPP3 example exposes only expected warning CHAL003")
 print("PASS AI is excluded from decision-authority types")
 print("PASS hard-screen ineligibility is distinct from merit rejection")
+print("PASS AI materiality is defined against the recommendation")
+print("PASS evaluator manifest has the minimum provenance envelope")
+print("PASS AI recommendation departure field is explicit")
+print("PASS Marketplace submission deadline matches the published process")
 print("PASS Charter preserves the AI unilateral-authority prohibition")
-print("PASS Charter states the commit–reveal limitation explicitly")
+print("PASS Charter requires a versioned AI evaluator manifest")
+print("PASS Charter requires pre-deadline evaluator-manifest commitment")
+print("PASS Charter states the commitment limitation explicitly")
 print(f"PASS Simocracy allocations reconcile to ${recorded_total}")
