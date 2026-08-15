@@ -109,7 +109,10 @@ def check_semantics(record: dict) -> list[Finding]:
                 findings.append(Finding("error", "REF104", f"evaluation.criteria[{i}].findingIds", f"unknown findingId {ref!r}"))
 
     for i, item in enumerate(disagreements):
-        for ref in item.get("evaluatorIds", []):
+        refs = item.get("evaluatorIds", [])
+        if not refs:
+            findings.append(Finding("error", "EVAL005", f"evaluation.disagreements[{i}].evaluatorIds", "recorded disagreement must identify at least one evaluator"))
+        for ref in refs:
             if ref not in evaluator_ids:
                 findings.append(Finding("error", "REF105", f"evaluation.disagreements[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
                 continue
@@ -246,7 +249,7 @@ def check_semantics(record: dict) -> list[Finding]:
     if status in DECIDED_STATUSES and authority_kind not in AUTHORITY_KINDS:
         findings.append(Finding("error", "AUTH000", "decision.authorityKind", "non-pending decision must identify a permitted human decision-authority type"))
 
-    committee_decision = authority_kind == "committee" or any(evaluator.get("kind") == "committee" and evaluator.get("participated") for evaluator in evaluators)
+    committee_decision = authority_kind == "committee"
     if status in DECIDED_STATUSES and committee_decision:
         participating_humans = [evaluator for evaluator in evaluators if evaluator.get("kind") == "human" and evaluator.get("participated") and not evaluator.get("recused")]
         if not participating_humans:
@@ -301,10 +304,19 @@ def check_semantics(record: dict) -> list[Finding]:
     challenge = record.get("challenge")
     if not isinstance(challenge, dict) or not (challenge.get("scope") or "").strip():
         findings.append(Finding("error", "CHAL001", "challenge", "record must state the scope of factual or procedural correction"))
-    elif status in ADJUDICATED_STATUSES and not challenge.get("processDefined"):
-        findings.append(Finding("error", "CHAL002", "challenge.processDefined", "adjudicated decision requires a defined factual or procedural correction process"))
-    elif status == "pending" and not challenge.get("processDefined"):
-        findings.append(Finding("warning", "CHAL003", "challenge.processDefined", "no factual or procedural correction process is recorded; the reviewed public governing artifacts do not identify one"))
+    else:
+        challenge_status = challenge.get("status")
+        process_defined = challenge.get("processDefined")
+        if status in ADJUDICATED_STATUSES and not process_defined:
+            findings.append(Finding("error", "CHAL002", "challenge.processDefined", "adjudicated decision requires a defined factual or procedural correction process"))
+        elif status == "pending" and not process_defined:
+            findings.append(Finding("warning", "CHAL003", "challenge.processDefined", "no factual or procedural correction process is recorded; the reviewed public governing artifacts do not identify one"))
+        if challenge_status in {"open", "submitted", "resolved", "expired"} and not process_defined:
+            findings.append(Finding("error", "CHAL004", "challenge.processDefined", f"challenge status {challenge_status!r} requires a defined process"))
+        if status == "pending" and challenge_status != "not-open":
+            findings.append(Finding("error", "CHAL005", "challenge.status", "pending decision cannot claim an active or completed post-decision challenge"))
+        if challenge_status == "resolved" and not (challenge.get("resolution") or "").strip():
+            findings.append(Finding("error", "CHAL006", "challenge.resolution", "resolved challenge requires a resolution"))
 
     disclosure = record.get("disclosure", {})
     classification = disclosure.get("classification")
@@ -321,10 +333,13 @@ def check_semantics(record: dict) -> list[Finding]:
     updated = _iso(record.get("timestamps", {}).get("updatedAt"))
     decided = _iso(decided_at)
     effective = _iso(governing_policy.get("effectiveAt"))
+    eligibility_checked = _iso(record.get("eligibility", {}).get("checkedAt"))
     if created and updated and updated < created:
         findings.append(Finding("error", "TIME001", "timestamps.updatedAt", "updatedAt precedes createdAt"))
     if effective and decided and effective > decided:
         findings.append(Finding("error", "TIME003", "governingPolicy.effectiveAt", "governing policy became effective after the recorded decision"))
+    if status in ADJUDICATED_STATUSES and eligibility_checked and decided and eligibility_checked > decided:
+        findings.append(Finding("error", "TIME004", "eligibility.checkedAt", "eligibility check cannot occur after the adjudicated decision it supports"))
 
     if governing_policy.get("changeDuringReview") and not (governing_policy.get("changeSummary") or "").strip():
         findings.append(Finding("error", "POL001", "governingPolicy.changeSummary", "policy change during review requires a change summary"))
