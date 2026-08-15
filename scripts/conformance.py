@@ -109,6 +109,10 @@ def check_semantics(record: dict) -> list[Finding]:
         for ref in item.get("evaluatorIds", []):
             if ref not in evaluator_ids:
                 findings.append(Finding("error", "REF105", f"evaluation.disagreements[{i}].evaluatorIds", f"unknown evaluatorId {ref!r}"))
+                continue
+            evaluator = evaluator_by_id[ref]
+            if not evaluator.get("participated") or evaluator.get("recused"):
+                findings.append(Finding("error", "EVAL004", f"evaluation.disagreements[{i}].evaluatorIds", f"disagreement is attributed to non-participating or recused evaluator {ref!r}"))
 
     for i, item in enumerate(delivery):
         for ref in item.get("evidenceIds", []):
@@ -166,6 +170,14 @@ def check_semantics(record: dict) -> list[Finding]:
             findings.append(Finding("error", "POL004", "governingPolicy.previousVersion", "previousVersion must differ from the active governing-policy version"))
         if governing_policy.get("changeNoticeUri") not in policy_sources:
             findings.append(Finding("error", "POL005", "governingPolicy.changeNoticeUri", "changeNoticeUri must also appear in governingPolicy.sources"))
+    else:
+        stale_change_fields = [
+            field
+            for field in ("changeSummary", "previousVersion", "changeNoticeUri", "priorEvaluationsRerun")
+            if governing_policy.get(field) not in (None, "")
+        ]
+        if stale_change_fields:
+            findings.append(Finding("error", "POL006", "governingPolicy", f"changeDuringReview=false conflicts with populated change metadata: {', '.join(stale_change_fields)}"))
 
     decision = record.get("decision", {})
     status = decision.get("status")
@@ -271,6 +283,8 @@ def check_semantics(record: dict) -> list[Finding]:
             findings.append(Finding("error", "AI006", "decision.aiRecommendationOverridden", "AI recommendation cannot be marked as overridden when no AI evaluator materially informed the recommendation"))
         if not (decision.get("aiOverrideRationale") or "").strip():
             findings.append(Finding("error", "AI007", "decision.aiOverrideRationale", "AI recommendation departure requires a rationale"))
+    elif (decision.get("aiOverrideRationale") or "").strip():
+        findings.append(Finding("error", "AI009", "decision.aiOverrideRationale", "AI departure rationale cannot be populated when aiRecommendationOverridden=false"))
 
     challenge = record.get("challenge")
     if not isinstance(challenge, dict) or not (challenge.get("scope") or "").strip():
