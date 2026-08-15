@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schema" / "grant-decision-record.schema.json"
 
 DECIDED_STATUSES = {"ineligible", "approved", "rejected", "deferred", "suspended"}
-MERIT_STATUSES = {"approved", "rejected"}
+SUBSTANTIVE_STATUSES = {"approved", "rejected", "suspended"}
 ADJUDICATED_STATUSES = {"ineligible", "approved", "rejected", "suspended"}
 AUTHORITY_KINDS = {"human", "committee", "dao-vote", "multisig", "other-human-authority"}
 
@@ -139,16 +139,19 @@ def check_semantics(record: dict) -> list[Finding]:
     if eligibility == "ineligible" and "fail" not in rule_results:
         findings.append(Finding("error", "ELIG002", "eligibility.rules", "eligibility.status='ineligible' requires at least one failed rule"))
 
-    if status in MERIT_STATUSES and eligibility != "eligible":
+    if status in SUBSTANTIVE_STATUSES and eligibility != "eligible":
         findings.append(Finding("error", "DEC003", "eligibility.status", f"{status} decision requires eligibility.status='eligible'"))
     if status == "ineligible" and eligibility != "ineligible":
         findings.append(Finding("error", "DEC009", "eligibility.status", "decision.status='ineligible' requires eligibility.status='ineligible'"))
 
-    if status in MERIT_STATUSES:
+    if status in SUBSTANTIVE_STATUSES:
         if not (decision.get("rationale") or "").strip():
             findings.append(Finding("error", "DEC007", "decision.rationale", f"{status} decision requires a substantive rationale"))
         if not material_findings:
             findings.append(Finding("error", "DEC008", "evaluation.materialFindings", f"{status} decision requires at least one attributable material finding"))
+
+    if status == "deferred" and not (decision.get("rationale") or "").strip():
+        findings.append(Finding("error", "DEC012", "decision.rationale", "deferred decision requires a rationale"))
 
     if status == "ineligible":
         if not ((decision.get("rationale") or "").strip() or (eligibility_rationale or "").strip()):
@@ -156,16 +159,13 @@ def check_semantics(record: dict) -> list[Finding]:
         if decision.get("awardedAmount") not in (None, 0):
             findings.append(Finding("error", "DEC011", "decision.awardedAmount", "ineligible decision cannot carry a positive award"))
 
-    if status == "approved":
+    if status in {"approved", "suspended"}:
         if not isinstance(decision.get("awardedAmount"), (int, float)) or decision.get("awardedAmount", 0) <= 0:
-            findings.append(Finding("error", "DEC004", "decision.awardedAmount", "approved decision requires a positive award amount"))
+            findings.append(Finding("error", "DEC004", "decision.awardedAmount", f"{status} decision requires a positive award amount"))
         if not delivery:
-            findings.append(Finding("error", "DEL001", "deliveryConditions", "approved award requires at least one observable delivery condition"))
+            findings.append(Finding("error", "DEL001", "deliveryConditions", f"{status} award requires at least one observable delivery condition"))
     elif status == "rejected" and decision.get("awardedAmount") not in (None, 0):
         findings.append(Finding("error", "DEC005", "decision.awardedAmount", "rejected decision cannot carry a positive award"))
-
-    if decision.get("humanOverride") and not (decision.get("overrideRationale") or "").strip():
-        findings.append(Finding("error", "DEC006", "decision.overrideRationale", "human override requires a rationale"))
 
     if status in ADJUDICATED_STATUSES:
         for i, conflict in enumerate(conflicts):
@@ -186,11 +186,18 @@ def check_semantics(record: dict) -> list[Finding]:
         if not (decision.get("decisionRule") or "").strip():
             findings.append(Finding("error", "AUTH003", "decision.decisionRule", "non-pending committee decision must record the applicable voting or consensus rule"))
 
-    material_ai = [evaluator for evaluator in evaluators if evaluator.get("kind") == "ai" and evaluator.get("participated") and evaluator.get("materiallyInformedDecision")]
-    if material_ai and record.get("evaluatorManifest") is None:
-        findings.append(Finding("warning", "AI001", "evaluatorManifest", "an AI evaluator materially informed the decision but no evaluator manifest is recorded"))
-
+    material_ai = [
+        evaluator
+        for evaluator in evaluators
+        if evaluator.get("kind") == "ai"
+        and evaluator.get("participated")
+        and evaluator.get("materiallyInformedRecommendation")
+    ]
     manifest = record.get("evaluatorManifest")
+
+    if material_ai and not isinstance(manifest, dict):
+        findings.append(Finding("error", "AI001", "evaluatorManifest", "material AI use requires a versioned evaluator manifest"))
+
     if isinstance(manifest, dict):
         reveal_status = manifest.get("revealStatus")
         commitment = manifest.get("commitment")
@@ -199,6 +206,23 @@ def check_semantics(record: dict) -> list[Finding]:
             findings.append(Finding("error", "AI002", "evaluatorManifest.commitment", f"revealStatus={reveal_status!r} requires a commitment"))
         if reveal_status == "revealed" and not reveal_uri:
             findings.append(Finding("error", "AI003", "evaluatorManifest.revealUri", "revealed manifest requires revealUri"))
+
+    if material_ai:
+        submission_deadline_raw = record.get("program", {}).get("submissionDeadline")
+        if not submission_deadline_raw:
+            findings.append(Finding("error", "AI004", "program.submissionDeadline", "material AI use requires the application deadline needed to verify pre-deadline commitment"))
+        elif isinstance(manifest, dict):
+            commitment = manifest.get("commitment")
+            committed_at = _iso(commitment.get("committedAt")) if isinstance(commitment, dict) else None
+            submission_deadline = _iso(submission_deadline_raw)
+            if committed_at and submission_deadline and committed_at >= submission_deadline:
+                findings.append(Finding("error", "AI005", "evaluatorManifest.commitment.committedAt", "evaluator manifest must be committed before applications close"))
+
+    if decision.get("aiRecommendationOverridden"):
+        if not material_ai:
+            findings.append(Finding("error", "AI006", "decision.aiRecommendationOverridden", "AI recommendation cannot be marked as overridden when no AI evaluator materially informed the recommendation"))
+        if not (decision.get("aiOverrideRationale") or "").strip():
+            findings.append(Finding("error", "AI007", "decision.aiOverrideRationale", "AI recommendation departure requires a rationale"))
 
     challenge = record.get("challenge")
     if not isinstance(challenge, dict) or not (challenge.get("scope") or "").strip():
@@ -232,14 +256,14 @@ def check_semantics(record: dict) -> list[Finding]:
     if governing_policy.get("changeDuringReview") and not (governing_policy.get("changeSummary") or "").strip():
         findings.append(Finding("error", "POL001", "governingPolicy.changeSummary", "policy change during review requires a change summary"))
 
-    if record.get("program", {}).get("materialityTier") == "C-enhanced" and status == "approved":
+    if record.get("program", {}).get("materialityTier") == "C-enhanced" and status in {"approved", "suspended"}:
         for i, condition in enumerate(delivery):
             if not (condition.get("verifier") or "").strip():
-                findings.append(Finding("warning", "DEL002", f"deliveryConditions[{i}].verifier", "enhanced approved award should identify the verifier"))
+                findings.append(Finding("warning", "DEL002", f"deliveryConditions[{i}].verifier", "enhanced award should identify the verifier"))
             if condition.get("targetDate") is None and not (condition.get("reviewWindow") or "").strip():
-                findings.append(Finding("warning", "DEL003", f"deliveryConditions[{i}]", "enhanced approved award should identify a target date or review window"))
+                findings.append(Finding("warning", "DEL003", f"deliveryConditions[{i}]", "enhanced award should identify a target date or review window"))
 
-    if status == "approved":
+    if status in {"approved", "suspended"}:
         award = decision.get("awardedAmount")
         decision_currency = decision.get("currency")
         payment_amounts = [condition.get("paymentAmount") for condition in delivery]
