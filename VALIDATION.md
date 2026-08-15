@@ -21,8 +21,7 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects broken evidence references.
 - PASS — adversarial suite rejects an eligible summary with failed eligibility rules.
 - PASS — an adjudicated disposition cannot precede its recorded eligibility check (`TIME004`).
-- PASS — a non-pending decision cannot occur after the record's last-update timestamp (`TIME005`).
-- PASS — retrospective finalized records remain valid when the decision predates record creation but not the record's last update.
+- PASS — a non-pending decision cannot occur after the record's last-update timestamp (`TIME005`); retrospective records remain valid when the decision predates record creation but not the record's last update.
 - PASS — a public governing-policy URI must occur in the declared governing source set (`POL002`).
 - PASS — the schema requires source mappings for mandate, eligibility, evaluation criteria, conflict rules, and decision procedure.
 - PASS — each decision-surface source must occur in the declared governing source set (`POL003`).
@@ -59,6 +58,7 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — pending and deferred records cannot carry a positive award (`DEC013`).
 - PASS — suspension requires substantive rationale and attributable findings.
 - PASS — deferral requires a rationale without being treated as a merit judgment.
+- PASS — retrospective finalized records are permitted.
 - PASS — Marketplace example records the published August 5, 2026 23:59 UTC submission deadline.
 - PASS — Marketplace example maps all seven published hard eligibility gates, including acknowledgment of the SPP3 Program Terms and Award Notice.
 - PASS — Marketplace example preserves the published M1–M5 weights: `25% / 20% / 35% / 10% / 10%`.
@@ -81,4 +81,12 @@ python scripts/test_final_consistency.py
 
 `python scripts/conformance.py --strict ...` intentionally fails the current worked example on `CHAL003` until a factual/procedural correction process is represented.
 
-`PASS` above describes the required executable contract encoded by the current test suite. The authoritative execution status for a specific commit is the CI/local validation record attached to that exact commit; a blocked CI job is not a passing or failing test result.
+## Exact-head execution record
+
+Commit `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` was independently reconstructed from GitHub-backed file contents and executed against byte-for-byte matched Git blob identities for the schema, canonical example, provenance record, Charter, validator, and both test suites.
+
+The four-command contract above completed successfully. The canonical example emitted only the expected `CHAL003` warning; both adversarial suites completed with all expected rejection and positive-control cases passing.
+
+The GitHub-hosted run for the same commit did not execute: GitHub reports that the job was not started because of the account payment/spending-limit condition. That hosted check is an infrastructure failure, not a test result.
+
+`PASS` above describes both the executable contract and the successful independent execution for `dc3a86a8ec7c555b89865a4e6b37dc45ef443879`. A future semantic change invalidates this execution record and requires a fresh exact-head run.
