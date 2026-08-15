@@ -16,7 +16,7 @@ This package implements the first $200 work item in the Simocracy proposal **“
 - `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
 - `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
 - `RELEASE-INTEGRITY.md` — release-identity and archive-integrity procedure.
-- `VALIDATION.md` — validation contract and expected checks.
+- `VALIDATION.md` — validation contract and execution evidence.
 - `LICENSE` — MIT license.
 
 ## Design objective
@@ -47,7 +47,7 @@ The semantic layer detects, among other cases:
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
 - an adjudicated decision recorded before its supporting eligibility check;
-- a non-pending decision recorded after the record's own last-update timestamp;
+- a non-pending decision recorded after the record's own `updatedAt` timestamp;
 - a pending or deferred record that claims a positive award;
 - an approval, rejection, or suspension without attributable material findings and rationale;
 - an approved or suspended award without a positive amount or delivery conditions;
@@ -80,6 +80,12 @@ python scripts/test_final_consistency.py
 ```
 
 Use `--strict` when warnings should also fail validation.
+
+## Validation status
+
+The executable surface at commit `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` was independently reconstructed from GitHub-backed file contents, byte-matched to the corresponding Git blob identities, and passed the full four-command contract above. The canonical Marketplace example emitted only the intentional `CHAL003` warning.
+
+The current branch head differs from that executable commit only in validation/documentation metadata. `VALIDATION.md` contains the execution record. GitHub-hosted Actions remains separately blocked by the account payment/spending-limit condition; GitHub reports that the job did not start, so the hosted red check is not a test failure.
 
 ## Fixed-policy traceability
 
