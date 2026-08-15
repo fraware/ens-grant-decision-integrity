@@ -26,7 +26,9 @@ The decision model distinguishes a hard-screen ineligibility disposition from a 
 
 ### Decision-state integrity
 
-A pending record cannot claim a decision timestamp. A non-pending decision requires one. Approval and rejection require an eligible application, a substantive rationale, and attributable material findings. An approved award requires a positive amount and at least one observable delivery condition.
+A pending record cannot claim a decision timestamp. A non-pending decision requires one.
+
+Approval, rejection, and suspension require an eligible application, substantive rationale, and attributable material findings. Approval and suspension also require a positive award amount and observable delivery conditions. A deferral requires a rationale but does not imply a merit judgment.
 
 Retrospective records are permitted: a decision can predate creation of the record that documents it.
 
@@ -42,7 +44,20 @@ A non-pending committee decision must identify participating human members, quor
 
 ### AI evaluator provenance
 
-If an AI evaluator materially informed a decision and no evaluator manifest is recorded, the validator emits `AI001` as a warning. Commitment and reveal states must remain internally consistent.
+AI materiality is recorded against the **grant recommendation**, not the institutional decision.
+
+If a participating AI evaluator materially informed the recommendation:
+
+- a versioned evaluator manifest is mandatory;
+- the manifest must contain the v0.1 minimum provenance envelope: version, commitment, reveal state, model identity, and human-review policy;
+- the program must record the submission deadline;
+- the manifest commitment time must be strictly earlier than that deadline.
+
+An empty manifest fails schema validation. A missing manifest produces `AI001`. A missing submission deadline produces `AI004`. A commitment at or after the deadline produces `AI005`.
+
+If the final human decision departs from a materially influential AI recommendation, `decision.aiRecommendationOverridden=true` records that fact and requires `aiOverrideRationale`. Marking an AI departure when no AI evaluator materially informed the recommendation produces `AI006`.
+
+The validator checks commitment timing and record consistency. It does not verify the commitment digest, prove that the committed configuration was executed, or replay the evaluator.
 
 ### Challenge integrity
 
@@ -58,7 +73,7 @@ Public, mixed, and confidential classifications must agree with `publicRecord` a
 
 ### Delivery and payment integrity
 
-For Tier C approved awards, the validator warns when a delivery condition lacks a verifier or both a target date and review window. Delivery payment currencies must agree with the award currency. Fully specified tranche amounts are compared with the total award.
+For Tier C approved or suspended awards, the validator warns when a delivery condition lacks a verifier or both a target date and review window. Delivery payment currencies must agree with the award currency. Fully specified tranche amounts are compared with the total award.
 
 ## Severity model
 
@@ -67,7 +82,7 @@ For Tier C approved awards, the validator warns when a delivery condition lacks 
 
 ## Current worked example
 
-The SPP3 Marketplace RFP example is intentionally pending. The reviewed public artifacts define eligibility, evaluation, committee quorum and voting, confidentiality, milestones, and award publication. They do not identify a post-decision process for correcting factual errors or procedural deviations.
+The SPP3 Marketplace RFP example is intentionally pending. The reviewed public artifacts define eligibility, evaluation, committee quorum and voting, confidentiality, milestones, the August 5, 2026 23:59 UTC submission deadline, and award publication. They do not identify a post-decision process for correcting factual errors or procedural deviations.
 
 The example therefore records `challenge.processDefined=false` and emits `CHAL003`. This maps the reviewed public process. It does not assert the absence of an internal or unpublished procedure and does not propose changing rules during the active review.
 
@@ -81,4 +96,4 @@ python scripts/test_conformance.py
 
 ## Scope boundary
 
-The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, or whether the governing policy itself is legitimate.
+The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, whether a committed evaluator configuration actually ran, or whether the governing policy itself is legitimate.
