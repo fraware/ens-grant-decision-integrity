@@ -11,6 +11,7 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects a pending record with a decision timestamp.
 - PASS — adversarial suite rejects approval without delivery conditions.
 - PASS — adversarial suite rejects a `supported-fact` without evidence.
+- PASS — a failed eligibility rule cannot omit supporting evidence (`EVID004`).
 - PASS — `risk` is rejected as an epistemic material-finding classification; the allowed classifications are `supported-fact`, `judgment`, `uncertainty`, and `unverified-claim`.
 - PASS — material findings cannot be attributed to non-participating or recused evaluators (`EVAL003`).
 - PASS — material disagreements cannot be attributed to non-participating or recused evaluators (`EVAL004`); a valid participating-evaluator disagreement is accepted.
@@ -27,6 +28,7 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — a record declaring `changeDuringReview=false` cannot retain stale change metadata (`POL006`); the canonical no-change record is accepted.
 - PASS — a complete in-round policy-change record is accepted.
 - PASS — adversarial suite rejects a recused evaluator still marked as participating.
+- PASS — a conflict record cannot mark a known evaluator as recused when that evaluator's own state contradicts recusal (`COI009`).
 - PASS — a recusal must identify the affected decision surface (`COI004`).
 - PASS — a recusal must explicitly state whether substitution occurred (`COI005`).
 - PASS — a substitute evaluator identifier must resolve (`REF107`).
@@ -39,23 +41,26 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — material AI use without an evaluator manifest fails as `AI001`.
 - PASS — an empty evaluator manifest cannot satisfy schema provenance requirements.
 - PASS — material AI use without a recorded submission deadline fails as `AI004`.
-- PASS — an evaluator-manifest commitment at or after the submission deadline fails as `AI005`.
+- PASS — a declared evaluator-manifest commitment time at or after the submission deadline fails as `AI005`.
 - PASS — an AI-recommendation departure cannot be recorded without materially influential AI evaluation (`AI006`).
 - PASS — `aiOverrideRationale` cannot remain populated when `aiRecommendationOverridden=false` (`AI009`).
+- PASS — a pending decision cannot record an institutional departure from an AI recommendation (`AI010`).
 - PASS — a valid pre-deadline AI provenance envelope is accepted.
-- PASS — a valid human departure from a materially influential AI recommendation is accepted.
+- PASS — a valid finalized human departure from a materially influential AI recommendation is accepted.
 - PASS — hard-screen ineligibility is represented separately from merit rejection.
 - PASS — pending and deferred records cannot carry a positive award (`DEC013`).
 - PASS — suspension requires substantive rationale and attributable findings.
 - PASS — deferral requires a rationale without being treated as a merit judgment.
 - PASS — retrospective finalized records are permitted.
 - PASS — Marketplace example records the published August 5, 2026 23:59 UTC submission deadline.
+- PASS — Marketplace example maps all seven published hard eligibility gates, including acknowledgment of the SPP3 Program Terms and Award Notice.
+- PASS — Marketplace example preserves the published M1–M5 weights: `25% / 20% / 35% / 10% / 10%`.
 - PASS — Marketplace example maps the public rules URI and all five normative decision surfaces to declared governing sources.
 - PASS — Simocracy allocation arithmetic: `65 + 59 + 20 + 51 + 24 = 219`.
 - PASS — AI cannot occupy a decision-authority type, consistent with `CHARTER.md`.
 - PASS — AI materiality is represented against the grant recommendation, not the institutional decision.
 - PASS — the generic `humanOverride` field is absent; AI-recommendation departures are explicit.
-- PASS — commitment semantics are scoped as configuration-integrity evidence, not proof that a configuration was executed or that a judgment was correct.
+- PASS — commitment timing validation is scoped to the ordering of declared timestamps; v0.1 does not prove pre-deadline existence without an external timestamp or publication anchor.
 - PASS — worked example is explicitly non-evaluative.
 
 ## CI contract
