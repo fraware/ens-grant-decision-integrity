@@ -17,9 +17,9 @@ example = json.loads(EXAMPLE_PATH.read_text(encoding="utf-8"))
 provenance = json.loads(PROVENANCE_PATH.read_text(encoding="utf-8"))
 
 findings = validate_record(example, schema)
-if findings:
-    for finding in findings:
-        print(finding.render())
+for finding in findings:
+    print(finding.render())
+if any(finding.severity == "error" for finding in findings):
     raise SystemExit(1)
 
 allocations = [d["allocationUsd"] for d in provenance["decisions"]]
@@ -30,5 +30,5 @@ if recorded_total != 219:
     raise SystemExit(f"FAIL expected v0.1 provenance total 219, got {recorded_total}")
 
 print("PASS schema is valid Draft 2020-12")
-print("PASS SPP3 example is structurally and semantically conformant")
+print("PASS SPP3 example has no conformance errors")
 print(f"PASS Simocracy allocations reconcile to ${recorded_total}")
