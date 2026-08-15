@@ -38,7 +38,7 @@ The semantic layer detects, among other cases:
 - a failed eligibility gate without supporting evidence;
 - use of `risk` as an epistemic classification instead of `supported-fact`, `judgment`, `uncertainty`, or `unverified-claim`;
 - dangling evidence, evaluator, or finding references;
-- a material finding or disagreement attributed to a non-participating or recused evaluator;
+- an unattributed disagreement or one attributed to a non-participating or recused evaluator;
 - non-public evidence with neither a URI nor a content hash;
 - partially specified criterion weights or weights that do not sum to `1.0`;
 - a public governing-policy URI outside the declared governing source set;
@@ -46,6 +46,7 @@ The semantic layer detects, among other cases:
 - an in-round policy change with incomplete prior-version, change-notice, or rerun traceability;
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
+- an adjudicated decision recorded before its supporting eligibility check;
 - a pending or deferred record that claims a positive award;
 - an approval, rejection, or suspension without attributable material findings and rationale;
 - an approved or suspended award without a positive amount or delivery conditions;
@@ -54,14 +55,16 @@ The semantic layer detects, among other cases:
 - a recusal that omits the affected decision surface or substitution state;
 - a substitute evaluator reference that does not resolve to an active, non-recused evaluator;
 - an adjudicated decision with an unresolved material conflict;
-- a non-pending committee decision that omits participating human members, quorum, or decision rule;
+- a committee decision that omits participating human members, quorum, or decision rule, without conflating an advisory committee evaluator with the final decision authority;
 - an adjudicated decision without a defined factual or procedural correction path;
+- an active challenge without a defined process, a pending decision claiming a post-decision challenge, or a resolved challenge without a resolution;
 - material AI use without the minimum evaluator-manifest provenance envelope;
 - a missing submission deadline when AI materially informs a recommendation;
 - a declared evaluator-manifest commitment time at or after the application deadline;
 - an AI evaluator claiming material influence without participation;
 - an AI-recommendation departure recorded without materially influential AI evaluation;
-- stale AI-departure rationale when no departure is recorded.
+- stale AI-departure rationale when no departure is recorded;
+- an institutional AI-recommendation departure recorded while the decision is still pending.
 
 The profile also represents an eligibility hard-screen separately from a merit rejection. This matches the Marketplace RFP's published rule that an ineligible application is returned without scoring.
 
