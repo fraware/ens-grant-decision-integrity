@@ -17,12 +17,23 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — adversarial suite rejects an adjudicated decision with an unresolved conflict.
 - PASS — adversarial suite rejects a non-pending committee decision without participating human members.
 - PASS — adversarial suite rejects adjudication without a defined factual/procedural correction path (`CHAL002`).
-- PASS — materially used AI evaluation without an evaluator manifest is surfaced as `AI001`.
+- PASS — material AI use without an evaluator manifest fails as `AI001`.
+- PASS — an empty evaluator manifest cannot satisfy schema provenance requirements.
+- PASS — material AI use without a recorded submission deadline fails as `AI004`.
+- PASS — an evaluator-manifest commitment at or after the submission deadline fails as `AI005`.
+- PASS — an AI-recommendation departure cannot be recorded without materially influential AI evaluation (`AI006`).
+- PASS — a valid pre-deadline AI provenance envelope is accepted.
+- PASS — a valid human departure from a materially influential AI recommendation is accepted.
 - PASS — hard-screen ineligibility is represented separately from merit rejection.
+- PASS — suspension requires substantive rationale and attributable findings.
+- PASS — deferral requires a rationale without being treated as a merit judgment.
 - PASS — retrospective finalized records are permitted.
+- PASS — Marketplace example records the published August 5, 2026 23:59 UTC submission deadline.
 - PASS — Simocracy allocation arithmetic: `65 + 59 + 20 + 51 + 24 = 219`.
 - PASS — AI cannot occupy a decision-authority type, consistent with `CHARTER.md`.
-- PASS — commit–reveal is scoped as configuration-integrity evidence, not proof that a configuration was used or that a judgment was correct.
+- PASS — AI materiality is represented against the grant recommendation, not the institutional decision.
+- PASS — the generic `humanOverride` field is absent; AI-recommendation departures are explicit.
+- PASS — commitment semantics are scoped as configuration-integrity evidence, not proof that a configuration was executed or that a judgment was correct.
 - PASS — worked example is explicitly non-evaluative.
 
 ## CI contract
