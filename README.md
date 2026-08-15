@@ -27,7 +27,7 @@ The charter does not try to automate grant judgment. It makes the decision proce
 
 A structurally valid JSON document can still encode a broken governance state. v0.1 therefore uses two validation layers:
 
-1. **JSON Schema** checks types, required fields, allowed states, and several local conditional constraints.
+1. **JSON Schema** checks types, required fields, allowed states, and local conditional constraints.
 2. **Semantic conformance** checks cross-references and institutional invariants across the record.
 
 The semantic layer rejects, among other cases:
@@ -36,20 +36,26 @@ The semantic layer rejects, among other cases:
 - dangling evidence, evaluator, or finding references;
 - criterion weights that are partial or do not sum to `1.0`;
 - a pending record that claims a decision timestamp;
-- approval or rejection of an application that is not eligible;
+- an eligibility summary inconsistent with its underlying rules;
+- approval or rejection without attributable material findings and rationale;
 - an approved award without a positive amount or delivery conditions;
+- a recused evaluator still marked as participating;
 - a finalized decision with an unresolved material conflict;
 - a final committee decision that omits participating human members, quorum, or decision rule;
-- inconsistent evaluator-manifest commitment/reveal states.
+- a final decision without a typed human-governed authority;
+- inconsistent evaluator-manifest commitment/reveal states;
+- a finalized decision with no defined factual or procedural correction path.
 
 Run:
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python scripts/validate.py
-python scripts/conformance.py --strict examples/spp3-marketplace-rfp.example.json
+python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 ```
+
+Use `--strict` when warnings should also fail validation.
 
 ## Current ENS fit
 
@@ -61,7 +67,7 @@ The design is intentionally compatible with current ENS practice:
 - The Marketplace RFP uses milestone-gated payment and on-chain traction evidence.
 - ENS has separately experimented with automated grant screening and identified useful screening capabilities alongside evaluator-gaming and agreeableness risks.
 
-The schema encodes these practices instead of replacing them.
+The worked Marketplace RFP example also exposes one current public-process gap: the reviewed RFP artifacts do not specify a post-decision factual or procedural correction path. The example records `challenge.processDefined=false`, producing warning `CHAL003` while the decision remains pending. A finalized record would fail conformance until the gap is resolved.
 
 ## Status
 
@@ -78,6 +84,7 @@ This package does not claim ratification by ENS DAO, endorsement by the SPP3 com
 5. Can the schema represent experimental grants without forcing false precision?
 6. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
 7. Which semantic conformance rules would create unacceptable operational friction in a real ENS review?
+8. Should ENS define an explicit factual/procedural correction mechanism before the Marketplace RFP decision is finalized?
 
 ## Sources
 
