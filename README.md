@@ -34,10 +34,14 @@ A structurally valid record can still contain cross-field inconsistencies that d
 The semantic layer detects, among other cases:
 
 - a `supported-fact` without evidence;
+- use of `risk` as an epistemic classification instead of `supported-fact`, `judgment`, `uncertainty`, or `unverified-claim`;
 - dangling evidence, evaluator, or finding references;
 - a material finding attributed to a non-participating or recused evaluator;
 - non-public evidence with neither a URI nor a content hash;
 - partially specified criterion weights or weights that do not sum to `1.0`;
+- a public governing-policy URI outside the declared governing source set;
+- a missing or undeclared source for mandate, eligibility, evaluation criteria, conflict rules, or decision procedure;
+- an in-round policy change with incomplete prior-version, change-notice, or rerun traceability;
 - a pending record that claims a decision timestamp;
 - an eligibility summary inconsistent with its underlying rules;
 - a pending or deferred record that claims a positive award;
@@ -48,7 +52,6 @@ The semantic layer detects, among other cases:
 - a substitute evaluator reference that does not resolve to an active, non-recused evaluator;
 - an adjudicated decision with an unresolved material conflict;
 - a non-pending committee decision that omits participating human members, quorum, or decision rule;
-- an in-round policy change that does not state whether prior evaluations were rerun;
 - an adjudicated decision without a defined factual or procedural correction path;
 - material AI use without the minimum evaluator-manifest provenance envelope;
 - a missing submission deadline when AI materially informs a recommendation;
@@ -69,6 +72,12 @@ python scripts/test_conformance.py
 
 Use `--strict` when warnings should also fail validation.
 
+## Fixed-policy traceability
+
+For an active review, the record identifies a public governing-policy URI and maps five normative decision surfaces—mandate, eligibility, evaluation criteria, conflict rules, and decision procedure—to URIs in the declared governing source set.
+
+If policy changes during review, the record additionally identifies the prior version, the disclosed change record, and whether evaluations already completed under the prior version were rerun. v0.1 checks this declared lineage; it does not determine whether the policy itself is legitimate or whether an evaluator interpreted it correctly.
+
 ## AI provenance boundary
 
 When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and a cryptographic commitment recorded strictly before the submission deadline. The record captures the minimum provenance envelope: manifest version, model identity, human-review policy, commitment metadata, and reveal state.
@@ -85,7 +94,7 @@ The design maps directly onto current ENS practices:
 - The Marketplace RFP uses milestone-gated payment and independently verifiable traction evidence.
 - ENS has separately tested AI-assisted grant screening and identified both useful screening capabilities and risks from prompt gaming and model agreeableness.
 
-The worked Marketplace RFP example records one unresolved documentation question without inferring an answer: the reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example sets `challenge.processDefined=false`, which produces warning `CHAL003` for the pending record. It does not assert that no internal or unpublished process exists, and it does not propose changing the rules of the active review.
+The worked Marketplace RFP example maps the public governing-policy URI and each of the five normative decision surfaces to the reviewed public sources. It also records one unresolved documentation question without inferring an answer: the reviewed public artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. The example sets `challenge.processDefined=false`, which produces warning `CHAL003` for the pending record. It does not assert that no internal or unpublished process exists, and it does not propose changing the rules of the active review.
 
 ## Status
 
@@ -98,12 +107,13 @@ This package does not claim ratification by ENS DAO, endorsement by the SPP3 com
 1. Which fields are necessary for a material decision record?
 2. Which fields should be public, selectively disclosed, or retained only for audit?
 3. Should v0.1 define a formal public projection of a confidential canonical record, or leave projection semantics to the adopting program?
-4. What value or risk threshold should trigger the full record?
-5. Is the minimum AI provenance envelope sufficient to make the pre-deadline commitment rule auditable without importing the later full evaluator-manifest protocol?
-6. Can the schema represent experimental grants without forcing false precision?
-7. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
-8. Which conformance rules would create disproportionate operational cost in an actual ENS review?
-9. Does the existing SPP3 process already provide a factual/procedural correction route that the reviewed Marketplace RFP artifacts do not identify? If so, how should the record represent it?
+4. Is the five-surface governing-policy map sufficient to reconstruct the rules of a review without duplicating the policy text?
+5. What value or risk threshold should trigger the full record?
+6. Is the minimum AI provenance envelope sufficient to make the pre-deadline commitment rule auditable without importing the later full evaluator-manifest protocol?
+7. Can the schema represent experimental grants without forcing false precision?
+8. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
+9. Which conformance rules would create disproportionate operational cost in an actual ENS review?
+10. Does the existing SPP3 process already provide a factual/procedural correction route that the reviewed Marketplace RFP artifacts do not identify? If so, how should the record represent it?
 
 ## Sources
 
