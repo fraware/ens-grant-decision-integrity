@@ -56,7 +56,7 @@ Approval, rejection, and suspension require an eligible application, substantive
 
 Pending and deferred records cannot carry a positive `awardedAmount`. The requested amount belongs in `application.requestedAmount`; an award is recorded only after an approving disposition.
 
-Retrospective records are permitted: a decision can predate creation of the record that documents it.
+Retrospective records are permitted: a decision can predate creation of the record that documents it. Once a non-pending decision is represented, however, `decision.decidedAt` cannot be later than `timestamps.updatedAt` (`TIME005`). This preserves retrospective documentation without allowing a record to claim it already contained a future decision.
 
 ### Conflict and recusal integrity
 
@@ -111,7 +111,9 @@ Public, mixed, and confidential classifications must agree with `publicRecord` a
 
 ### Temporal integrity
 
-`updatedAt` cannot precede `createdAt`. The governing policy cannot take effect after the decision it governed. An adjudicated decision cannot precede its recorded eligibility check.
+`updatedAt` cannot precede `createdAt` (`TIME001`). The governing policy cannot take effect after the decision it governed (`TIME003`). An adjudicated decision cannot precede its recorded eligibility check (`TIME004`). A non-pending decision cannot occur after the record's last-update time (`TIME005`).
+
+Retrospective records remain valid when `decision.decidedAt < timestamps.createdAt`, provided the record itself is internally ordered: `createdAt <= updatedAt` and `decidedAt <= updatedAt`.
 
 The active policy version's `effectiveAt` records the effective time of that version; in-round change traceability is checked separately under Governing-policy traceability.
 
