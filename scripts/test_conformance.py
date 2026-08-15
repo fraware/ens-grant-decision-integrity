@@ -89,6 +89,10 @@ def supported_fact_without_evidence(record):
     record["evaluation"]["materialFindings"] = [{"findingId":"F1","statement":"Claim presented as fact.","classification":"supported-fact","evidenceIds":[],"evaluatorIds":["committee"],"materiality":"high"}]
 
 
+def finding_from_nonparticipant(record):
+    record["evaluation"]["materialFindings"] = [{"findingId":"F1","statement":"Illustrative judgment.","classification":"judgment","evidenceIds":[],"evaluatorIds":["committee"],"materiality":"high"}]
+
+
 def nonpublic_evidence_without_locator(record):
     record["evidence"][0]["disclosure"] = "confidential"
     record["evidence"][0].pop("uri", None)
@@ -112,6 +116,29 @@ def recused_but_participating(record):
     record["evaluators"].append({"evaluatorId":"human-1","displayName":"Illustrative reviewer","kind":"human","role":"reviewer","participated":True,"recused":True,"recusalReason":"Illustrative conflict."})
 
 
+def recusal_without_surface(record):
+    record["evaluators"].append({"evaluatorId":"human-recused","displayName":"Illustrative reviewer","kind":"human","role":"reviewer","participated":False,"recused":True,"recusalReason":"Illustrative conflict."})
+    record["conflicts"] = [{"conflictId":"C-recusal","subjectId":"human-recused","description":"Illustrative conflict.","status":"recused","resolution":"Reviewer recused."}]
+
+
+def valid_recusal_without_substitute(record):
+    record["evaluators"].append({"evaluatorId":"human-recused","displayName":"Illustrative reviewer","kind":"human","role":"reviewer","participated":False,"recused":True,"recusalReason":"Illustrative conflict."})
+    record["conflicts"] = [{"conflictId":"C-recusal","subjectId":"human-recused","description":"Illustrative conflict.","status":"recused","resolution":"Reviewer recused.","affectedDecisionSurfaces":["application scoring"],"substitutionUsed":False,"substituteEvaluatorId":None}]
+
+
+def recusal_with_unknown_substitute(record):
+    record["evaluators"].append({"evaluatorId":"human-recused","displayName":"Illustrative reviewer","kind":"human","role":"reviewer","participated":False,"recused":True,"recusalReason":"Illustrative conflict."})
+    record["conflicts"] = [{"conflictId":"C-recusal","subjectId":"human-recused","description":"Illustrative conflict.","status":"recused","resolution":"Reviewer recused and replaced.","affectedDecisionSurfaces":["application scoring"],"substitutionUsed":True,"substituteEvaluatorId":"missing-reviewer"}]
+
+
+def valid_recusal_with_substitute(record):
+    record["evaluators"].extend([
+        {"evaluatorId":"human-recused","displayName":"Illustrative reviewer","kind":"human","role":"reviewer","participated":False,"recused":True,"recusalReason":"Illustrative conflict."},
+        {"evaluatorId":"human-substitute","displayName":"Illustrative substitute","kind":"human","role":"reviewer","participated":True,"recused":False,"recusalReason":None},
+    ])
+    record["conflicts"] = [{"conflictId":"C-recusal","subjectId":"human-recused","description":"Illustrative conflict.","status":"recused","resolution":"Reviewer recused and replaced.","affectedDecisionSurfaces":["application scoring"],"substitutionUsed":True,"substituteEvaluatorId":"human-substitute"}]
+
+
 def unresolved_conflict(record):
     make_approved(record)
     record["conflicts"] = [{"conflictId":"C1","subjectId":"human-final","description":"Material relationship with applicant.","status":"unresolved","resolution":None}]
@@ -126,6 +153,10 @@ def committee_without_members(record):
 
 def material_ai_without_manifest(record):
     add_material_ai(record)
+
+
+def material_ai_without_participation(record):
+    record["evaluators"].append({"evaluatorId":"ai-screen","displayName":"Illustrative AI evaluator","kind":"ai","role":"screening","participated":False,"recused":False,"recusalReason":None,"materiallyInformedRecommendation":True})
 
 
 def material_ai_with_empty_manifest(record):
@@ -183,6 +214,15 @@ def valid_ineligible(record):
     record["challenge"].update({"scope":"Correction of factual or procedural eligibility errors.","processDefined":True})
 
 
+def pending_with_positive_award(record):
+    record["decision"]["awardedAmount"] = 100
+
+
+def deferred_with_positive_award(record):
+    record["evaluators"] = [{"evaluatorId":"human-defer","displayName":"Illustrative decision-maker","kind":"human","role":"decision authority","participated":True,"recused":False,"recusalReason":None}]
+    record["decision"].update({"status":"deferred","authority":"Illustrative decision-maker","authorityKind":"human","decidedAt":"2026-08-16T13:00:00Z","rationale":"Decision deferred pending additional evidence.","awardedAmount":100,"quorum":None,"decisionRule":None})
+
+
 def retrospective_final_record(record):
     make_approved(record)
     record["decision"]["decidedAt"] = "2026-08-10T13:00:00Z"
@@ -202,15 +242,32 @@ def deferred_without_rationale(record):
     record["decision"].update({"status":"deferred","authority":"Illustrative decision-maker","authorityKind":"human","decidedAt":"2026-08-16T13:00:00Z","rationale":None,"quorum":None,"decisionRule":None})
 
 
+def policy_change_without_rerun_statement(record):
+    record["governingPolicy"]["changeDuringReview"] = True
+    record["governingPolicy"]["changeSummary"] = "Illustrative in-round policy correction."
+
+
+def valid_policy_change(record):
+    record["governingPolicy"]["changeDuringReview"] = True
+    record["governingPolicy"]["changeSummary"] = "Illustrative in-round policy correction."
+    record["governingPolicy"]["priorEvaluationsRerun"] = False
+
+
 expect("approval requires delivery conditions", "SCHEMA", approved_without_delivery)
 expect("supported fact requires evidence", "SCHEMA", supported_fact_without_evidence)
+expect("finding cannot be attributed to a non-participant", "EVAL003", finding_from_nonparticipant)
 expect("non-public evidence without locator is surfaced", "EVID003", nonpublic_evidence_without_locator)
 expect_no_errors("non-public evidence with a URI remains usable", nonpublic_evidence_with_uri)
 expect("broken evidence reference is rejected", "REF101", broken_reference)
 expect("eligible summary cannot contain a failed rule", "ELIG001", eligible_with_failed_rule)
 expect("recused evaluator cannot participate", "COI002", recused_but_participating)
+expect("recusal requires affected decision surface", "COI004", recusal_without_surface)
+expect_no_errors("valid recusal without substitute", valid_recusal_without_substitute)
+expect("recusal substitute must resolve", "REF107", recusal_with_unknown_substitute)
+expect_no_errors("valid recusal with substitute", valid_recusal_with_substitute)
 expect("adjudication requires conflict closure", "COI001", unresolved_conflict)
 expect("committee decision requires participating human members", "AUTH001", committee_without_members)
+expect("AI cannot materially inform recommendation without participating", "AI008", material_ai_without_participation)
 expect("material AI use requires a manifest", "AI001", material_ai_without_manifest)
 expect("empty AI manifest cannot satisfy provenance", "SCHEMA", material_ai_with_empty_manifest)
 expect("material AI use requires a submission deadline", "AI004", material_ai_without_deadline)
@@ -221,8 +278,12 @@ expect_no_errors("valid AI recommendation departure", valid_ai_override)
 expect("adjudication requires a correction path", "CHAL002", final_without_challenge_process)
 expect("ineligible summary requires a failed rule", "ELIG002", ineligible_without_failed_rule)
 expect_no_errors("valid ineligible hard-screen record", valid_ineligible)
+expect("pending record cannot carry a positive award", "DEC013", pending_with_positive_award)
+expect("deferred record cannot carry a positive award", "DEC013", deferred_with_positive_award)
 expect_no_errors("retrospective finalized record", retrospective_final_record)
 expect("suspension requires attributable findings", "DEC008", suspended_without_findings)
 expect("deferral requires a rationale", "DEC012", deferred_without_rationale)
+expect("in-round policy change requires rerun statement", "SCHEMA", policy_change_without_rerun_statement)
+expect_no_errors("valid in-round policy change record", valid_policy_change)
 
 print("PASS adversarial conformance suite")
