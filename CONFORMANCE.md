@@ -12,13 +12,13 @@ Identifiers for evaluators, evidence, findings, criteria, disagreements, conflic
 
 A material finding can be attributed only to an evaluator marked as participating and not recused. A finding attributed to a known evaluator who did not participate, or who was recused, fails as `EVAL003`.
 
-A disagreement follows the same attribution rule. A disagreement attributed to a known evaluator who did not participate, or who was recused, fails as `EVAL004`. This prevents a record from manufacturing apparent dissent from an actor who was outside the review surface.
+A recorded disagreement must identify at least one evaluator (`EVAL005`). Each referenced evaluator must have participated and must not have been recused (`EVAL004`). This prevents the record from manufacturing apparent dissent from an actor outside the review surface.
 
 ### Evidence integrity
 
 A finding classified as `supported-fact` must reference evidence. Every material finding must identify at least one evaluator. A scored criterion must reference at least one finding. Public evidence must expose a retrievable URI.
 
-A failed eligibility rule must also reference evidence. A hard-screen failure with an empty `evidenceIds` array fails as `EVID004`; this prevents an ineligible disposition from bypassing the evidence-linkage requirement simply because merit scoring never occurred.
+A failed eligibility rule must also reference evidence. A hard-screen failure with an empty `evidenceIds` array fails as `EVID004`; this prevents an ineligible disposition from bypassing evidence linkage simply because merit scoring never occurred.
 
 Non-public evidence can remain confidential. If it has neither a retrievable URI nor a content hash, the validator emits `EVID003` as an auditability warning. A private URI is sufficient to avoid this warning; v0.1 does not require every confidential artifact to be publicly disclosed or cryptographically committed.
 
@@ -45,6 +45,8 @@ These checks establish declared traceability. They do not establish that the pub
 `eligibility.status=eligible` requires every rule to be `pass` or `not-applicable`. `eligibility.status=ineligible` requires at least one failed rule.
 
 The decision model distinguishes a hard-screen ineligibility disposition from a merit rejection. `decision.status=ineligible` requires `eligibility.status=ineligible`, at least one failed eligibility rule, and a decision or eligibility rationale. It does not require merit findings. The failed rule itself must carry evidence under `EVID004`.
+
+For an adjudicated disposition, the recorded eligibility check cannot occur after the decision it supports (`TIME004`). Deferred records are excluded from this ordering requirement because deferral can occur during an unfinished eligibility process.
 
 ### Decision-state integrity
 
@@ -76,7 +78,7 @@ An adjudicated decision cannot leave a material conflict in `disclosed` or `unre
 
 Decision authority is typed as `human`, `committee`, `dao-vote`, `multisig`, or `other-human-authority`. AI is intentionally absent from the authority types.
 
-A non-pending committee decision must identify participating human members, quorum, and the applicable voting or consensus rule.
+A non-pending decision with `authorityKind=committee` must identify participating human members, quorum, and the applicable voting or consensus rule. A committee that participates only as an evaluator does not trigger those decision-authority requirements.
 
 ### AI evaluator provenance
 
@@ -93,13 +95,15 @@ If a participating AI evaluator materially informed the recommendation:
 
 An empty manifest fails schema validation. A missing manifest produces `AI001`. A missing submission deadline produces `AI004`. A declared commitment time at or after the deadline produces `AI005`.
 
-If the final human decision departs from a materially influential AI recommendation, `decision.aiRecommendationOverridden=true` records that fact and requires `aiOverrideRationale`. Marking an AI departure when no AI evaluator materially informed the recommendation produces `AI006`. Conversely, populating `aiOverrideRationale` when `aiRecommendationOverridden=false` fails as `AI009`; the rationale cannot exist without the event it purports to explain.
+If a finalized human decision departs from a materially influential AI recommendation, `decision.aiRecommendationOverridden=true` records that fact and requires `aiOverrideRationale`. Marking a departure when no AI evaluator materially informed the recommendation produces `AI006`; populating a rationale when no departure is recorded fails as `AI009`; and a pending decision cannot record an institutional departure (`AI010`).
 
 The validator checks the internal ordering of the declared `committedAt` timestamp and submission deadline. v0.1 does not define or verify an external timestamp/publication anchor, verify the commitment digest, prove that the committed configuration was executed, or replay the evaluator. A later commitment protocol is required to establish independently verifiable pre-deadline existence.
 
 ### Challenge integrity
 
-The record states whether a factual or procedural correction process is defined. An adjudicated decision with `challenge.processDefined=false` is non-conformant. A pending record can expose the unresolved documentation question as warning `CHAL003`.
+The record states whether a factual or procedural correction process is defined. An adjudicated decision with `challenge.processDefined=false` is non-conformant (`CHAL002`). A pending record can expose the unresolved documentation question as warning `CHAL003`.
+
+An active or completed challenge state (`open`, `submitted`, `resolved`, or `expired`) requires a defined process (`CHAL004`). A pending decision cannot claim an active or completed post-decision challenge (`CHAL005`). A challenge marked `resolved` must include its resolution (`CHAL006`).
 
 ### Disclosure integrity
 
@@ -107,7 +111,7 @@ Public, mixed, and confidential classifications must agree with `publicRecord` a
 
 ### Temporal integrity
 
-`updatedAt` cannot precede `createdAt`. The governing policy cannot take effect after the decision it governed.
+`updatedAt` cannot precede `createdAt`. The governing policy cannot take effect after the decision it governed. An adjudicated decision cannot precede its recorded eligibility check.
 
 The active policy version's `effectiveAt` records the effective time of that version; in-round change traceability is checked separately under Governing-policy traceability.
 
