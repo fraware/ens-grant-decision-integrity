@@ -7,11 +7,14 @@ This package implements the first funded tranche of the Simocracy proposal **“
 ## Included
 
 - `CHARTER.md` — draft institutional charter for grant decision integrity.
-- `schema/grant-decision-record.schema.json` — JSON Schema (Draft 2020-12) for a versioned grant decision record.
-- `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP into the schema.
+- `schema/grant-decision-record.schema.json` — JSON Schema (Draft 2020-12) for a versioned decision record.
+- `CONFORMANCE.md` — machine-checkable cross-field invariants and severity model.
+- `scripts/conformance.py` — semantic conformance validator.
+- `scripts/test_conformance.py` — adversarial negative tests proving invalid institutional states are rejected.
+- `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP.
 - `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
 - `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
-- `VALIDATION.md` — structural validation results.
+- `VALIDATION.md` — validation contract and expected checks.
 - `LICENSE` — MIT license.
 
 ## Design objective
@@ -20,17 +23,45 @@ The charter does not try to automate grant judgment. It makes the decision proce
 
 > A third party should be able to determine which rules governed a material funding decision, which evidence supported its material findings, who exercised authority, where conflicts or disagreement existed, and what conditions govern challenge and delivery.
 
+## Two-layer validation
+
+A structurally valid JSON document can still encode a broken governance state. v0.1 therefore uses two validation layers:
+
+1. **JSON Schema** checks types, required fields, allowed states, and several local conditional constraints.
+2. **Semantic conformance** checks cross-references and institutional invariants across the record.
+
+The semantic layer rejects, among other cases:
+
+- a `supported-fact` without evidence;
+- dangling evidence, evaluator, or finding references;
+- criterion weights that are partial or do not sum to `1.0`;
+- a pending record that claims a decision timestamp;
+- approval or rejection of an application that is not eligible;
+- an approved award without a positive amount or delivery conditions;
+- a finalized decision with an unresolved material conflict;
+- a final committee decision that omits participating human members, quorum, or decision rule;
+- inconsistent evaluator-manifest commitment/reveal states.
+
+Run:
+
+```bash
+python -m pip install -r requirements-dev.txt
+python scripts/validate.py
+python scripts/conformance.py --strict examples/spp3-marketplace-rfp.example.json
+python scripts/test_conformance.py
+```
+
 ## Current ENS fit
 
 The design is intentionally compatible with current ENS practice:
 
 - SPP3 uses published rubrics and structured evaluation.
-- The Marketplace RFP requires output-defined, dated, independently verifiable milestones.
-- Committee recusals and quorum rules are explicit.
+- The Marketplace RFP requires output-defined, independently verifiable milestones.
+- Committee conflict and quorum rules are explicit.
 - The Marketplace RFP uses milestone-gated payment and on-chain traction evidence.
-- ENS has separately experimented with AI-assisted grant screening and identified both useful screening capabilities and risks from evaluator gaming and overly agreeable models.
+- ENS has separately experimented with automated grant screening and identified useful screening capabilities alongside evaluator-gaming and agreeableness risks.
 
-The schema encodes these practices rather than replacing them.
+The schema encodes these practices instead of replacing them.
 
 ## Status
 
@@ -43,13 +74,14 @@ This package does not claim ratification by ENS DAO, endorsement by the SPP3 com
 1. Which fields are genuinely necessary for a material decision record?
 2. Which fields should be public, selectively disclosed, or retained only for audit?
 3. What monetary or risk threshold should trigger the full record?
-4. Which parts of an AI evaluator manifest should be committed before review and disclosed after decisions?
+4. Which evaluator-manifest elements should be committed before review and disclosed after decisions?
 5. Can the schema represent experimental grants without forcing false precision?
-6. Can an accountability body verify milestones without becoming the substantive grant evaluator?
+6. Can an accountability body verify milestones without acquiring substantive grant-selection authority?
+7. Which semantic conformance rules would create unacceptable operational friction in a real ENS review?
 
 ## Sources
 
 - ENS SPP3 Marketplace RFP: https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263
 - Marketplace RFP submission timeline and rubric: https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309
 - SPP3 cohort recommendation and committee process: https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237
-- ENS AI grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939
+- ENS automated grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939
