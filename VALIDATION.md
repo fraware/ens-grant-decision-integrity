@@ -14,11 +14,13 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — a failed eligibility rule cannot omit supporting evidence (`EVID004`).
 - PASS — `risk` is rejected as an epistemic material-finding classification; the allowed classifications are `supported-fact`, `judgment`, `uncertainty`, and `unverified-claim`.
 - PASS — material findings cannot be attributed to non-participating or recused evaluators (`EVAL003`).
+- PASS — a recorded disagreement must identify at least one evaluator (`EVAL005`).
 - PASS — material disagreements cannot be attributed to non-participating or recused evaluators (`EVAL004`); a valid participating-evaluator disagreement is accepted.
 - PASS — non-public evidence with neither a URI nor a content hash is surfaced as `EVID003` without forcing disclosure.
 - PASS — non-public evidence with a retrievable URI remains usable without `EVID003`.
 - PASS — adversarial suite rejects broken evidence references.
 - PASS — adversarial suite rejects an eligible summary with failed eligibility rules.
+- PASS — an adjudicated disposition cannot precede its recorded eligibility check (`TIME004`).
 - PASS — a public governing-policy URI must occur in the declared governing source set (`POL002`).
 - PASS — the schema requires source mappings for mandate, eligibility, evaluation criteria, conflict rules, and decision procedure.
 - PASS — each decision-surface source must occur in the declared governing source set (`POL003`).
@@ -35,8 +37,12 @@ The repository checks structural validity and the v0.1 cross-field conformance p
 - PASS — a valid recusal without substitution is accepted.
 - PASS — a valid recusal with an active, non-recused substitute is accepted.
 - PASS — adversarial suite rejects an adjudicated decision with an unresolved conflict.
-- PASS — adversarial suite rejects a non-pending committee decision without participating human members.
+- PASS — a committee final authority requires participating human members, quorum, and decision rule.
+- PASS — a participating committee evaluator under a human final authority does not incorrectly trigger committee-authority requirements.
 - PASS — adversarial suite rejects adjudication without a defined factual/procedural correction path (`CHAL002`).
+- PASS — an active/completed challenge state requires a defined process (`CHAL004`).
+- PASS — a pending decision cannot claim an active or completed post-decision challenge (`CHAL005`).
+- PASS — a resolved challenge requires a recorded resolution (`CHAL006`).
 - PASS — an AI evaluator cannot materially inform the recommendation without participating (`AI008`).
 - PASS — material AI use without an evaluator manifest fails as `AI001`.
 - PASS — an empty evaluator manifest cannot satisfy schema provenance requirements.
@@ -73,3 +79,5 @@ python scripts/test_final_consistency.py
 ```
 
 `python scripts/conformance.py --strict ...` intentionally fails the current worked example on `CHAL003` until a factual/procedural correction process is represented.
+
+`PASS` above describes the required executable contract encoded by the current test suite. The authoritative execution status for a specific commit is the CI/local validation record attached to that exact commit; a blocked CI job is not a passing or failing test result.
