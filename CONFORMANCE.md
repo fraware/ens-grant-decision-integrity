@@ -14,6 +14,8 @@ Identifiers for evaluators, evidence, findings, criteria, disagreements, conflic
 
 A finding classified as `supported-fact` must reference evidence. Every material finding must identify at least one evaluator. A scored criterion must reference at least one finding. Public evidence must expose a retrievable URI.
 
+Non-public evidence can remain confidential. If it has neither a retrievable URI nor a content hash, the validator emits `EVID003` as an auditability warning. A private URI is sufficient to avoid this warning; v0.1 does not require every confidential artifact to be publicly disclosed or cryptographically committed.
+
 ### Evaluation integrity
 
 Criterion weights must either be omitted consistently or be specified for every criterion and sum to `1.0`.
