@@ -4,7 +4,7 @@
 
 Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same proposal mechanism. Marginal value declined after roughly the first $200 of cumulative funding.
 
-v0.1 implements the proposal's $200 Charter and decision-record schema work item. Commitment generation, selective disclosure proofs, and evaluator replay remain outside this release.
+v0.1 implements the proposal's $200 Charter and decision-record schema work item. It records the minimum evaluator-provenance envelope needed to enforce the Charter's pre-deadline commitment rule. Commitment generation, a complete evaluator-manifest format, selective disclosure proofs, and evaluator replay remain outside this release.
 
 ## 2. Existing ENS practices preserved
 
@@ -28,7 +28,7 @@ The delivery-condition object models a target date or review window, verificatio
 
 The Marketplace RFP states that applications failing the hard eligibility gate are returned without scoring and that this is not a quality judgment.
 
-The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Merit findings are required for approval and rejection; an ineligible disposition is linked to the failed eligibility rule.
+The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Substantive findings are required for approval, rejection, and suspension; an ineligible disposition is linked to the failed eligibility rule.
 
 ### Privacy and selective disclosure
 
@@ -45,15 +45,17 @@ The same experiment identified two material risks:
 1. publication of exact evaluator instructions can create a gaming surface;
 2. AI evaluators can remain agreeable after identifying substantive red flags.
 
-The Charter addresses the first through a public-rule / operational-manifest boundary and optional commit–reveal. It addresses the second through evidence-linked findings, preserved disagreement, and explicit human authority.
+The Charter addresses the first by keeping public normative rules distinct from operational evaluator details and requiring a commitment to the versioned evaluator manifest before applications close whenever AI materially informs a recommendation. It addresses the second through evidence-linked findings, preserved disagreement, explicit human authority, and attributable departures from AI recommendations.
+
+v0.1 does not define how a manifest is serialized or hashed. It records the manifest version, model identity, human-review policy, commitment metadata, and reveal state so timing and record consistency can be checked without overstating cryptographic guarantees.
 
 ## 4. Threat model
 
-### T1 — Criteria drift during review
+### T1 — Criteria or evaluator drift during review
 
 **Risk:** criteria or AI evaluator configuration changes after applications are observed.
 
-**Control:** versioned policy, evaluator manifest, and optional pre-deadline commitment.
+**Control:** versioned governing policy plus a versioned evaluator manifest committed strictly before the submission deadline when AI materially informs a recommendation.
 
 ### T2 — Unsupported findings
 
@@ -77,7 +79,7 @@ The Charter addresses the first through a public-rule / operational-manifest bou
 
 **Risk:** reviewers treat an AI score or recommendation as binding despite a policy that reserves authority to humans.
 
-**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type.
+**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type. A recorded departure from an AI recommendation cannot exist unless a participating AI evaluator materially informed that recommendation.
 
 ### T6 — Milestones reduce to activity reports
 
@@ -89,7 +91,7 @@ The Charter addresses the first through a public-rule / operational-manifest bou
 
 **Risk:** public auditability reveals private, security-sensitive, or commercially sensitive material.
 
-**Control:** disclosure classification and selective audit access. Hash commitments remain optional and are not treated as cryptographic guarantees unless their mechanism and anchor are specified.
+**Control:** disclosure classification and selective audit access. Hash commitments remain descriptive unless their mechanism and anchor are specified.
 
 ### T8 — Administrative cost exceeds accountability value
 
@@ -99,13 +101,13 @@ The Charter addresses the first through a public-rule / operational-manifest bou
 
 ### T9 — Nominal conformance
 
-**Risk:** a schema-valid record contains cross-field contradictions such as unsupported factual findings, dangling references, inconsistent eligibility, unresolved conflicts, or unattributed committee action.
+**Risk:** a schema-valid record contains cross-field contradictions such as unsupported factual findings, dangling references, inconsistent eligibility, unresolved conflicts, unattributed committee action, or an AI manifest committed after applications close.
 
 **Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial cases in CI.
 
 ## 5. Marketplace RFP worked example
 
-As of August 15, 2026, the Marketplace RFP submission window is closed. Committee evaluation is scheduled for August 5–19, with the award announcement on or before August 28.
+As of August 15, 2026, the Marketplace RFP submission window is closed. The published deadline was August 5 at 23:59 UTC; committee evaluation is scheduled for August 5–19, with the award announcement on or before August 28.
 
 The RFP is a useful test case. It contains:
 
@@ -123,9 +125,9 @@ The reviewed public artifacts do not identify a post-decision factual/procedural
 
 ## 6. Structural validity and record conformance
 
-JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, weight completeness, eligibility consistency, decision-state transitions, conflict closure, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and AI evaluator-manifest state.
+JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, weight completeness, eligibility consistency, decision-state transitions, conflict closure, committee attribution, correction-path declaration, timestamp ordering, delivery conditions, and AI evaluator-manifest timing.
 
-A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, or that ENS has adopted the Charter.
+A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
 
 `CONFORMANCE.md` defines the checks and severity model.
 
