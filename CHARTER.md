@@ -114,7 +114,17 @@ AI outputs are recommendations or evidence-processing artifacts. They do not con
 
 ### 5.2 Evaluator manifest
 
-When AI materially informs a covered decision, the program SHOULD maintain a versioned evaluator manifest containing, to the extent technically and legally practical:
+When AI materially informs a grant recommendation, the program MUST maintain a versioned evaluator manifest.
+
+The decision record MUST identify at minimum:
+
+- the manifest version;
+- the AI model or models represented by the manifest;
+- the human-review policy;
+- the manifest commitment and commitment time;
+- the manifest's reveal state.
+
+The underlying manifest SHOULD contain, to the extent technically and legally practical:
 
 - model provider and model identifier;
 - model or endpoint version information;
@@ -126,35 +136,33 @@ When AI materially informs a covered decision, the program SHOULD maintain a ver
 - material configuration parameters;
 - creation time and version identifier.
 
-### 5.3 Commit–reveal boundary
+v0.1 records the minimum provenance envelope above. A complete evaluator-manifest format, commitment generation, selective disclosure, and replay remain separate work.
 
-Where publishing the exact evaluator configuration prior to the application deadline would create a material gaming surface, the program SHOULD separate:
+### 5.3 Pre-deadline commitment and disclosure
 
-**Public normative rules**
+For any AI system that materially informs a grant recommendation, the program MUST cryptographically commit to the evaluator manifest before applications close.
+
+Public normative rules MUST remain available independently of that commitment, including:
+
 - mandate;
 - eligibility;
 - evaluation dimensions;
 - evidence standards;
 - conflict rules;
-- appeal rights;
+- challenge rights;
 - human authority.
 
-**Operational evaluator details**
-- exact prompts;
-- red-team queries;
-- retrieval sequences;
-- ensemble implementation;
-- hidden consistency checks.
+Exact operational evaluator details MAY remain undisclosed during the application period where disclosure would create a material gaming surface. Those details can include exact prompts, red-team queries, retrieval sequences, ensemble implementation, and hidden consistency checks.
 
-The program MAY cryptographically commit to the operational evaluator manifest prior to the review deadline and disclose it after the decision, subject to applicant privacy, security, licensing, and legal constraints.
+After the decision, the program SHOULD disclose the committed manifest or an appropriate audit representation, subject to applicant privacy, security, licensing, and legal constraints.
 
 A commitment can establish that a subsequently disclosed manifest matches the value committed at the recorded time, assuming the commitment and its time anchor are trustworthy. It does not establish that the evaluator used that manifest, that the review was complete, or that the resulting judgment was correct.
 
-### 5.4 Overrides
+### 5.4 Departures from AI recommendations
 
 A human decision that materially departs from an AI recommendation SHOULD record the departure and its rationale.
 
-A human override is not presumptively an error. The record exists to preserve attribution and reviewability.
+A departure is not presumptively an error. The record exists to preserve attribution and reviewability.
 
 ## 6. Privacy, security, and redaction
 
@@ -203,7 +211,7 @@ A revision SHOULD include:
 - affected decision surfaces;
 - migration treatment for active applications where relevant.
 
-Material changes to eligibility, conflict rules, appeal rights, AI-assisted evaluation rules, or delivery enforcement SHOULD receive public notice under the program's governing process.
+Material changes to eligibility, conflict rules, challenge rights, AI-assisted evaluation rules, or delivery enforcement SHOULD receive public notice under the program's governing process.
 
 ## 9. Minimum decision record
 
@@ -221,7 +229,7 @@ A conforming standard record SHOULD contain:
 - material disagreement;
 - AI evaluator provenance when applicable;
 - final human-governed disposition;
-- override rationale when applicable;
+- departure rationale when applicable;
 - challenge status;
 - award amount if funded;
 - delivery conditions;
