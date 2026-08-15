@@ -34,7 +34,7 @@ I built a small v0.1 artifact from the ENS Simocracy proposal on grant decision 
 
 Would you be willing to give it an adversarial read from the committee or accountability side? The useful question is: **what would you delete, what is missing, and what would make this impractical in an actual grant round?**
 
-I am especially interested in whether the boundary between public criteria and committed/revealed operational AI evaluator details addresses the prompt-gaming concern raised in the AI screening experiment without adding unnecessary process overhead.
+For materially influential AI evaluation, v0.1 now records a minimum provenance envelope and requires the evaluator manifest to be committed before the submission deadline. It does not implement the later full evaluator-manifest protocol or evaluator replay. I would especially value feedback on whether that is the smallest useful boundary for preventing silent configuration changes without adding unnecessary process overhead.
 
 ## Review checklist
 
@@ -47,7 +47,7 @@ A reviewer can respond to any subset:
 - Does the existing SPP3 process already provide a factual/procedural correction route that the public Marketplace artifacts do not identify?
 - Which milestone fields match the accountability body's actual needs?
 - Where should confidential applicant evidence live?
-- Is commit–reveal worth implementing, or is evaluator versioning sufficient?
+- Is the minimum AI provenance envelope sufficient to audit pre-deadline commitment without importing a full evaluator protocol?
 - What is the minimum decision record you would actually use?
 
 ## Success condition
