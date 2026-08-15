@@ -81,12 +81,14 @@ python scripts/test_final_consistency.py
 
 `python scripts/conformance.py --strict ...` intentionally fails the current worked example on `CHAL003` until a factual/procedural correction process is represented.
 
-## Exact-head execution record
+## Exact executable-surface execution record
 
 Commit `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` was independently reconstructed from GitHub-backed file contents and executed against byte-for-byte matched Git blob identities for the schema, canonical example, provenance record, Charter, validator, and both test suites.
 
 The four-command contract above completed successfully. The canonical example emitted only the expected `CHAL003` warning; both adversarial suites completed with all expected rejection and positive-control cases passing.
 
-The GitHub-hosted run for the same commit did not execute: GitHub reports that the job was not started because of the account payment/spending-limit condition. That hosted check is an infrastructure failure, not a test result.
+The branch has since received documentation-only commits. No executable input to the four-command contract changed after `dc3a86a8ec7c555b89865a4e6b37dc45ef443879`; this was verified by Git commit comparison.
 
-`PASS` above describes both the executable contract and the successful independent execution for `dc3a86a8ec7c555b89865a4e6b37dc45ef443879`. A future semantic change invalidates this execution record and requires a fresh exact-head run.
+The GitHub-hosted run for `dc3a86a8ec7c555b89865a4e6b37dc45ef443879` did not execute: GitHub reports that the job was not started because of the account payment/spending-limit condition. That hosted check is an infrastructure failure, not a test result.
+
+`PASS` above describes the executable contract and the successful independent execution of the current executable surface. A future executable or semantic change invalidates this record and requires a fresh exact-surface run.
