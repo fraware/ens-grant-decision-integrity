@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evaluator-manifest.schema.json",
+  "title": "ENS GDI Phase II Evaluator Manifest",
+  "description": "Versioned evaluator configuration committed before applications close. Public normative rules remain on v0.1 governing-policy surfaces.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "programId",
+    "roundId",
+    "applicationDeadline",
+    "models",
+    "instructions",
+    "retrieval",
+    "tools",
+    "parameters",
+    "aggregation",
+    "humanReviewPolicy",
+    "canonicalization"
+  ],
+  "properties": {
+    "manifestVersion": { "const": "1" },
+    "programId": { "type": "string", "minLength": 1 },
+    "roundId": { "type": "string", "minLength": 1 },
+    "applicationDeadline": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "models": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "model"],
+        "properties": {
+          "provider": { "type": "string", "minLength": 1 },
+          "model": { "type": "string", "minLength": 1 },
+          "version": { "type": ["string", "null"] },
+          "replayable": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "instructions": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "retrieval": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": { "type": "string", "minLength": 1 },
+        "sources": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "tools": {
+      "type": "object",
+      "required": ["allowed"],
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Numeric values that need lexical precision MUST be JSON strings.",
+      "additionalProperties": true
+    },
+    "aggregation": {
+      "type": "object",
+      "required": ["method"],
+      "properties": {
+        "method": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "humanReviewPolicy": { "type": "string", "minLength": 1 },
+    "canonicalization": { "const": "RFC8785" }
+  }
+}

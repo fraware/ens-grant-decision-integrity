@@ -1,0 +1,36 @@
+[
+  {
+    "comment": "Lexicographic object keys and nested object.",
+    "value": {
+      "b": 2,
+      "a": 1,
+      "nested": {
+        "d": false,
+        "c": true
+      }
+    },
+    "jcsUtf8Hex": "7b2261223a312c2262223a322c226e6573746564223a7b2263223a747275652c2264223a66616c73657d7d"
+  },
+  {
+    "comment": "Array order is preserved; numbers use JSON/ECMAScript serialization.",
+    "value": {
+      "z": [
+        1,
+        2,
+        3
+      ],
+      "a": "ok"
+    },
+    "jcsUtf8Hex": "7b2261223a226f6b222c227a223a5b312c322c335d7d"
+  },
+  {
+    "comment": "Literals and empty structures.",
+    "value": {
+      "empty": {},
+      "list": [],
+      "flag": false,
+      "missing": null
+    },
+    "jcsUtf8Hex": "7b22656d707479223a7b7d2c22666c6167223a66616c73652c226c697374223a5b5d2c226d697373696e67223a6e756c6c7d"
+  }
+]

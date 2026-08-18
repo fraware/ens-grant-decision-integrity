@@ -81,6 +81,25 @@ Expected results:
 - the declared commitment time precedes the submission deadline;
 - departures from materially influential AI recommendations are recorded only on non-pending dispositions and include rationale.
 
+## Phase II contract (additive)
+
+The v0.1 commands and expected results above are unchanged. Phase II adds a second suite that must not be substituted for them:
+
+```bash
+python -m pip install -r phase2/requirements.txt
+python -m pytest phase2/tests
+```
+
+Expected Phase II results:
+
+- T1–T12 pass;
+- production JCS bytes match a second independent RFC 8785 implementation and RFC 8785 sample encoding;
+- T6/T7 pass on `rekor-v1-recorded-fixture` receipts when live Rekor is unavailable;
+- the public retrospective example has no confidential applicant data, hosted generation `not-replayable`, deterministic layers `exact-match`, and preserves `CHAL003` on its embedded pending v0.1 record;
+- no Phase II object populates `decision.authorityKind`.
+
+A Phase II pass does not establish execution, fairness, legitimacy, or funding authority.
+
 ## Limits
 
 Validation establishes structural and declared cross-field consistency. It does not establish:

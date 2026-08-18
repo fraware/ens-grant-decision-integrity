@@ -119,6 +119,25 @@ v0.1 does not define how a manifest is serialized or hashed, nor how a commitmen
 
 **Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
 
+## 4.1 Phase II protocol controls (P1–P10)
+
+These rows are additive. They do not rewrite T1–T11 above. v0.1 still does not, by itself, prove pre-deadline existence of a commitment.
+
+| ID | Failure mode | Phase II control |
+|---|---|---|
+| P1 | Two serializers produce different bytes for one manifest. | RFC 8785 JCS, I-JSON only; T1 dual implementation. |
+| P2 | A material manifest change after commitment still opens. | Digest opening; adversarial test T2. |
+| P3 | Two salts are treated as one commitment. | 32-byte CSPRNG salt; T3. |
+| P4 | Another object type verifies as an evaluator-manifest commitment. | Versioned domain string; T4. |
+| P5 | programId, roundId, or deadline drift after commitment. | Those fields bind both manifest and envelope; T5. |
+| P6 | A commitment at or after the deadline is treated as pre-deadline. | Profile-verified anchor time, strict inequality; T6. |
+| P7 | A corrupted inclusion proof or substituted digest still verifies. | Offline SET, inclusion, checkpoint, and digest match; T7. |
+| P8 | Withheld state is reported as manifest-content verification. | Reveal-status gate; T8. |
+| P9 | A run attestation with the wrong commitment or output is accepted. | Predicate binding; T9. |
+| P10 | Replay is taken as fairness, or Phase II objects become decision authority. | Layer outcomes including honest `not-replayable`; T10–T12. Authority remains on the v0.1 `decision` object. |
+
+Details: `phase2/CLAIM-MATRIX.md` and `phase2/PROTOCOL.md`.
+
 ## 5. Marketplace RFP worked example
 
 As of August 15, 2026, the Marketplace RFP submission window is closed. The published deadline was August 5 at 23:59 UTC; committee evaluation is scheduled for August 5–19, with the award announcement on or before August 28.

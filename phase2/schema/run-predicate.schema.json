@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run-predicate.schema.json",
+  "title": "ENS GDI Phase II Evaluator Run Predicate",
+  "description": "Custom in-toto predicate. Not a software-build predicate. MUST NOT contain authorityKind or other decision-authority fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestCommitmentDigest",
+    "programId",
+    "roundId",
+    "operator",
+    "implementation",
+    "inputSnapshots",
+    "outputDigest",
+    "humanReviewState",
+    "layerDigests"
+  ],
+  "properties": {
+    "manifestCommitmentDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "programId": { "type": "string", "minLength": 1 },
+    "roundId": { "type": "string", "minLength": 1 },
+    "operator": { "type": "string", "minLength": 1 },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "digestSha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "digestSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "inputSnapshots": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applicationSha256", "evidenceSha256", "retrievalSha256"],
+      "properties": {
+        "applicationSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidenceSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "retrievalSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "outputDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "humanReviewState": { "type": "string", "minLength": 1 },
+    "layerDigests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preprocessing",
+        "retrieval-snapshot",
+        "scoring",
+        "aggregation",
+        "hosted-generation"
+      ],
+      "properties": {
+        "preprocessing": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "retrieval-snapshot": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "scoring": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "aggregation": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "hosted-generation": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

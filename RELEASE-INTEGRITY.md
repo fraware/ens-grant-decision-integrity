@@ -19,6 +19,8 @@ The archive digest authenticates only the exact archive file whose digest is pub
 
 A later release can define deterministic packaging, signed tags or attestations, and an external transparency anchor.
 
+Phase II, when released, remains anchored to a Git commit SHA under the same procedure. Repository version may move to `0.2.0` only at a Phase II release tag. Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is separately specified. A Rekor envelope over an evaluator-manifest commitment is not a signed release of this repository and must not be described as one.
+
 ## Why no in-tree checksum manifest
 
 An in-tree checksum list can detect accidental corruption in a copied tree. It is not an independent authenticity anchor when the checksums and the files they describe can change in the same commit.

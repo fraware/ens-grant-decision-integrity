@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "commitment-envelope.schema.json",
+  "title": "ENS GDI Phase II Commitment Envelope",
+  "description": "Public commitment object. MUST NOT contain salt or hidden manifest contents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "version",
+    "programId",
+    "roundId",
+    "applicationDeadline",
+    "commitmentAlgorithm",
+    "commitmentDigest",
+    "manifestSchemaVersion"
+  ],
+  "properties": {
+    "type": { "const": "ens-gdi-evaluator-manifest-commitment" },
+    "version": { "const": "1" },
+    "programId": { "type": "string", "minLength": 1 },
+    "roundId": { "type": "string", "minLength": 1 },
+    "applicationDeadline": { "type": "string", "format": "date-time" },
+    "commitmentAlgorithm": { "const": "sha256-salted-jcs-rfc8785-v1" },
+    "commitmentDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifestSchemaVersion": { "const": "1" }
+  }
+}
