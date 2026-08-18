@@ -1,55 +1,80 @@
-# ENS Grant Decision Integrity — v0.1
+# ENS Grant Decision Integrity
 
-A compact, vendor-neutral governance artifact for making material ENS grant decisions inspectable without delegating final authority to automated systems.
+A draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
-This package implements the first funded tranche of the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to the proposal. The first proposed tranche was $200 for a draft Grants Charter and a machine-readable decision-record schema.
+The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to that proposal. v0.1 implements its first $200 work item: a Grants Charter and a machine-readable decision-record schema.
 
-## Included
+## What v0.1 provides
 
-- `CHARTER.md` — draft institutional charter for grant decision integrity.
-- `schema/grant-decision-record.schema.json` — JSON Schema (Draft 2020-12) for a versioned grant decision record.
-- `examples/spp3-marketplace-rfp.example.json` — illustrative, non-evaluative mapping of the current SPP3 Marketplace RFP into the schema.
-- `provenance/simocracy-funding.json` — the five recorded funding decisions and allocation totals.
-- `DESIGN-NOTES.md` — design rationale, threat model, scope boundaries, and source mapping.
-- `VALIDATION.md` — structural validation results.
-- `LICENSE` — MIT license.
+The profile records enough information for a third party to reconstruct the procedural basis of a material funding decision:
 
-## Design objective
+- the versioned public rules governing the review;
+- eligibility results and evidence for failed gates;
+- evaluation criteria, material findings, and evidence references;
+- evaluator participation, disagreement, conflicts, recusals, and substitutions;
+- the human-governed decision authority and decision state;
+- a factual/procedural correction path;
+- delivery conditions for funded awards;
+- minimum provenance when AI materially informs a recommendation.
 
-The charter does not try to automate grant judgment. It makes the decision procedure attributable and reviewable.
+JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express.
 
-> A third party should be able to determine which rules governed a material funding decision, which evidence supported its material findings, who exercised authority, where conflicts or disagreement existed, and what conditions govern challenge and delivery.
+## Repository
 
-## Current ENS fit
+- `CHARTER.md` — normative decision-integrity requirements.
+- `schema/grant-decision-record.schema.json` — JSON Schema Draft 2020-12 record format.
+- `CONFORMANCE.md` — cross-field conformance rules and severity model.
+- `scripts/conformance.py` — semantic conformance validator.
+- `scripts/test_conformance.py` — adversarial and valid-edge tests.
+- `scripts/test_final_consistency.py` — source-fidelity and cross-field regression tests.
+- `examples/spp3-marketplace-rfp.example.json` — fictional, non-evaluative mapping of the ENS SPP3 Marketplace RFP.
+- `provenance/simocracy-funding.json` — recorded Simocracy funding decisions.
+- `DESIGN-NOTES.md` — design rationale, threat model, and scope boundaries.
+- `VALIDATION.md` — validation contract and expected outcomes.
+- `REVIEW-REQUEST.md` — focused review protocol.
+- `RELEASE-INTEGRITY.md` — release-integrity procedure.
 
-The design is intentionally compatible with current ENS practice:
+## Validation
 
-- SPP3 uses published rubrics and structured evaluation.
-- The Marketplace RFP requires output-defined, dated, independently verifiable milestones.
-- Committee recusals and quorum rules are explicit.
-- The Marketplace RFP uses milestone-gated payment and on-chain traction evidence.
-- ENS has separately experimented with AI-assisted grant screening and identified both useful screening capabilities and risks from evaluator gaming and overly agreeable models.
+Install the pinned development dependency and run the complete contract:
 
-The schema encodes these practices rather than replacing them.
+```bash
+python -m pip install -r requirements-dev.txt
+python scripts/validate.py
+python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
+python scripts/test_conformance.py
+python scripts/test_final_consistency.py
+```
 
-## Status
+The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract.
 
-**Draft v0.1 — implementation artifact, not an adopted ENS policy.**
+## ENS process mapping
 
-This package does not claim ratification by ENS DAO, endorsement by the SPP3 committee, or adoption by the ENS Foundation.
+The worked example maps the public SPP3 Marketplace process without evaluating any applicant. It records:
 
-## Suggested review questions
+- all seven published hard eligibility conditions;
+- the published M1–M5 weights: 25%, 20%, 35%, 10%, and 10%;
+- the public rules and sources governing mandate, eligibility, evaluation criteria, conflict rules, and decision procedure;
+- the published committee quorum and decision rule;
+- milestone and traction-verification requirements.
 
-1. Which fields are genuinely necessary for a material decision record?
-2. Which fields should be public, selectively disclosed, or retained only for audit?
-3. What monetary or risk threshold should trigger the full record?
-4. Which parts of an AI evaluator manifest should be committed before review and disclosed after decisions?
-5. Can the schema represent experimental grants without forcing false precision?
-6. Can an accountability body verify milestones without becoming the substantive grant evaluator?
+The example is a dated snapshot of the published process. It is fictional, does not identify, score, recommend, or reject a real applicant, and does not need to be rewritten when the underlying RFP later reaches an award state. A later process change warrants a new example or version only if it changes the decision-integrity model.
+
+## AI provenance boundary
+
+When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and records a minimum provenance envelope: model identity, human-review policy, commitment metadata, reveal state, and the application deadline used for the timing check.
+
+The validator checks only that the declared commitment time precedes the declared submission deadline. v0.1 does not define canonical manifest serialization, commitment generation, an independently verifiable timestamp or publication anchor, proof verification, selective-disclosure proofs, or evaluator replay. It therefore does not prove that a commitment existed at the declared time or that the committed configuration was actually used.
+
+## Scope
+
+This project governs the integrity of the decision record. It does not determine which projects ENS should fund, replace substantive committee judgment, establish the truth of cited evidence, or create authority for AI systems to approve, reject, suspend, or release funding.
+
+**Draft v0.1.** This artifact is not adopted ENS policy and does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee.
 
 ## Sources
 
 - ENS SPP3 Marketplace RFP: https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263
 - Marketplace RFP submission timeline and rubric: https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309
-- SPP3 cohort recommendation and committee process: https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237
+- SPP3 program authorization and committee model: https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086
 - ENS AI grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939

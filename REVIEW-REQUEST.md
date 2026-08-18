@@ -1,55 +1,63 @@
-# Review Request — Draft v0.1
-
-## Intended audience
-
-SPP3 committee / accountability participants and Lighthouse Labs contributors working on grant evaluation.
+# External Review Protocol — Draft v0.1
 
 ## Objective
 
-Obtain one concrete external judgment on whether the Charter and decision-record schema would improve an actual ENS funding process without adding disproportionate administrative overhead.
+Test whether the Charter and decision-record schema improve an actual ENS funding workflow without creating disproportionate process cost.
 
-The request is deliberately for critique, not endorsement or funding.
+The request is for adversarial critique. It is not a request for endorsement, funding, or a decision on any live applicant.
 
-## Public forum note
+## Review boundary
 
-I used the recent ENS Simocracy experiment to test a narrow governance question: if grant evaluation becomes more structured and increasingly AI-assisted, what minimum record should exist so the DAO can still reconstruct how a material decision was made?
+v0.1 contains a draft Grants Charter, a machine-readable decision-record schema, a conformance validator, and a fictional mapping of the public SPP3 Marketplace process.
 
-Five ENS Governance funding decisions allocated a cumulative $219 to the resulting proposal, with evaluators repeatedly identifying the Grants Charter and commit–reveal treatment of AI-assisted screening as the distinctive pieces. I have now implemented the first tranche as a small v0.1 package: a draft Grant Decision Integrity Charter, a machine-readable decision-record schema, and a non-evaluative mapping of the current Marketplace RFP into that schema.
+It does not implement a complete evaluator-manifest protocol, independently verifiable commitment anchoring, selective-disclosure proofs, evaluator replay, or a deterministic confidential-to-public record projection.
 
-I deliberately used the Marketplace RFP only as a process example. The example does not identify, score, or comment on any live applicant.
+The worked Marketplace record does not identify, score, recommend, or reject a real applicant and does not propose changing an active review.
 
-The question I would value feedback on is narrow: **which fields would actually improve the committee/accountability workflow, and which fields would create process cost without enough audit value?**
+## Validation
 
-In particular, I would be interested in reactions to three boundaries:
+The repository carries a reproducible validation contract in `VALIDATION.md`. The worked example is expected to have no conformance errors and to emit only `CHAL003` while the reviewed public process does not identify a factual/procedural correction route.
 
-1. public normative criteria versus operational evaluator details;
-2. public decision records versus selectively disclosed audit material;
-3. milestone verification versus substantive re-evaluation of the grantee.
+## Primary review question
 
-If the schema is useful, I can revise it against the committee's actual workflow. If a simpler record provides the same guarantees, I would prefer the simpler design.
+**What would you delete, what is missing, and what would make this impractical in a real ENS funding workflow?**
 
-## Direct review request
+A simpler mechanism is preferable wherever it preserves the same guarantees.
 
-I built a small v0.1 artifact from the ENS Simocracy proposal on grant decision integrity: a draft Charter plus a JSON decision-record schema. I mapped the public Marketplace RFP process into one fictional, pending record so the design could be tested against a real ENS workflow without touching live applicant evaluation.
+## Review lenses
 
-Would you be willing to give it a quick adversarial read from the committee/accountability side? The useful question for me is not “do you like the idea?” It is: **what would you delete, what is missing, and what would make this impractical to use in an actual grant round?**
+### Committee workflow
 
-I am especially interested in whether the proposed boundary between public criteria and committed/revealed operational evaluator details addresses the prompt-gaming concern raised in the AI screening experiment without creating unnecessary process overhead.
+- Does the distinction between evaluator participation and final decision authority match actual committee practice?
+- Are quorum, decision-rule, recusal, and substitution records sufficient without duplicating internal administration?
+- Is the five-surface governing-policy map sufficient to reconstruct which public rules governed a review?
+- Which required fields create process cost without enough audit value?
 
-## Review checklist
+### Grant administration and accountability
 
-A reviewer can respond to any subset:
+- Is evidence linkage for failed hard-screen rules operationally realistic?
+- Does the challenge model correctly distinguish factual/procedural correction from relitigation of substantive judgment?
+- Does the existing process already provide a correction route that the reviewed public Marketplace artifacts do not identify?
+- Do delivery-condition fields support accountability without giving the verifier authority to re-evaluate grant merit?
+- Which information should remain internal or selectively disclosed?
 
-- Is policy versioning already captured elsewhere in a way that makes the schema field redundant?
-- Is an evidence link for every material finding realistic?
-- Should individual evaluator identity remain internal in some programs?
-- Is preserved disagreement valuable, or would it create noise?
-- Is the proposed factual-correction challenge path too broad or too narrow?
-- Which milestone fields match the accountability body's actual needs?
-- Where should confidential applicant evidence live?
-- Is commit–reveal worth implementing, or is simple evaluator versioning sufficient?
-- What is the minimum decision record you would actually use?
+### AI-assisted evaluation
+
+- Is `materiallyInformedRecommendation` the right threshold for triggering evaluator-manifest provenance?
+- Which evaluator-manifest elements must be fixed before applications close, and which should remain undisclosed until later?
+- Does the declared pre-deadline commitment requirement address configuration drift without implying stronger assurance than the record provides?
+- What independently verifiable timestamp or publication anchor would be appropriate in a later commit–reveal protocol?
+- Could the manifest or conformance rules themselves create a gaming surface?
+
+## Requested response format
+
+For each issue, a short response is sufficient:
+
+1. **Surface** — Charter section, schema field, or conformance rule.
+2. **Failure mode or cost** — what goes wrong in a real workflow.
+3. **Evidence or scenario** — concrete example if available.
+4. **Smallest change** — delete, add, weaken, strengthen, or leave unchanged.
 
 ## Success condition
 
-The review succeeds if it produces at least one concrete schema deletion, addition, or constraint grounded in an actual ENS review workflow.
+The review succeeds if it identifies at least one concrete deletion, addition, constraint, simplification, or confirmed non-change grounded in an actual review or accountability workflow.

@@ -16,7 +16,7 @@ The project is optimized for narrow, evidence-backed improvements to grant decis
 A proposed change should state:
 
 1. the decision surface affected;
-2. the failure mode or operational burden;
+2. the failure mode or operational cost;
 3. the evidence or concrete scenario;
 4. the smallest change that resolves it;
 5. any new privacy, security, or governance trade-off introduced.
