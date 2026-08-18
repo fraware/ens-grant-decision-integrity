@@ -22,3 +22,7 @@ A proposed change should state:
 5. any new privacy, security, or governance trade-off introduced.
 
 Please avoid broad governance manifestos or unsupported claims of objectivity. The artifact governs decision integrity; it does not determine which projects should receive funding.
+
+## Validation before proposing a change
+
+Run the complete validation contract in `README.md` before proposing a change. A contribution that intentionally changes a conformance rule should update the corresponding adversarial or regression test and explain the new guarantee or trade-off.

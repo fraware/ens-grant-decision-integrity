@@ -19,4 +19,4 @@ jobs:
       - run: python scripts/validate.py
       - run: python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
       - run: python scripts/test_conformance.py
-      - run: python scripts/test_final_consistency.py
+      - run: python scripts/test_regressions.py

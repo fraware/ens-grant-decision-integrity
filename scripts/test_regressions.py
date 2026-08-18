@@ -229,4 +229,4 @@ expect("AI rationale requires a recorded departure", "AI009", stale_ai_departure
 expect("no-change policy record rejects stale change metadata", "POL006", stale_policy_change_metadata)
 expect_no_errors("canonical no-change policy metadata", canonical_no_change)
 
-print("PASS final cross-field consistency suite")
+print("PASS regression and source-consistency suite")

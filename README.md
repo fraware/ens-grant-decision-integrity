@@ -1,6 +1,6 @@
 # ENS Grant Decision Integrity
 
-A draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
+A versioned draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
 The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to that proposal. v0.1 implements its first $200 work item: a Grants Charter and a machine-readable decision-record schema.
 
@@ -26,12 +26,15 @@ JSON Schema validates record structure. A separate conformance validator checks 
 - `CONFORMANCE.md` — cross-field conformance rules and severity model.
 - `scripts/conformance.py` — semantic conformance validator.
 - `scripts/test_conformance.py` — adversarial and valid-edge tests.
-- `scripts/test_final_consistency.py` — source-fidelity and cross-field regression tests.
+- `scripts/test_regressions.py` — source-fidelity and cross-field regression tests.
 - `examples/spp3-marketplace-rfp.example.json` — fictional, non-evaluative mapping of the ENS SPP3 Marketplace RFP.
 - `provenance/simocracy-funding.json` — recorded Simocracy funding decisions.
 - `DESIGN-NOTES.md` — design rationale, threat model, and scope boundaries.
 - `VALIDATION.md` — validation contract and expected outcomes.
-- `REVIEW-REQUEST.md` — focused review protocol.
+- `REVIEW.md` — focused review guide.
+- `CONTRIBUTING.md` — contribution standard.
+- `SECURITY.md` — handling for sensitive reports.
+- `CITATION.cff` and `LICENSE` — citation and licensing metadata.
 - `RELEASE-INTEGRITY.md` — release-integrity procedure.
 
 ## Validation
@@ -43,7 +46,7 @@ python -m pip install -r requirements-dev.txt
 python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
-python scripts/test_final_consistency.py
+python scripts/test_regressions.py
 ```
 
 The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract.
@@ -70,7 +73,7 @@ The validator checks only that the declared commitment time precedes the declare
 
 This project governs the integrity of the decision record. It does not determine which projects ENS should fund, replace substantive committee judgment, establish the truth of cited evidence, or create authority for AI systems to approve, reject, suspend, or release funding.
 
-**Draft v0.1.** This artifact is not adopted ENS policy and does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee.
+**Status.** Repository version `0.1.0` implements record schema version `0.1`. The Charter remains a draft governance proposal: it is not adopted ENS policy and does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee.
 
 ## Sources
 
