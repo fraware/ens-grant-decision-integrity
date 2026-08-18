@@ -4,25 +4,27 @@
 
 This Charter defines minimum procedural guarantees for material grant and service-provider funding decisions made on behalf of ENS.
 
-Its purpose is to preserve accountable human judgment as grant evaluation becomes more technical, evidence-intensive, and increasingly assisted by automated systems. It establishes a record of **which rules governed a decision, which evidence supported material findings, who exercised authority, where conflicts or disagreement existed, and how the resulting award is verified after selection**.
+Its purpose is to make material decisions reconstructable without displacing accountable human judgment. A conforming record identifies **which rules governed the decision, which evidence supported material findings, who exercised authority, where conflicts or disagreement existed, and which conditions govern challenge and delivery**.
 
 The Charter is neutral on treasury custody, board composition, funding strategy, and the substantive merits of individual applicants. It governs the integrity of the adjudicative process.
 
+The key words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT**, and **MAY** are to be interpreted as described in RFC 2119 and RFC 8174 when, and only when, they appear in all capitals.
+
 ## 2. Scope
 
-The Charter applies to a funding program, grant, service-provider award, or other discretionary allocation when the responsible ENS body determines that the decision is material by value, risk, strategic importance, or use of automated evaluation.
+The Charter applies to a funding program, grant, service-provider award, or other discretionary allocation when the responsible ENS body determines that the decision is material by value, risk, strategic importance, or material use of AI-assisted evaluation.
 
 A program MAY use a simplified record for low-value or routine awards. Simplification MUST preserve the core invariants in Section 4.
 
-This Charter does not itself establish eligibility, scoring weights, program budgets, or selection thresholds. Those remain program-specific and must be referenced through the applicable decision policy.
+This Charter does not establish eligibility, scoring weights, program budgets, or selection thresholds. Those remain program-specific and MUST be identified through the governing decision policy.
 
 ## 3. Roles
 
 Each covered decision MUST identify the following roles where applicable:
 
 - **Policy authority** — the body authorized to establish the program mandate and evaluation rules.
-- **Evaluator** — a human or automated system producing findings, scores, recommendations, or evidence summaries.
-- **Decision authority** — the human body authorized to approve, reject, defer, suspend, or modify an award.
+- **Evaluator** — a human or AI system producing findings, scores, recommendations, or evidence summaries.
+- **Decision authority** — the human-governed body authorized to approve, reject, defer, suspend, or modify an award.
 - **Accountability authority** — the body authorized to verify delivery conditions or administer payment consequences.
 - **Applicant** — the person or organization seeking funding.
 - **Appeal authority** — the body or procedure authorized to correct factual or procedural errors.
@@ -35,11 +37,15 @@ Every covered material decision MUST satisfy the following invariants.
 
 ### 4.1 Fixed governing policy
 
-The record MUST identify the exact version of the mandate, eligibility rules, evaluation criteria, conflict rules, and decision procedure governing the active review.
+The governing policy for an active review MUST be publicly available. The record MUST identify its exact version and the source governing each of the mandate, eligibility rules, evaluation criteria, conflict rules, and decision procedure.
 
-Material changes during an active review MUST be versioned and disclosed. A change affecting applicant treatment MUST state its effective time and whether prior evaluations were rerun.
+Material changes during an active review MUST be versioned and disclosed. The record MUST identify the prior version and the disclosure record. A change affecting applicant treatment MUST state its effective time and whether prior evaluations were rerun.
 
 ### 4.2 Evidence-linked material findings
+
+Each failed eligibility determination used to support an ineligible disposition MUST identify supporting evidence.
+
+An adjudicated disposition MUST NOT be recorded earlier than the eligibility check supporting that disposition.
 
 Each material finding used to support approval, rejection, ranking, suspension, or payment MUST either:
 
@@ -50,33 +56,39 @@ Evidence references SHOULD be independently retrievable where privacy, security,
 
 ### 4.3 Attributable authority
 
-The final disposition MUST identify the decision authority and the date of the decision.
+A final disposition MUST identify the decision authority and decision time.
 
-Where a committee acts collectively, the record MUST identify participating members, recusals, quorum status, and the applicable voting or consensus rule.
+Any non-pending disposition represented in a record MUST occur at or before the record's last-update time. Retrospective documentation MAY be created after the disposition, but a record MUST NOT claim to contain a disposition that occurs after its own last recorded update.
+
+Where a committee acts collectively as the decision authority, the record MUST identify participating human members, recusals, quorum status, and the applicable voting or consensus rule. A committee participating only as an evaluator does not by itself make the committee the decision authority.
 
 ### 4.4 Conflict handling
 
 Material conflicts of interest MUST be disclosed and resolved according to the governing conflict policy.
 
-A recusal MUST identify the affected evaluator or decision-maker and the decision surface from which they were excluded. If a substitution or alternate reviewer is used, the record MUST identify that substitution.
+A recusal MUST identify the affected evaluator or decision-maker and the decision surface from which they were excluded. If a substitution or alternate reviewer is used, the record MUST identify that substitution. Where the recused subject is represented as an evaluator in the record, the conflict state and evaluator participation state MUST agree.
 
 ### 4.5 Preserved disagreement
 
 Material disagreement among evaluators SHOULD remain visible when it affects risk, eligibility, security, scope, budget, or delivery confidence.
 
+Any disagreement represented in the decision record MUST identify at least one participating, non-recused evaluator to whom that disagreement is attributable.
+
 An aggregate score MUST NOT be treated as evidence that disagreement did not exist.
 
 ### 4.6 Explicit human authority
 
-An automated system MUST NOT possess unilateral authority to approve, reject, suspend, or release material grant funding.
+An AI system MUST NOT exercise unilateral authority to approve, reject, suspend, or release material grant funding.
 
-When an automated system materially informs a recommendation, the final decision record MUST identify the responsible human decision authority.
+When an AI system materially informs a recommendation, the final decision record MUST identify the responsible human decision authority.
 
 ### 4.7 Challenge path
 
-Applicants MUST have a defined process to identify factual errors or procedural deviations.
+Applicants MUST have a defined process to identify factual errors or procedural deviations in an adjudicated decision.
 
 The challenge process MAY be limited in scope and time. It need not create a right to relitigate substantive judgment, but it MUST distinguish factual correction from substantive disagreement.
+
+A challenge represented as open, submitted, resolved, or expired MUST correspond to a defined process. A pending decision record MUST NOT represent a post-decision challenge as active or completed. A challenge marked resolved MUST record its resolution.
 
 ### 4.8 Delivery conditions
 
@@ -91,7 +103,7 @@ Each material condition SHOULD specify:
 - dependencies outside the grantee's control;
 - the payment, remediation, or escalation consequence.
 
-Experimental work MAY use learning gates, decision gates, or evidence-generation milestones when output cannot responsibly be fixed in advance. The gate itself must remain observable.
+Experimental work MAY use learning gates, decision gates, or evidence-generation milestones when a fixed output would create false precision. The gate itself MUST remain observable.
 
 ## 5. AI-assisted evaluation
 
@@ -108,11 +120,21 @@ AI systems MAY assist with:
 - drafting;
 - summarization.
 
-AI outputs are recommendations or evidence-processing artifacts. They are not institutional authority.
+AI outputs are recommendations or evidence-processing artifacts. They do not constitute institutional authority.
 
 ### 5.2 Evaluator manifest
 
-When AI materially informs a covered decision, the program SHOULD maintain a versioned evaluator manifest containing, to the extent technically and legally practical:
+When AI materially informs a grant recommendation, the program MUST maintain a versioned evaluator manifest.
+
+The decision record MUST identify at minimum:
+
+- the manifest version;
+- the AI model or models represented by the manifest;
+- the human-review policy;
+- the manifest commitment and commitment time;
+- the manifest's reveal state.
+
+The underlying manifest SHOULD contain, to the extent technically and legally practical:
 
 - model provider and model identifier;
 - model or endpoint version information;
@@ -124,37 +146,35 @@ When AI materially informs a covered decision, the program SHOULD maintain a ver
 - material configuration parameters;
 - creation time and version identifier.
 
-### 5.3 Commit–reveal boundary
+v0.1 records the minimum provenance envelope above. A complete evaluator-manifest format, commitment generation, selective disclosure, and replay remain separate work.
 
-Where publishing the exact evaluator configuration before applications close would create a material gaming surface, the program SHOULD separate:
+### 5.3 Pre-deadline commitment and disclosure
 
-**Public normative rules**
+For any AI system that materially informs a grant recommendation, the program MUST cryptographically commit to the evaluator manifest before applications close.
+
+Public normative rules MUST remain available independently of that commitment, including:
+
 - mandate;
 - eligibility;
 - evaluation dimensions;
 - evidence standards;
 - conflict rules;
-- appeal rights;
+- challenge rights;
 - human authority.
 
-from:
+Exact operational evaluator details MAY remain undisclosed during the application period where disclosure would create a material gaming surface. Those details can include exact prompts, red-team queries, retrieval sequences, ensemble implementation, and hidden consistency checks.
 
-**Operational evaluator details**
-- exact prompts;
-- red-team queries;
-- retrieval sequences;
-- ensemble implementation;
-- hidden consistency checks.
+After the decision, the program SHOULD disclose the committed manifest or an appropriate audit representation, subject to applicant privacy, security, licensing, and legal constraints.
 
-The program MAY cryptographically commit to the operational evaluator manifest before the review deadline and disclose it after the decision, subject to applicant privacy, security, licensing, and legal constraints.
+The v0.1 decision record stores declared commitment metadata, including `committedAt`; it does not define or verify an external timestamp or publication anchor. A later commitment protocol must specify how the digest is bound to independently verifiable pre-deadline existence. Where such an anchor is trustworthy, a commitment can establish that a subsequently disclosed manifest matches the value committed at the anchored time. It still does not establish that the evaluator used that manifest, that the review was complete, or that the resulting judgment was correct.
 
-A commitment proves that a configuration existed in a fixed form. It does not prove that the resulting judgment was substantively correct.
+### 5.4 Departures from AI recommendations
 
-### 5.4 Overrides
+A human decision that materially departs from an AI recommendation SHOULD record the departure and its rationale.
 
-A human decision that materially departs from an automated recommendation SHOULD record the departure and its rationale.
+A pending decision record MUST NOT mark an AI recommendation as overridden; such a departure is an attribute of an institutional disposition, not of an in-progress review.
 
-A human override is not presumptively an error. The purpose of the record is attribution and reviewability.
+A departure is not presumptively an error. The record exists to preserve attribution and reviewability.
 
 ## 6. Privacy, security, and redaction
 
@@ -176,17 +196,17 @@ The program SHOULD distinguish:
 2. selectively disclosed audit material;
 3. confidential source material.
 
-Hash commitments MAY be used to prove the existence or integrity of withheld artifacts without publishing their contents.
+A hash commitment MAY support later integrity checks over a withheld artifact when the commitment mechanism and its anchor are specified. v0.1 does not define such a mechanism.
 
 ## 7. Proportionality
 
-The record burden SHOULD scale with value and risk.
+Recording requirements SHOULD scale with value and risk.
 
 A program MAY define tiers such as:
 
 - **Tier A — simplified**: low-value or routine grants;
 - **Tier B — standard**: material grants requiring complete decision and delivery records;
-- **Tier C — enhanced**: high-value, security-sensitive, strategically significant, or AI-material decisions requiring evaluator provenance and stronger auditability.
+- **Tier C — enhanced**: high-value, security-sensitive, strategically significant, or materially AI-assisted decisions requiring stronger evaluator provenance and auditability.
 
 The thresholds are program-specific. A monetary threshold alone SHOULD NOT determine enhanced treatment where security or institutional risk is high.
 
@@ -203,7 +223,7 @@ A revision SHOULD include:
 - affected decision surfaces;
 - migration treatment for active applications where relevant.
 
-Material changes to eligibility, conflict rules, appeal rights, automated authority, or delivery enforcement SHOULD receive public notice under the program's governing process.
+Material changes to eligibility, conflict rules, challenge rights, AI-assisted evaluation rules, or delivery enforcement SHOULD receive public notice under the program's governing process.
 
 ## 9. Minimum decision record
 
@@ -219,28 +239,28 @@ A conforming standard record SHOULD contain:
 - evaluator identities or permitted pseudonymous identifiers;
 - conflicts and recusals;
 - material disagreement;
-- automated evaluator provenance when applicable;
-- final human disposition;
-- override rationale when applicable;
+- AI evaluator provenance when applicable;
+- final human-governed disposition;
+- departure rationale when applicable;
 - challenge status;
 - award amount if funded;
 - delivery conditions;
 - public/private disclosure classification;
-- timestamps and integrity metadata.
+- timestamps and provenance metadata.
 
-The accompanying JSON Schema defines a machine-readable representation.
+The accompanying JSON Schema defines a machine-readable representation. `scripts/conformance.py` checks the v0.1 cross-field conformance profile.
 
 ## 10. Non-goals
 
 This Charter does not:
 
 - determine which projects ENS should fund;
-- require automated scoring;
+- require AI scoring;
 - require public disclosure of every applicant artifact;
 - replace committee judgment with a formula;
 - require every grant to use the same rubric;
 - guarantee substantive correctness;
-- make cryptographic commitment equivalent to institutional legitimacy;
+- make cryptographic commitment equivalent to procedural or institutional legitimacy;
 - authorize an accountability body to reinterpret grant quality outside its delegated mandate.
 
 ## 11. Adoption and review
@@ -253,10 +273,12 @@ An ENS funding program adopting this Charter SHOULD publish:
 4. the public decision-record location;
 5. the responsible appeal and accountability authorities.
 
-The Charter SHOULD be reviewed after each major funding cycle against observed administrative cost, appeals, false or unsupported findings, implementation failures, evaluator gaming, and stakeholder feedback.
+The Charter SHOULD be reviewed after each major funding cycle against observed administrative cost, appeals, unsupported findings, implementation failures, evaluator gaming, and stakeholder feedback.
 
 ## 12. Conformance statement
 
-A program may state that a decision record is **“ENS Grant Decision Integrity Charter v0.1 compatible”** only when the record preserves the core invariants in Section 4 and identifies any deviations from the remaining provisions.
+A program MAY state that a decision record is **“ENS Grant Decision Integrity Charter v0.1 compatible”** only when the record preserves the core invariants in Section 4 and identifies any deviations from the remaining provisions.
+
+Passing the v0.1 schema and conformance validator establishes structural and declared cross-field consistency. It does not establish the truth of cited evidence, the quality of substantive judgment, or institutional adoption of this Charter.
 
 This draft is an implementation proposal, not adopted ENS policy.

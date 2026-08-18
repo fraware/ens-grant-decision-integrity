@@ -1,6 +1,5 @@
 name: Implementation feedback
-about: Report friction from using the charter or decision schema in a real review process
-labels: ["implementation"]
+description: Report friction from using the Charter or decision schema in a real review process
 body:
   - type: input
     id: workflow

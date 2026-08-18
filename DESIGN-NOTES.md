@@ -1,117 +1,167 @@
 # Design Notes — ENS Grant Decision Integrity v0.1
 
-## 1. Why this artifact is narrow
+## 1. Scope
 
-The Simocracy funding record strongly rewarded the adjudicative layer: a Grants Charter, evidence-linked decisions, and commit–reveal treatment of AI-assisted screening. It also showed diminishing marginal value after roughly the first $200 of funding.
+Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same proposal mechanism. Marginal value declined after roughly the first $200 of cumulative funding.
 
-This v0.1 therefore implements the funded core and deliberately stops short of a full cryptographic evaluator protocol.
+v0.1 implements the proposal's $200 Charter and decision-record schema work item. It records the minimum evaluator-provenance envelope needed to represent the Charter's pre-deadline commitment rule. Commitment generation, external timestamp or publication anchoring, a complete evaluator-manifest format, selective disclosure proofs, and evaluator replay remain outside this release.
 
 ## 2. Existing ENS practices preserved
 
-### Published evaluation policy
+### Published decision policy
 
-SPP3 published its application format, eligibility screen, scoring rubric, program terms, and committee process before selection. The Marketplace RFP likewise publishes a marketplace-specific rubric and hard eligibility gate.
+SPP3 publishes eligibility rules, evaluation criteria, program terms, and committee process. The Marketplace RFP adds a marketplace-specific hard eligibility gate and weighted rubric.
 
-### Committee attribution and recusals
+The record therefore identifies one public governing-policy URI and maps five normative decision surfaces—mandate, eligibility, evaluation criteria, conflict rules, and decision procedure—to declared source URIs. This permits reconstruction of which public artifact governed each surface without collapsing several documents into an invented single policy text.
 
-The SPP3 cohort recommendation states that qualifying applications were evaluated by all members unless recused, discloses a recusal, and describes the quorum/process model. The schema therefore treats evaluators, recusals, and quorum as first-class fields.
+### Committee attribution and voting
+
+The ratified SPP3 committee model defines committee roles, quorum, and the decision rule. Voting or ranking requires three of four Member seats to be active and participating. Decisions use a simple majority of participating Members; the Chair votes only as a tiebreaker.
+
+The schema therefore treats evaluator participation, recusals, quorum, and decision rule as first-class decision attributes. The conformance layer applies committee quorum and voting requirements only when `decision.authorityKind=committee`; advisory participation by a committee evaluator does not silently convert the final authority into a committee decision.
 
 ### Independent verification
 
-The Marketplace RFP requires milestones to state what ships, when, and how completion can be independently verified. Post-go-live traction gates are intended to use on-chain data such as attributable protocol revenue, active wallets, sales, and retention.
+The Marketplace RFP requires milestones to identify what ships, when it is expected, and how completion can be independently verified. Post-go-live traction gates use independently observable evidence, including on-chain activity.
 
-The delivery-condition object in the schema directly models this structure.
+The delivery-condition object models a target date or review window, verification method, verifier, evidence, dependencies, payment amount, and consequence.
+
+### Eligibility and merit are distinct
+
+The Marketplace RFP states that applications failing the hard eligibility gate are returned without scoring and that this is not a quality judgment. Its published gate contains seven conditions, including acknowledgment of the SPP3 Program Terms and Award Notice.
+
+The record model therefore distinguishes `decision.status=ineligible` from `decision.status=rejected`. Substantive findings are required for approval, rejection, and suspension; an ineligible disposition is linked to a failed eligibility rule, and a failed rule must identify supporting evidence. An adjudicated decision cannot predate the eligibility check supporting it. The worked example maps all seven published eligibility conditions.
 
 ### Privacy and selective disclosure
 
-The SPP3 process keeps applications confidential during review and gives applicants an opportunity to review/redact material before publication. The Charter therefore separates public decision records, selectively disclosed audit material, and confidential source material.
+The Marketplace RFP stores applications confidentially during review. The Charter distinguishes public decision records, selectively disclosed audit material, and confidential source material.
 
-## 3. AI screening design
+v0.1 does not define a deterministic public projection of a confidential canonical record. That boundary is retained as an explicit review question. Non-public evidence without a URI or content hash is surfaced as a warning, preserving privacy without treating an unlocatable evidence reference as fully auditable.
 
-ENS's AI screening experiment found useful capabilities in detecting missing budget structure, non-falsifiable KPIs, undefined scope, repository inconsistencies, overlap, and conflict-of-interest problems.
+## 3. AI-assisted screening
 
-The same experiment identified two risks:
+The ENS screening experiment used frontier AI models to apply weighted rubrics, inspect evidence, surface discrepancies, and generate funding recommendations.
 
-1. publishing exact prompts creates a gaming surface;
-2. evaluators can remain overly agreeable even after identifying red flags.
+The same experiment identified two material risks:
 
-The Charter's commit–reveal boundary addresses the first problem procedurally. Preserved disagreement, explicit human authority, and evidence-linked findings address the second.
+1. publication of exact evaluator instructions can create a gaming surface;
+2. AI evaluators can remain agreeable after identifying substantive red flags.
+
+The Charter addresses the first by keeping public normative rules distinct from operational evaluator details and requiring a commitment to the versioned evaluator manifest before applications close whenever AI materially informs a recommendation. It addresses the second through evidence-linked findings, preserved disagreement, explicit human authority, and attributable departures from AI recommendations.
+
+v0.1 does not define how a manifest is serialized or hashed, nor how a commitment is externally anchored. It records the manifest version, model identity, human-review policy, commitment metadata, and reveal state. The validator can compare the declared `committedAt` value with the submission deadline, but that comparison does not prove that the commitment existed at that time. Independently verifiable pre-deadline existence requires the later commitment protocol to specify a trustworthy timestamp or publication anchor.
 
 ## 4. Threat model
 
-### T1 — Criteria drift during review
+### T1 — Criteria or evaluator drift during review
 
-**Risk:** criteria or model configuration changes after applications are observed.
+**Risk:** criteria or AI evaluator configuration changes after applications are observed, or an in-round policy change is applied inconsistently to evaluations already completed.
 
-**Control:** versioned policy + evaluator manifest + optional pre-deadline commitment.
+**Control:** a public governing-policy URI, explicit source mapping for each normative decision surface, version and effective time, change summary, prior-version and change-notice traceability, explicit record of whether prior evaluations were rerun, and declared pre-deadline evaluator-manifest commitment metadata when AI materially informs a recommendation. External proof of the commitment's pre-deadline existence remains part of the later commit–reveal protocol.
 
-### T2 — Unsupported evaluator findings
+### T2 — Unsupported or misattributed findings
 
-**Risk:** a score or recommendation rests on an assertion that cannot be traced to applicant evidence or public evidence.
+**Risk:** a material finding cannot be traced to evidence, an explicit epistemic classification, or an evaluator who actually participated; or a hard-screen failure records ineligibility without evidence supporting the failed gate.
 
-**Control:** evidence-linked material findings; unsupported claims must be labeled as judgment or uncertainty.
+**Control:** failed eligibility rules require evidence; material findings are evidence-linked or explicitly classified as `judgment`, `uncertainty`, or `unverified-claim`; and evaluator-attribution checks enforce participation and recusal state. Risk can be the subject of a finding without functioning as an epistemic classification.
 
-### T3 — Score laundering
+### T3 — Score aggregation obscures disagreement
 
-**Risk:** averaging conceals a severe disagreement about security, eligibility, or deliverability.
+**Risk:** an aggregate score conceals material disagreement, or a disagreement is recorded without an attributable evaluator.
 
-**Control:** material disagreement is recorded separately from aggregate scores.
+**Control:** disagreement is recorded independently of aggregate scores. Every recorded disagreement identifies at least one participating, non-recused evaluator.
 
-### T4 — Conflict hidden behind process
+### T4 — Conflict disclosure without operational recusal
 
-**Risk:** a reviewer discloses a relationship but still shapes the evaluation.
+**Risk:** a disclosed material relationship continues to affect an adjudicated decision, a nominal recusal does not identify the decision surface or replacement reviewer, or the conflict record and evaluator record disagree about whether recusal occurred.
 
-**Control:** recusal records identify decision surface and substitute reviewer where applicable.
+**Control:** adjudicated records cannot leave a material conflict in disclosed or unresolved state. A recusal identifies the affected decision surface, explicitly states whether substitution occurred, resolves any substitute identifier to an active, non-recused evaluator, and must agree with the recused evaluator's own participation state.
 
-### T5 — Automation acquires de facto authority
+### T5 — AI recommendation acquires de facto authority
 
-**Risk:** reviewers treat model scores as binding even if policy calls them advisory.
+**Risk:** reviewers treat an AI score or recommendation as binding, or the record retrospectively represents a departure from AI advice before an institutional disposition exists.
 
-**Control:** explicit human disposition and override/departure record.
+**Control:** the decision authority is explicitly human-governed; AI systems cannot occupy the decision-authority type. An AI evaluator cannot materially inform a recommendation unless marked as participating. A departure requires materially influential AI evaluation, a rationale, and a non-pending institutional disposition.
 
-### T6 — Milestones become activity reports
+### T6 — Award state outruns the decision
 
-**Risk:** funded work reports effort without establishing completion.
+**Risk:** a pending or deferred record carries a positive award and thereby encodes funding before an approving disposition.
 
-**Control:** delivery conditions require observable outputs/outcomes and verification methods.
+**Control:** positive `awardedAmount` is prohibited for pending, deferred, ineligible, and rejected states. Approval and suspension preserve the award amount; suspension also requires attributable findings and delivery conditions.
 
-### T7 — Transparency harms applicants
+### T7 — Challenge state outruns the decision
 
-**Risk:** public auditability exposes private, security-sensitive, or commercially sensitive material.
+**Risk:** a record claims a challenge is active or resolved without a defined process, represents a post-decision challenge while the decision is still pending, or marks a challenge resolved without recording the resolution.
 
-**Control:** disclosure classification, selective audit access, and integrity commitments for withheld artifacts.
+**Control:** active/completed challenge states require a defined process; pending decisions cannot claim post-decision challenge activity; resolved challenges require a resolution.
 
-### T8 — Administrative burden overwhelms small grants
+### T8 — Milestones reduce to activity reports
 
-**Risk:** full records cost more than the accountability value they create.
+**Risk:** funded work reports effort without establishing whether a delivery condition was met.
 
-**Control:** proportionate materiality tiers.
+**Control:** delivery conditions identify observable outputs or outcomes and a verification method.
 
-## 5. Why the current Marketplace RFP is a useful worked example
+### T9 — Transparency exposes protected material
 
-As of August 15, 2026, the Marketplace RFP submission window is closed and committee evaluation is scheduled for August 5–19, with an award announcement on or before August 28.
+**Risk:** public auditability reveals private, security-sensitive, or commercially sensitive material.
 
-The RFP is a useful test case because it already contains:
+**Control:** disclosure classification and selective audit access. Hash commitments remain descriptive unless their mechanism and anchor are specified.
 
-- a hard eligibility gate;
-- a five-criterion weighted rubric;
-- explicit conflict and quorum rules;
+### T10 — Administrative cost exceeds accountability value
+
+**Risk:** full records impose disproportionate process cost on low-value or routine grants.
+
+**Control:** program-defined materiality tiers and simplified records that preserve the Section 4 invariants.
+
+### T11 — Nominal conformance
+
+**Risk:** a schema-valid record contains cross-field contradictions such as undeclared governing-policy sources, unsupported hard-screen failures, unsupported or misattributed findings, inconsistent eligibility timing, a non-pending decision timestamp later than the record's own last-update time, contradictory recusal state, unresolved conflicts, incomplete recusal provenance, false committee-authority inference, premature award or challenge state, or a declared AI commitment time after applications close.
+
+**Control:** a separate conformance layer checks cross-field relations and is exercised against adversarial and valid-edge cases in CI.
+
+## 5. Marketplace RFP worked example
+
+As of August 15, 2026, the Marketplace RFP submission window is closed. The published deadline was August 5 at 23:59 UTC; committee evaluation is scheduled for August 5–19, with the award announcement on or before August 28.
+
+The RFP is a useful test case. It contains:
+
+- seven hard eligibility conditions;
+- a five-criterion weighted rubric (M1 25%, M2 20%, M3 35%, M4 10%, M5 10%);
+- a named committee process with published quorum and voting rules;
 - confidential application handling;
 - milestone-gated payment;
-- independent/on-chain verification requirements;
+- independently verifiable and on-chain traction requirements;
 - a defined award threshold.
 
-The included example does **not** score any real applicant and does **not** imply committee endorsement. It demonstrates how a public program policy can be represented as a pending decision record.
+The example does not identify, score, recommend, or reject any real applicant. It maps the public process into a fictional pending record, including all seven eligibility gates, the published rubric weights, the public rules URI, and the source governing each of the five normative decision surfaces.
 
-## 6. Deliberate Phase-II boundary
+The reviewed public artifacts do not identify a post-decision factual/procedural correction process. The example records that documentation gap as `challenge.processDefined=false`. This does not assert that no internal or unpublished process exists, and it does not propose a rule change during the active review.
 
-The schema includes an optional `evaluatorManifest` object with a manifest version, commitment digest, commit timestamp, reveal status, model descriptors, retrieval sources, and human-review policy.
+## 6. Structural validity and record conformance
 
-v0.1 does not implement commitment generation or replay. That is intentionally left as a distinct technical work package.
+JSON Schema validates representation. The conformance validator checks relations across fields: reference resolution, evidence requirements, evaluator and disagreement attribution, weight completeness, governing-policy source traceability, policy-change lineage, eligibility consistency and timing, decision-state transitions, conflict closure, reciprocal recusal state, recusal provenance, committee authority, challenge lifecycle, timestamp ordering, delivery conditions, and declared AI evaluator-manifest timing.
 
-## 7. Source map
+A validator pass establishes internal consistency with the v0.1 profile. It does not establish that cited evidence is true, that substantive judgment is sound, that a commitment existed at its declared time without an external anchor, that a committed evaluator configuration actually ran, or that ENS has adopted the Charter.
+
+`CONFORMANCE.md` defines the checks and severity model.
+
+## 7. Retrospective records
+
+A decision record can be created after the decision it documents. v0.1 therefore permits `decision.decidedAt` to precede `timestamps.createdAt`.
+
+The temporal invariants are narrower: the governing policy must have been effective by the time of an adjudicated decision; the eligibility check supporting that adjudication cannot postdate it; `updatedAt` cannot precede `createdAt`; and a non-pending `decision.decidedAt` cannot be later than `updatedAt`.
+
+This permits retrospective testing of historical decisions without misrepresenting either record creation time or the record's last-update time.
+
+## 8. Release integrity boundary
+
+v0.1 does not define canonical JSON serialization, record signing, or proof binding. The optional record-level `integrity` object remains descriptive.
+
+Release identity is anchored to the reviewed Git commit SHA. A release archive receives a published SHA-256 digest for that exact artifact. `RELEASE-INTEGRITY.md` defines the procedure and its limits.
+
+## 9. Source map
 
 - Marketplace RFP authorization: https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263
 - Marketplace RFP rubric and timeline: https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309
-- SPP3 cohort recommendation: https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237
+- SPP3 program authorization and committee model: https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086
 - AI grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939
