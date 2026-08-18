@@ -1,18 +1,18 @@
-# External Review Protocol — Draft v0.1
+# Review Guide — v0.1
 
 ## Objective
 
 Test whether the Charter and decision-record schema improve an actual ENS funding workflow without creating disproportionate process cost.
 
-The request is for adversarial critique. It is not a request for endorsement, funding, or a decision on any live applicant.
+A useful review is adversarial: identify concrete failure modes, unnecessary requirements, missing invariants, and implementation cost. Review does not imply endorsement, funding, or a decision on any applicant.
 
-## Review boundary
+## Scope
 
 v0.1 contains a draft Grants Charter, a machine-readable decision-record schema, a conformance validator, and a fictional mapping of the public SPP3 Marketplace process.
 
 It does not implement a complete evaluator-manifest protocol, independently verifiable commitment anchoring, selective-disclosure proofs, evaluator replay, or a deterministic confidential-to-public record projection.
 
-The worked Marketplace record does not identify, score, recommend, or reject a real applicant and does not propose changing an active review.
+The worked Marketplace record is a dated, fictional process snapshot. It does not identify, score, recommend, or reject a real applicant, and it does not prescribe changes to the mapped process.
 
 ## Validation
 
@@ -49,7 +49,7 @@ A simpler mechanism is preferable wherever it preserves the same guarantees.
 - What independently verifiable timestamp or publication anchor would be appropriate in a later commit–reveal protocol?
 - Could the manifest or conformance rules themselves create a gaming surface?
 
-## Requested response format
+## Suggested response format
 
 For each issue, a short response is sufficient:
 
@@ -58,6 +58,6 @@ For each issue, a short response is sufficient:
 3. **Evidence or scenario** — concrete example if available.
 4. **Smallest change** — delete, add, weaken, strengthen, or leave unchanged.
 
-## Success condition
+## Useful outcome
 
-The review succeeds if it identifies at least one concrete deletion, addition, constraint, simplification, or confirmed non-change grounded in an actual review or accountability workflow.
+The strongest feedback identifies a concrete deletion, addition, constraint, simplification, or confirmed non-change grounded in an actual review or accountability workflow.

@@ -138,7 +138,7 @@ The reviewed public artifacts do not identify a post-decision process for correc
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/conformance.py --strict examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
-python scripts/test_final_consistency.py
+python scripts/test_regressions.py
 ```
 
 ## Scope boundary

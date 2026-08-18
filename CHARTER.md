@@ -27,7 +27,7 @@ Each covered decision MUST identify the following roles where applicable:
 - **Decision authority** — the human-governed body authorized to approve, reject, defer, suspend, or modify an award.
 - **Accountability authority** — the body authorized to verify delivery conditions or administer payment consequences.
 - **Applicant** — the person or organization seeking funding.
-- **Appeal authority** — the body or procedure authorized to correct factual or procedural errors.
+- **Challenge authority** — the body or procedure authorized to correct factual or procedural errors.
 
 One actor MAY hold more than one role only where the governing program permits it. Role concentration SHOULD be disclosed where it materially affects independence.
 
@@ -271,9 +271,9 @@ An ENS funding program adopting this Charter SHOULD publish:
 2. the program-specific policy reference;
 3. any permitted deviations;
 4. the public decision-record location;
-5. the responsible appeal and accountability authorities.
+5. the responsible challenge and accountability authorities.
 
-The Charter SHOULD be reviewed after each major funding cycle against observed administrative cost, appeals, unsupported findings, implementation failures, evaluator gaming, and stakeholder feedback.
+The Charter SHOULD be reviewed after each major funding cycle against observed administrative cost, challenge volume and outcomes, unsupported findings, implementation failures, evaluator gaming, and stakeholder feedback.
 
 ## 12. Conformance statement
 

@@ -12,7 +12,7 @@ python -m pip install -r requirements-dev.txt
 python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
-python scripts/test_final_consistency.py
+python scripts/test_regressions.py
 ```
 
 Expected results:
