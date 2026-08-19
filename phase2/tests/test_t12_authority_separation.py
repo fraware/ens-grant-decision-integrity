@@ -58,3 +58,27 @@ def test_valid_bundle_establishes_c6_without_touching_authority() -> None:
         bundle["decisionRecord"]["decision"]["authorityKind"],
         bundle["envelope"],
     )
+
+
+def test_v01_ai_authority_kind_rejected_by_graph() -> None:
+    private_pem, public_pem = generate_rekor_fixture_key()
+    bundle = build_bundle(rekor_private_pem=private_pem)
+    bundle["decisionRecord"]["decision"]["authorityKind"] = "ai"
+    with pytest.raises(Phase2Error, match="authorityKind"):
+        verify_graph(bundle, fixture_private_key_pem=private_pem, trust_root_pem=public_pem)
+
+
+def test_envelope_forbidden_authority_field_fails_graph() -> None:
+    private_pem, public_pem = generate_rekor_fixture_key()
+    bundle = build_bundle(rekor_private_pem=private_pem)
+    bundle["envelope"]["fundingAuthority"] = "must-not-appear"
+    with pytest.raises(Phase2Error, match="(decision-authority fields|Additional properties)"):
+        verify_graph(bundle, fixture_private_key_pem=private_pem, trust_root_pem=public_pem)
+
+
+def test_manifest_nested_forbidden_authority_field_fails_graph() -> None:
+    private_pem, public_pem = generate_rekor_fixture_key()
+    bundle = build_bundle(rekor_private_pem=private_pem)
+    bundle["manifest"]["instructions"]["decisionAuthority"] = "must-not-appear"
+    with pytest.raises(Phase2Error, match="decision-authority fields"):
+        verify_graph(bundle, fixture_private_key_pem=private_pem, trust_root_pem=public_pem)

@@ -14,7 +14,12 @@
       "type": "string",
       "enum": ["committed", "revealed", "selective-audit", "withheld"]
     },
-    "manifest": { "type": ["object", "null"] },
+    "manifest": {
+      "oneOf": [
+        { "$ref": "evaluator-manifest.schema.json" },
+        { "type": "null" }
+      ]
+    },
     "saltHex": {
       "type": ["string", "null"],
       "pattern": "^[0-9a-f]{64}$"
@@ -22,7 +27,12 @@
     "selectiveAuditResult": { "type": ["object", "null"] },
     "runAttestation": { "type": ["object", "null"] },
     "runPublicKeyPem": { "type": ["string", "null"] },
-    "replayReport": { "type": ["object", "null"] },
+    "replayReport": {
+      "oneOf": [
+        { "$ref": "replay-report.schema.json" },
+        { "type": "null" }
+      ]
+    },
     "layerInputs": { "type": ["object", "null"] },
     "decisionRecord": { "type": "object" },
     "notes": {

@@ -33,7 +33,20 @@ python -m pytest phase2/tests
 
 T1 compares the production RFC 8785 adapter (`rfc8785`) with a second independent implementation (`jcs`, the cyberphone/RFC-author lineage) and with RFC 8785 vectors.
 
-T6 and T7 use `rekor-v1-recorded-fixture` receipts so they do not depend on live Sigstore availability or on a controllable production timestamp. A recorded-from-live hashedrekord is stored when live Rekor was reachable at fixture generation; see `vectors/README.md`.
+T6 and T7 use `rekor-v1-recorded-fixture` receipts so they do not depend on live Sigstore availability or on a controllable production timestamp. See [ADMIN-BURDEN.md](ADMIN-BURDEN.md) for operational cost, key handling, and proportionality notes.
+
+### Live Rekor (2026-08-19)
+
+POST to `https://rekor.sigstore.dev/api/v1/log/entries` failed from this environment with `ConnectionResetError` (remote host forcibly closed the connection). No `vectors/rekor-live-hashedrekord.json` was recorded. T7 skips the optional live-receipt case; T6/T7 and the public example rely on the recorded-fixture profile.
+
+Fixture verification is rigorous but not a public Rekor claim:
+
+- The hashedrekord body SHA-256 must match the JCS envelope bytes.
+- The signed entry timestamp must verify under the pinned test-log ECDSA P-256 key (`vectors/rekor-fixture-trust-root.pem`).
+- The RFC 6962 inclusion proof must reconstruct the claimed root hash.
+- The signed checkpoint must verify under the same key.
+
+Production `rekor-v1` pins the Sigstore Rekor v1 production public key in `src/anchors/rekor.py` and does not trust a live `/api/v1/log/publicKey` response as the root. When live Rekor is reachable, record a receipt per `ADMIN-BURDEN.md` and enable T7's live fixture test.
 
 ## CLI
 
@@ -58,7 +71,9 @@ Signing keys in tests and in the public example are test keys. A real program mu
 
 The example's anchor is a `rekor-v1-recorded-fixture` receipt. It does not claim inclusion in production Rekor on a date before the published Marketplace deadline.
 
-## Administrative burden (from constructing the example)
+## Administrative burden
+
+See [ADMIN-BURDEN.md](ADMIN-BURDEN.md) for keys, reveal policy, anchor steps, committee operational cost, and proportionality notes. The summary below remains for quick orientation.
 
 Constructing one fictional bundle required: writing a versioned manifest with round identifiers; generating salt and a commitment; selecting an anchor profile and retaining offline-verifiable receipt material; generating a test Ed25519 key, signing a run statement, and storing the public key; computing deterministic layer snapshots; writing an honest `not-replayable` hosted-generation outcome; filling v0.1 `evaluatorManifest` with algorithm `other` and the verified fixture time; confirming the pending record still emits only `CHAL003`.
 

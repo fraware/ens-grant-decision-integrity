@@ -26,18 +26,50 @@
     "logIndex": { "type": ["integer", "null"], "minimum": 0 },
     "verifierMaterial": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": ["kind"],
       "properties": {
         "kind": { "type": "string", "minLength": 1 },
-        "bodyB64": { "type": "string" },
-        "integratedTime": { "type": "integer" },
-        "logIdHex": { "type": "string" },
-        "signedEntryTimestampB64": { "type": "string" },
-        "inclusionProof": { "type": "object" },
-        "checkpoint": { "type": "string" },
-        "uuid": { "type": "string" }
-      }
+        "bodyB64": { "type": "string", "minLength": 1 },
+        "integratedTime": { "type": "integer", "minimum": 0 },
+        "logIdHex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "signedEntryTimestampB64": { "type": "string", "minLength": 1 },
+        "inclusionProof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["logIndex", "treeSize", "rootHash", "hashes"],
+          "properties": {
+            "logIndex": { "type": "integer", "minimum": 0 },
+            "treeSize": { "type": "integer", "minimum": 1 },
+            "rootHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "hashes": {
+              "type": "array",
+              "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        },
+        "checkpoint": { "type": "string", "minLength": 1 },
+        "uuid": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "rekor-v1-offline" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": [
+              "bodyB64",
+              "integratedTime",
+              "logIdHex",
+              "signedEntryTimestampB64",
+              "inclusionProof",
+              "checkpoint",
+              "uuid"
+            ]
+          }
+        }
+      ]
     }
   }
 }
