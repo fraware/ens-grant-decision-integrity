@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -15,11 +16,13 @@ from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schema" / "grant-decision-record.schema.json"
+SCHEMA_02_PATH = ROOT / "schema" / "grant-decision-record-0.2.schema.json"
 
 DECIDED_STATUSES = {"ineligible", "approved", "rejected", "deferred", "suspended"}
 SUBSTANTIVE_STATUSES = {"approved", "rejected", "suspended"}
 ADJUDICATED_STATUSES = {"ineligible", "approved", "rejected", "suspended"}
 AUTHORITY_KINDS = {"human", "committee", "dao-vote", "multisig", "other-human-authority"}
+CONTENT_HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 @dataclass(frozen=True)
@@ -370,6 +373,123 @@ def check_semantics(record: dict) -> list[Finding]:
     return findings
 
 
+def load_schema_for_record(record: dict) -> dict:
+    version = record.get("schemaVersion", "0.1")
+    if version == "0.1":
+        return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    if version == "0.2":
+        if isinstance(record.get("withheldCommitments"), dict) and record["withheldCommitments"]:
+            return json.loads((ROOT / "schema" / "grant-decision-public-projection-0.2.schema.json").read_text(encoding="utf-8"))
+        return json.loads(SCHEMA_02_PATH.read_text(encoding="utf-8"))
+    raise ValueError(f"unsupported schemaVersion {version!r}")
+
+
+def check_schema_02_extensions(record: dict) -> list[Finding]:
+    findings: list[Finding] = []
+    if record.get("schemaVersion") != "0.2":
+        return findings
+
+    governing_policy = record.get("governingPolicy", {})
+    policy_sources = set(governing_policy.get("sources", []))
+    surface_sources = governing_policy.get("surfaceSources", {})
+
+    pinning = record.get("policyPinning")
+    if isinstance(pinning, dict):
+        pinned_uris: set[str] = set()
+        for i, source in enumerate(pinning.get("sources", [])):
+            uri = source.get("uri")
+            content_hash = source.get("contentHash", "")
+            if uri not in policy_sources:
+                findings.append(
+                    Finding(
+                        "error",
+                        "POL007",
+                        f"policyPinning.sources[{i}].uri",
+                        "pinned URI must also appear in governingPolicy.sources",
+                    )
+                )
+            if not CONTENT_HASH_PATTERN.match(content_hash):
+                findings.append(
+                    Finding(
+                        "error",
+                        "POL008",
+                        f"policyPinning.sources[{i}].contentHash",
+                        "contentHash must match sha256:<64 lowercase hex>",
+                    )
+                )
+            surface = source.get("surface")
+            if surface and surface != "other" and surface_sources.get(surface) != uri:
+                findings.append(
+                    Finding(
+                        "error",
+                        "POL009",
+                        f"policyPinning.sources[{i}].surface",
+                        "pinned surface URI must match governingPolicy.surfaceSources for that surface",
+                    )
+                )
+            if uri in pinned_uris:
+                findings.append(
+                    Finding("error", "POL010", f"policyPinning.sources[{i}].uri", f"duplicate pinned URI {uri!r}")
+                )
+            pinned_uris.add(uri)
+
+    authority_identity = record.get("authorityIdentity")
+    if isinstance(authority_identity, dict):
+        decision = record.get("decision", {})
+        identity_kind = authority_identity.get("authorityKind")
+        if identity_kind != decision.get("authorityKind"):
+            findings.append(
+                Finding(
+                    "error",
+                    "AUTH004",
+                    "authorityIdentity.authorityKind",
+                    "structured authority kind must match decision.authorityKind",
+                )
+            )
+        evaluators = record.get("evaluators", [])
+        evaluator_by_id = {
+            evaluator.get("evaluatorId"): evaluator
+            for evaluator in evaluators
+            if isinstance(evaluator.get("evaluatorId"), str)
+        }
+        human_members = 0
+        for i, member in enumerate(authority_identity.get("members", [])):
+            evaluator_id = member.get("evaluatorId")
+            if evaluator_id not in evaluator_by_id:
+                findings.append(
+                    Finding(
+                        "error",
+                        "AUTH005",
+                        f"authorityIdentity.members[{i}].evaluatorId",
+                        f"unknown evaluatorId {evaluator_id!r}",
+                    )
+                )
+                continue
+            evaluator = evaluator_by_id[evaluator_id]
+            if evaluator.get("kind") == "ai":
+                findings.append(
+                    Finding(
+                        "error",
+                        "AUTH006",
+                        f"authorityIdentity.members[{i}].evaluatorId",
+                        "AI evaluators cannot appear in structured authority identity",
+                    )
+                )
+            if evaluator.get("kind") == "human" and evaluator.get("participated") and not evaluator.get("recused"):
+                human_members += 1
+        if identity_kind == "committee" and human_members == 0:
+            findings.append(
+                Finding(
+                    "error",
+                    "AUTH007",
+                    "authorityIdentity.members",
+                    "committee structured authority requires at least one participating human member link",
+                )
+            )
+
+    return findings
+
+
 def validate_schema(record: dict, schema: dict) -> list[Finding]:
     try:
         import jsonschema
@@ -385,11 +505,14 @@ def validate_schema(record: dict, schema: dict) -> list[Finding]:
     return output
 
 
-def validate_record(record: dict, schema: dict) -> list[Finding]:
+def validate_record(record: dict, schema: dict | None = None) -> list[Finding]:
+    schema = schema or load_schema_for_record(record)
     structural = validate_schema(record, schema)
     if structural:
         return structural
-    return check_semantics(record)
+    findings = check_semantics(record)
+    findings.extend(check_schema_02_extensions(record))
+    return findings
 
 
 def main() -> int:
@@ -398,12 +521,11 @@ def main() -> int:
     parser.add_argument("--strict", action="store_true", help="treat warnings as failures")
     args = parser.parse_args()
 
-    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     failed = False
     for raw in args.records:
         path = Path(raw)
         record = json.loads(path.read_text(encoding="utf-8"))
-        record_findings = validate_record(record, schema)
+        record_findings = validate_record(record)
         print(f"{path}:")
         if not record_findings:
             print("  PASS")

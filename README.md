@@ -81,11 +81,33 @@ python -m pytest phase2/tests
 python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-public.bundle.json
 ```
 
+## Wave 4 (schema 0.2 extensions)
+
+Wave 4 adds optional schema `0.2` extensions without mutating v0.1 behavior:
+
+- `schema/grant-decision-record-0.2.schema.json` — optional `policyPinning` and `authorityIdentity`
+- `schema/grant-decision-public-projection-0.2.schema.json` — relaxed requirements for projected public records
+- `projection/` — deterministic confidential-to-public record projection with withheld commitments
+- `phase2/src/anchors/rfc3161.py` — RFC 3161 TSA profile (`rfc3161`, `rfc3161-recorded-fixture`)
+- `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`)
+- `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
+- `ADOPTION.md` — adoption pathway for ENS programs
+- `methodology/GRANT-DECISION-INTEGRITY.md` — draft twelve-step review methodology
+
+```bash
+python scripts/conformance.py examples/tier-a-simplified-grant.example.json
+python scripts/test_schema_02.py
+python -m pytest projection/tests
+python projection/src/cli.py --confidential examples/tier-a-simplified-grant.example.json --spec projection/examples/tier-a-projection-spec.json --out /tmp/tier-a-public.json
+```
+
+Selective disclosure remains deferred; see `phase2/DEFERRED.md`.
+
 ## Scope
 
 This project governs the integrity of the decision record. It does not determine which projects ENS should fund, replace substantive committee judgment, establish the truth of cited evidence, or create authority for AI systems to approve, reject, suspend, or release funding.
 
-**Status.** Repository version `0.1.0` implements record schema version `0.1`. The Charter remains a draft governance proposal: it is not adopted ENS policy and does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee.
+**Status.** Repository version `0.3.0` on the Wave 4 branch adds schema 0.2 extensions and projection. v0.1 record schema version `"0.1"` remains the default grant-decision profile. The Charter remains a draft governance proposal: it is not adopted ENS policy and does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee.
 
 ## Sources
 

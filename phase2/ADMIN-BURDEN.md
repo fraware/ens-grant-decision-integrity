@@ -41,9 +41,9 @@ Test private keys in `phase2/vectors/` exist only for the harness and the public
 4. Verify under the pinned trust root: hashedrekord digest match, SET signature, Merkle inclusion, checkpoint signature.
 5. Compare verified `integratedTime` strictly before `applicationDeadline`.
 
-## Live Rekor status (2026-08-19)
+## Live Rekor status (2026-08-19, Wave 4 re-check)
 
-POST to `https://rekor.sigstore.dev/api/v1/log/entries` failed with `ConnectionResetError` from this environment. T6, T7, and the public example therefore use `rekor-v1-recorded-fixture` receipts verified under the shipped test-log key (`vectors/rekor-fixture-trust-root.pem`). That profile does **not** establish inclusion in the public Sigstore Rekor log.
+POST to `https://rekor.sigstore.dev/api/v1/log/entries` failed again with `ConnectionResetError` from this environment during Wave 4 completion. T6, T7, and the public example therefore continue to use `rekor-v1-recorded-fixture` receipts verified under the shipped test-log key (`vectors/rekor-fixture-trust-root.pem`). That profile does **not** establish inclusion in the public Sigstore Rekor log.
 
 When live Rekor is reachable, record a hashedrekord with:
 

@@ -149,6 +149,26 @@ Phase II graph verification is a separate contract: `python -m pytest phase2/tes
 
 The Marketplace example remains the v0.1 worked example. `--strict` must still fail while `CHAL003` exists. The Phase II public retrospective example is pending against the same public artifacts and preserves `CHAL003`.
 
+## Schema 0.2 extensions (additive)
+
+Records with `schemaVersion: "0.2"` validate against `schema/grant-decision-record-0.2.schema.json`. v0.1 records continue to validate against the unchanged v0.1 schema.
+
+When `policyPinning` is present:
+
+- `POL007` — pinned URI must appear in `governingPolicy.sources`
+- `POL008` — `contentHash` must match `sha256:<64 lowercase hex>`
+- `POL009` — optional surface pin must match `surfaceSources`
+- `POL010` — duplicate pinned URIs fail
+
+When `authorityIdentity` is present:
+
+- `AUTH004` — structured authority kind must match `decision.authorityKind`
+- `AUTH005` — member `evaluatorId` values must resolve
+- `AUTH006` — AI evaluators cannot appear in structured authority identity
+- `AUTH007` — committee structured authority requires at least one linked participating human member
+
+Public projections with non-empty `withheldCommitments` validate against `schema/grant-decision-public-projection-0.2.schema.json`.
+
 ## Scope boundary
 
 The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, whether a commitment existed at the declared time without an external anchor, whether a committed evaluator configuration actually ran, or whether the governing policy itself is legitimate.

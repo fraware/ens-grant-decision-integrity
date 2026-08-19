@@ -90,7 +90,19 @@ It does not establish that every observer saw the same log (monitoring against s
 
 `rekor-v1-recorded-fixture` receipts are verified under a test-log key shipped with the fixture. They do not establish inclusion in the public Sigstore Rekor log. Tests T6 and T7 use that fixture profile when live Rekor is unavailable or when a controllable timestamp is required.
 
-RFC 3161 and Ethereum adapters exist only as interface stubs and raise `NotImplementedError`.
+## RFC 3161 trust boundary
+
+Profile `rfc3161` verifies CMS `TimeStampToken` structures from a live TSA against a pinned certificate. Profile `rfc3161-recorded-fixture` verifies a signed `TSTInfo` fixture (`rfc3161-fixture-v1` verifier material) under a test TSA key shipped with the repository.
+
+A successful verify establishes that the token binds the envelope digest and carries a signed generation time under the pinned TSA key. It does not establish TSA honesty, universal time, or Rekor inclusion.
+
+## Ethereum calldata trust boundary
+
+Profile `ethereum-calldata-fixture` verifies recorded transaction calldata of the form `gdi:<sha256(envelope)>` against fixture block metadata. Live Ethereum anchoring is not implemented. Block timestamp trust is explicit. EIP-712 is not a time anchor.
+
+## Deferred profiles
+
+RFC 3161 live anchoring requires a pinned TSA trust root at issuance time. Ethereum live anchoring requires RPC policy and cost accounting; see `phase2/DEFERRED.md` and `phase2/src/anchors/ethereum.py`.
 
 ## v0.1 linkage non-claims
 

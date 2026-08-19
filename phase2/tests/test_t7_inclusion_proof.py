@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from anchors.base import EthereumAdapter, Rfc3161Adapter
+from anchors.ethereum import EthereumAdapter
 from anchors.rekor import RekorAdapter
 from envelope import envelope_bytes
 from factories import build_bundle, generate_rekor_fixture_key
@@ -55,11 +55,9 @@ def test_valid_fixture_receipt_verifies() -> None:
     adapter.verify(envelope_bytes(bundle["envelope"]), bundle["receipt"])
 
 
-def test_rfc3161_and_ethereum_are_unimplemented() -> None:
-    with pytest.raises(NotImplementedError, match="RFC 3161"):
-        Rfc3161Adapter().anchor(b"{}")
+def test_ethereum_live_is_unimplemented() -> None:
     with pytest.raises(NotImplementedError, match="Ethereum"):
-        EthereumAdapter().verify(b"{}", {})
+        EthereumAdapter(profile_id="ethereum").anchor(b"{}")
 
 
 def test_recorded_from_live_rekor_if_present() -> None:

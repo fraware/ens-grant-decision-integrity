@@ -138,6 +138,17 @@ These rows are additive. They do not rewrite T1–T11 above. v0.1 still does not
 
 Details: `phase2/CLAIM-MATRIX.md` and `phase2/PROTOCOL.md`.
 
+## 4.2 Wave 4 controls (additive)
+
+| ID | Failure mode | Wave 4 control |
+|---|---|---|
+| W1 | Governing-policy URIs drift without detectable content change. | Optional schema 0.2 `policyPinning` with `sha256:` content hashes; POL007–POL010. |
+| W2 | Committee authority is only a free string with no member linkage. | Optional schema 0.2 `authorityIdentity` linked to evaluator IDs; AUTH004–AUTH007. |
+| W3 | Public publication leaks confidential applicant fields. | Deterministic projection with `withheldCommitments`; projection spec domain `ens-gdi/public-projection/v1`. |
+| W4 | Single anchor vendor lock-in without documented alternate. | RFC 3161 and Ethereum calldata fixture profiles alongside Rekor; explicit trust boundaries in `CLAIM-MATRIX.md`. |
+
+Selective disclosure remains deferred per `phase2/DEFERRED.md`.
+
 ## 5. Marketplace RFP worked example
 
 As of August 15, 2026, the Marketplace RFP submission window is closed. The published deadline was August 5 at 23:59 UTC; committee evaluation is scheduled for August 5–19, with the award announcement on or before August 28.

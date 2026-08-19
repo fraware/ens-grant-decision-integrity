@@ -15,7 +15,14 @@
   "properties": {
     "profileId": {
       "type": "string",
-      "enum": ["rekor-v1", "rekor-v1-recorded-fixture", "rfc3161", "ethereum"]
+      "enum": [
+        "rekor-v1",
+        "rekor-v1-recorded-fixture",
+        "rfc3161",
+        "rfc3161-recorded-fixture",
+        "ethereum",
+        "ethereum-calldata-fixture"
+      ]
     },
     "envelopeDigestSha256": {
       "type": "string",
@@ -49,7 +56,17 @@
           }
         },
         "checkpoint": { "type": "string", "minLength": 1 },
-        "uuid": { "type": "string", "minLength": 1 }
+        "uuid": { "type": "string", "minLength": 1 },
+        "tsTokenB64": { "type": "string", "minLength": 1 },
+        "tsaCertificatePem": { "type": "string", "minLength": 1 },
+        "tstInfoDerB64": { "type": "string", "minLength": 1 },
+        "signatureB64": { "type": "string", "minLength": 1 },
+        "chainId": { "type": "integer", "minimum": 1 },
+        "txHash": { "type": "string", "minLength": 1 },
+        "blockNumber": { "type": "integer", "minimum": 0 },
+        "blockTimestamp": { "type": "integer", "minimum": 0 },
+        "calldataHex": { "type": "string", "minLength": 1 },
+        "envelopeDigestSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
       },
       "allOf": [
         {
@@ -66,6 +83,40 @@
               "inclusionProof",
               "checkpoint",
               "uuid"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "rfc3161-fixture-v1" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["tstInfoDerB64", "signatureB64", "tsaCertificatePem"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "rfc3161-offline" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["tsTokenB64", "tsaCertificatePem"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "ethereum-calldata-offline" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": [
+              "chainId",
+              "txHash",
+              "blockNumber",
+              "blockTimestamp",
+              "calldataHex",
+              "envelopeDigestSha256"
             ]
           }
         }

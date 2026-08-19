@@ -1,4 +1,4 @@
-"""Anchor adapter interface. RFC 3161 and Ethereum remain unimplemented."""
+"""Anchor adapter interface."""
 
 from __future__ import annotations
 
@@ -39,45 +39,15 @@ class AnchorAdapter(ABC):
         raise NotImplementedError
 
 
-class Rfc3161Adapter(AnchorAdapter):
-    profile_id = "rfc3161"
-
-    def anchor(self, envelope_bytes: bytes) -> dict[str, Any]:
-        raise NotImplementedError(
-            "RFC 3161 timestamping is not implemented. Select profile rekor-v1 "
-            "or rekor-v1-recorded-fixture. This stub does not emit timestamps."
-        )
-
-    def verify(self, envelope_bytes: bytes, receipt: dict[str, Any]) -> TemporalClaim:
-        raise NotImplementedError(
-            "RFC 3161 verification is not implemented. Select profile rekor-v1 "
-            "or rekor-v1-recorded-fixture. This stub does not emit timestamps."
-        )
-
-
-class EthereumAdapter(AnchorAdapter):
-    profile_id = "ethereum"
-
-    def anchor(self, envelope_bytes: bytes) -> dict[str, Any]:
-        raise NotImplementedError(
-            "Ethereum anchoring is not implemented. EIP-712 is not a time anchor. "
-            "Select profile rekor-v1 or rekor-v1-recorded-fixture."
-        )
-
-    def verify(self, envelope_bytes: bytes, receipt: dict[str, Any]) -> TemporalClaim:
-        raise NotImplementedError(
-            "Ethereum verification is not implemented. EIP-712 is not a time anchor. "
-            "Select profile rekor-v1 or rekor-v1-recorded-fixture."
-        )
-
-
 def select_adapter(profile_id: str, **kwargs: Any) -> AnchorAdapter:
+    from anchors.ethereum import EthereumAdapter
     from anchors.rekor import RekorAdapter
+    from anchors.rfc3161 import Rfc3161Adapter
 
     if profile_id in {"rekor-v1", "rekor-v1-recorded-fixture"}:
         return RekorAdapter(profile_id=profile_id, **kwargs)
-    if profile_id == "rfc3161":
-        return Rfc3161Adapter()
-    if profile_id == "ethereum":
-        return EthereumAdapter()
+    if profile_id in {"rfc3161", "rfc3161-recorded-fixture"}:
+        return Rfc3161Adapter(profile_id=profile_id, **kwargs)
+    if profile_id in {"ethereum", "ethereum-calldata-fixture"}:
+        return EthereumAdapter(profile_id=profile_id, **kwargs)
     raise NotImplementedError(f"unknown anchor profile {profile_id}")

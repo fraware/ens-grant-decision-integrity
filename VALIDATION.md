@@ -100,6 +100,24 @@ Expected Phase II results:
 
 A Phase II pass does not establish execution, fairness, legitimacy, or funding authority.
 
+## Wave 4 contract (additive)
+
+```bash
+python scripts/conformance.py examples/tier-a-simplified-grant.example.json
+python scripts/test_schema_02.py
+python -m pytest projection/tests
+```
+
+Expected Wave 4 results:
+
+- Tier A example passes schema 0.2 and conformance checks;
+- adversarial schema 0.2 tests reject bad pins and AI authority identity;
+- projection tests are deterministic and the public projection validates;
+- T13 RFC 3161 fixture tests and T14 Ethereum fixture tests pass;
+- v0.1 contract remains unchanged.
+
+Live Rekor: POST to `https://rekor.sigstore.dev` failed with `ConnectionResetError` from the development environment on 2026-08-19. T7 continues to use `rekor-v1-recorded-fixture`; the skipped live vector test remains optional.
+
 ## Limits
 
 Validation establishes structural and declared cross-field consistency. It does not establish:
