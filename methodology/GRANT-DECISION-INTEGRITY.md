@@ -1,6 +1,6 @@
 # Grant Decision Integrity methodology (draft)
 
-Status: **draft** — not a frozen ENS standard. This document adapts Appendix B's twelve-step review pattern into mechanism-first language for inspecting grant decision records. It does not certify outcomes, fairness, or funding authority.
+Status: **draft** — not a frozen ENS standard. This document describes a twelve-step review pattern in mechanism-first language for inspecting grant decision records. It does not certify outcomes, fairness, or funding authority.
 
 ## Purpose
 

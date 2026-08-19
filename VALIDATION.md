@@ -100,7 +100,7 @@ Expected Phase II results:
 
 A Phase II pass does not establish execution, fairness, legitimacy, or funding authority.
 
-## Wave 4 contract (additive)
+## Schema 0.2 contract (additive)
 
 ```bash
 python scripts/conformance.py examples/tier-a-simplified-grant.example.json
@@ -108,13 +108,14 @@ python scripts/test_schema_02.py
 python -m pytest projection/tests
 ```
 
-Expected Wave 4 results:
+Expected schema 0.2 results:
 
 - Tier A example passes schema 0.2 and conformance checks;
 - adversarial schema 0.2 tests reject bad pins and AI authority identity;
 - projection tests are deterministic and the public projection validates;
-- T13 RFC 3161 fixture tests and T14 Ethereum fixture tests pass;
 - v0.1 contract remains unchanged.
+
+RFC 3161 and Ethereum calldata adapters ship with fixture profiles (`rfc3161-recorded-fixture`, `ethereum-calldata-fixture`). Live TSA and live mainnet anchoring are optional program workflows; the reference test suite verifies Rekor fixture receipts (T6/T7) and asserts that live Ethereum anchoring raises `NotImplementedError`.
 
 Live Rekor: POST to `https://rekor.sigstore.dev` failed with `ConnectionResetError` from the development environment on 2026-08-19. T7 continues to use `rekor-v1-recorded-fixture`; the skipped live vector test remains optional.
 

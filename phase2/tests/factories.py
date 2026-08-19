@@ -226,7 +226,7 @@ def build_bundle(
             )
     source_uri = (
         "https://github.com/fraware/ens-grant-decision-integrity/blob/"
-        "phase-ii-evaluator-provenance/phase2/examples/retrospective-public.bundle.json"
+        "https://github.com/fraware/ens-grant-decision-integrity/blob/main/phase2/examples/retrospective-public.bundle.json"
     )
     record = v01_record(
         digest=envelope["commitmentDigest"],

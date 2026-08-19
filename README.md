@@ -2,7 +2,9 @@
 
 A versioned draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
-The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to that proposal. v0.1 implements its first $200 work item: a Grants Charter and a machine-readable decision-record schema.
+The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to that proposal. v0.1 implements its first $200 work item: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 adds optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
+
+**Releases:** [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) (latest) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
 
 ## What v0.1 provides
 
@@ -19,27 +21,27 @@ The profile records enough information for a third party to reconstruct the proc
 
 JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express.
 
-## Repository
+## Repository layout
 
-- `CHARTER.md` — normative decision-integrity requirements.
-- `schema/grant-decision-record.schema.json` — JSON Schema Draft 2020-12 record format.
-- `CONFORMANCE.md` — cross-field conformance rules and severity model.
-- `scripts/conformance.py` — semantic conformance validator.
-- `scripts/test_conformance.py` — adversarial and valid-edge tests.
-- `scripts/test_regressions.py` — source-fidelity and cross-field regression tests.
-- `examples/spp3-marketplace-rfp.example.json` — fictional, non-evaluative mapping of the ENS SPP3 Marketplace RFP.
-- `provenance/simocracy-funding.json` — recorded Simocracy funding decisions.
-- `DESIGN-NOTES.md` — design rationale, threat model, and scope boundaries.
-- `VALIDATION.md` — validation contract and expected outcomes.
-- `REVIEW.md` — focused review guide.
-- `CONTRIBUTING.md` — contribution standard.
-- `SECURITY.md` — handling for sensitive reports.
-- `CITATION.cff` and `LICENSE` — citation and licensing metadata.
-- `RELEASE-INTEGRITY.md` — release-integrity procedure.
+| Path | Purpose |
+|---|---|
+| `CHARTER.md` | Normative decision-integrity requirements (draft governance proposal) |
+| `schema/grant-decision-record.schema.json` | JSON Schema Draft 2020-12 record format (default `schemaVersion` `"0.1"`) |
+| `schema/grant-decision-record-0.2.schema.json` | Optional schema 0.2 extensions (`policyPinning`, `authorityIdentity`) |
+| `CONFORMANCE.md` | Cross-field conformance rules and severity model |
+| `scripts/conformance.py` | Semantic conformance validator |
+| `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, and replay |
+| `projection/` | Deterministic confidential-to-public record projection |
+| `examples/` | Fictional worked examples (non-evaluative) |
+| `methodology/GRANT-DECISION-INTEGRITY.md` | Draft twelve-step review methodology |
+| `ADOPTION.md` | Adoption pathway for ENS grant programs |
+| `VALIDATION.md` | Validation contract and expected outcomes |
+| `DESIGN-NOTES.md` | Design rationale, threat model, and scope boundaries |
+| `RELEASE-INTEGRITY.md` | Release-identity and archive-integrity procedure |
 
-## Validation
+## Quickstart
 
-Install the pinned development dependency and run the complete contract:
+Install pinned dependencies and run the complete v0.1 validation contract:
 
 ```bash
 python -m pip install -r requirements-dev.txt
@@ -51,25 +53,7 @@ python scripts/test_regressions.py
 
 The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract.
 
-## ENS process mapping
-
-The worked example maps the public SPP3 Marketplace process without evaluating any applicant. It records:
-
-- all seven published hard eligibility conditions;
-- the published M1–M5 weights: 25%, 20%, 35%, 10%, and 10%;
-- the public rules and sources governing mandate, eligibility, evaluation criteria, conflict rules, and decision procedure;
-- the published committee quorum and decision rule;
-- milestone and traction-verification requirements.
-
-The example is a dated snapshot of the published process. It is fictional, does not identify, score, recommend, or reject a real applicant, and does not need to be rewritten when the underlying RFP later reaches an award state. A later process change warrants a new example or version only if it changes the decision-integrity model.
-
-## AI provenance boundary
-
-When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and records a minimum provenance envelope: model identity, human-review policy, commitment metadata, reveal state, and the application deadline used for the timing check.
-
-The validator checks only that the declared commitment time precedes the declared submission deadline. v0.1 does not define canonical manifest serialization, commitment generation, an independently verifiable timestamp or publication anchor, proof verification, selective-disclosure proofs, or evaluator replay. A schema 0.1 record without a Phase II evidence bundle therefore does not prove that a commitment existed at the declared time or that the committed configuration was actually used.
-
-## Phase II
+## Phase II (evaluator provenance)
 
 `phase2/` is an additive protocol for evaluator-manifest commitment, Rekor-profile anchoring, run attestation, and replay. Grant-decision `schemaVersion` remains `"0.1"`. Phase II does not change v0.1 Charter, schema, or conformance behavior.
 
@@ -81,15 +65,17 @@ python -m pytest phase2/tests
 python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-public.bundle.json
 ```
 
-## Wave 4 (schema 0.2 extensions)
+Rekor tests and the public example use `rekor-v1-recorded-fixture` receipts verified under a shipped test-log key. That profile does **not** establish inclusion in the public Sigstore Rekor log. See `phase2/ADMIN-BURDEN.md`.
 
-Wave 4 adds optional schema `0.2` extensions without mutating v0.1 behavior:
+## Schema 0.2 extensions (v0.3)
+
+Optional schema `0.2` extensions do not mutate v0.1 behavior:
 
 - `schema/grant-decision-record-0.2.schema.json` — optional `policyPinning` and `authorityIdentity`
 - `schema/grant-decision-public-projection-0.2.schema.json` — relaxed requirements for projected public records
 - `projection/` — deterministic confidential-to-public record projection with withheld commitments
 - `phase2/src/anchors/rfc3161.py` — RFC 3161 TSA profile (`rfc3161`, `rfc3161-recorded-fixture`)
-- `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`)
+- `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`); live mainnet anchoring is not implemented
 - `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
 - `ADOPTION.md` — adoption pathway for ENS programs
 - `methodology/GRANT-DECISION-INTEGRITY.md` — draft twelve-step review methodology
@@ -103,11 +89,37 @@ python projection/src/cli.py --confidential examples/tier-a-simplified-grant.exa
 
 Selective disclosure remains deferred; see `phase2/DEFERRED.md`.
 
-## Scope
+## What validators prove and do not prove
+
+**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a bundle is present.
+
+**Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying the selected anchor profile; execution of a committed evaluator configuration; funding authority.
+
+## AI provenance boundary
+
+When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and records a minimum provenance envelope: model identity, human-review policy, commitment metadata, reveal state, and the application deadline used for the timing check.
+
+The v0.1 validator checks only that the declared commitment time precedes the declared submission deadline. v0.1 does not define canonical manifest serialization, commitment generation, an independently verifiable timestamp or publication anchor, proof verification, selective-disclosure proofs, or evaluator replay. A schema 0.1 record without a Phase II evidence bundle therefore does not prove that a commitment existed at the declared time or that the committed configuration was actually used.
+
+## ENS process mapping
+
+The worked example maps the public SPP3 Marketplace process without evaluating any applicant. It records all seven published hard eligibility conditions, the published M1–M5 weights, the public rules and sources governing mandate, eligibility, evaluation criteria, conflict rules, and decision procedure, the published committee quorum and decision rule, and milestone and traction-verification requirements.
+
+The example is a dated snapshot of the published process. It is fictional, does not identify, score, recommend, or reject a real applicant, and does not need to be rewritten when the underlying RFP later reaches an award state.
+
+## Scope and status
 
 This project governs the integrity of the decision record. It does not determine which projects ENS should fund, replace substantive committee judgment, establish the truth of cited evidence, or create authority for AI systems to approve, reject, suspend, or release funding.
 
-**Status.** Repository version `0.3.0` on the Wave 4 branch adds schema 0.2 extensions and projection. v0.1 record schema version `"0.1"` remains the default grant-decision profile. The Charter remains a draft governance proposal: it is not adopted ENS policy and does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee.
+| Item | Value |
+|---|---|
+| Repository version | `0.3.0` |
+| Default grant-decision `schemaVersion` | `"0.1"` |
+| Optional extensions | schema `"0.2"` (additive) |
+| Charter status | Draft governance proposal — not adopted ENS policy |
+| Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
+
+For adoption guidance, see `ADOPTION.md`. For security-sensitive reports, see `SECURITY.md`.
 
 ## Sources
 

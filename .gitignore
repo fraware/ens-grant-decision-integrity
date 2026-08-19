@@ -5,3 +5,12 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .DS_Store
+
+# Local release artifacts (official archives belong on GitHub Releases only)
+*.zip
+*.zip.sha256
+*.sha256
+
+# Internal handoff and planning documents
+*.docx
+_dossier*

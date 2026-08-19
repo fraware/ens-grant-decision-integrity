@@ -377,7 +377,7 @@
         "committedAt": "2026-07-20T12:00:00Z"
       },
       "revealStatus": "revealed",
-      "revealUri": "https://github.com/fraware/ens-grant-decision-integrity/blob/phase-ii-evaluator-provenance/phase2/examples/retrospective-public.bundle.json",
+      "revealUri": "https://github.com/fraware/ens-grant-decision-integrity/blob/main/phase2/examples/retrospective-public.bundle.json",
       "models": [
         {
           "provider": "hosted-generative-api",
@@ -464,7 +464,7 @@
       "updatedAt": "2026-08-15T13:00:00Z"
     },
     "integrity": {
-      "sourceUri": "https://github.com/fraware/ens-grant-decision-integrity/blob/phase-ii-evaluator-provenance/phase2/examples/retrospective-public.bundle.json"
+      "sourceUri": "https://github.com/fraware/ens-grant-decision-integrity/blob/main/phase2/examples/retrospective-public.bundle.json"
     },
     "notes": [
       "Fictional Phase II retrospective example. Not an evaluation of any real applicant.",
