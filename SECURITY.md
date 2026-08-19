@@ -1,6 +1,8 @@
 # Security and sensitive disclosures
 
-This repository contains governance specifications, validation code, and fictional examples. It should not contain applicant-confidential material, production credentials, private keys, or undisclosed evaluator configuration.
+This repository contains governance specifications, validation code, and fictional examples. It should not contain applicant-confidential material, production credentials, or undisclosed evaluator configuration.
+
+Phase II test vectors may include test-log and test-attestation private keys. Those keys exist only for the harness and the public retrospective example. They are not production keys and MUST NOT be reused for a live program.
 
 ## Sensitive reports
 

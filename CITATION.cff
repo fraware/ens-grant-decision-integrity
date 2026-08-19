@@ -1,11 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this artifact, please cite it as below."
 title: "ENS Grant Decision Integrity"
-version: "0.1.0"
+version: "0.2.0"
 type: software
 authors:
   - family-names: Petel
     given-names: Mateo
 license: MIT
-abstract: "A Grants Charter and machine-readable decision-record schema for inspectable, human-authorized grant adjudication, developed from an ENS Simocracy funding proposal."
+abstract: "A Grants Charter and machine-readable decision-record schema for inspectable, human-authorized grant adjudication, plus Phase II evaluator-manifest commitment, anchoring, run attestation, and replay reference implementation."
 repository-code: "https://github.com/fraware/ens-grant-decision-integrity"

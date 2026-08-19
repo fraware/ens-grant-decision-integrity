@@ -141,6 +141,14 @@ python scripts/test_conformance.py
 python scripts/test_regressions.py
 ```
 
+## Phase II contract (additive)
+
+Phase II does not change the v0.1 checks above. A later evidence bundle may fill `evaluatorManifest` using algorithm `"other"`, the Phase II digest, verified anchor time as `committedAt`, and mapped `revealStatus`. That fill does not make `scripts/conformance.py` verify salt, JCS, or the anchor profile.
+
+Phase II graph verification is a separate contract: `python -m pytest phase2/tests` and `python phase2/src/cli.py verify-graph`. It establishes only the claims in `phase2/CLAIM-MATRIX.md`. It MUST fail any attempt to populate `decision.authorityKind` from Phase II objects.
+
+The Marketplace example remains the v0.1 worked example. `--strict` must still fail while `CHAL003` exists. The Phase II public retrospective example is pending against the same public artifacts and preserves `CHAL003`.
+
 ## Scope boundary
 
 The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, whether a commitment existed at the declared time without an external anchor, whether a committed evaluator configuration actually ran, or whether the governing policy itself is legitimate.

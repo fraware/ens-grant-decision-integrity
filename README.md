@@ -67,7 +67,19 @@ The example is a dated snapshot of the published process. It is fictional, does 
 
 When AI materially informs a grant recommendation, v0.1 requires a versioned evaluator manifest and records a minimum provenance envelope: model identity, human-review policy, commitment metadata, reveal state, and the application deadline used for the timing check.
 
-The validator checks only that the declared commitment time precedes the declared submission deadline. v0.1 does not define canonical manifest serialization, commitment generation, an independently verifiable timestamp or publication anchor, proof verification, selective-disclosure proofs, or evaluator replay. It therefore does not prove that a commitment existed at the declared time or that the committed configuration was actually used.
+The validator checks only that the declared commitment time precedes the declared submission deadline. v0.1 does not define canonical manifest serialization, commitment generation, an independently verifiable timestamp or publication anchor, proof verification, selective-disclosure proofs, or evaluator replay. A schema 0.1 record without a Phase II evidence bundle therefore does not prove that a commitment existed at the declared time or that the committed configuration was actually used.
+
+## Phase II
+
+`phase2/` is an additive protocol for evaluator-manifest commitment, Rekor-profile anchoring, run attestation, and replay. Grant-decision `schemaVersion` remains `"0.1"`. Phase II does not change v0.1 Charter, schema, or conformance behavior.
+
+A Phase II graph pass establishes only the claims in `phase2/CLAIM-MATRIX.md`. A valid commitment is not execution. A signed run is an assertion. Replay agreement is not correctness. Hosted models may be `not-replayable`. Hashes are not legitimacy. AI systems cannot approve, reject, suspend, or release funding.
+
+```bash
+python -m pip install -r phase2/requirements.txt
+python -m pytest phase2/tests
+python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-public.bundle.json
+```
 
 ## Scope
 

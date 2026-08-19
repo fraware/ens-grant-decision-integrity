@@ -1,0 +1,484 @@
+{
+  "bundleVersion": "1",
+  "envelope": {
+    "type": "ens-gdi-evaluator-manifest-commitment",
+    "version": "1",
+    "programId": "ens-gdi-phase2-retrospective-public",
+    "roundId": "marketplace-like-illustrative-2026",
+    "applicationDeadline": "2026-08-05T23:59:00Z",
+    "commitmentAlgorithm": "sha256-salted-jcs-rfc8785-v1",
+    "commitmentDigest": "e984bf39346f2176a18fc62ab541cad4b531c17b398a2f147bc815299250c5a8",
+    "manifestSchemaVersion": "1"
+  },
+  "receipt": {
+    "profileId": "rekor-v1-recorded-fixture",
+    "envelopeDigestSha256": "8140b6fffda75dd69ee34eb2c41617e59d138e4d0ccdb2529f3992f33730f496",
+    "anchorId": "fixture:f93079edef703bfd4abab185157581b4f48ae6e3d708cd09b0df50457c2d48ea:0",
+    "anchoredAt": "2026-07-20T12:00:00Z",
+    "logIndex": 0,
+    "verifierMaterial": {
+      "kind": "rekor-v1-offline",
+      "bodyB64": "eyJhcGlWZXJzaW9uIjoiMC4wLjEiLCJraW5kIjoiaGFzaGVkcmVrb3JkIiwic3BlYyI6eyJkYXRhIjp7Imhhc2giOnsiYWxnb3JpdGhtIjoic2hhMjU2IiwidmFsdWUiOiI4MTQwYjZmZmZkYTc1ZGQ2OWVlMzRlYjJjNDE2MTdlNTlkMTM4ZTRkMGNjZGIyNTI5ZjM5OTJmMzM3MzBmNDk2In19LCJzaWduYXR1cmUiOnsiY29udGVudCI6Ik1FVUNJRjJLdXpHQ1E1bEVWYjhIZ0d3VUtobWFFZ3oxdGk1N0ltUW9uelcvUjVlUUFpRUF2TDNVK3VJK1FYUm4vZFpVTi9Na0lMYXpQWDdzRHFXQ3lYb0hMci9CamgwPSIsInB1YmxpY0tleSI6eyJjb250ZW50IjoiTFMwdExTMUNSVWRKVGlCUVZVSk1TVU1nUzBWWkxTMHRMUzBLVFVacmQwVjNXVWhMYjFwSmVtb3dRMEZSV1VsTGIxcEplbW93UkVGUlkwUlJaMEZGV2t4VVpFbDBUREZDYjBNMGFYa3ZjMjVaTDBWV1VUVXhNV1pMWWdwdGVrdDNiV1pwYmt0SFEwOVRUV3RxZVM5d1ZtRlhhVTE2Vm13eU4yZ3dUbGxVVDBNNVppdG5TV1JVYWpGV1EwWm9WbUZXYldrd04ySjNQVDBLTFMwdExTMUZUa1FnVUZWQ1RFbERJRXRGV1MwdExTMHRDZz09In19fX0=",
+      "integratedTime": 1784548800,
+      "logIdHex": "f93079edef703bfd4abab185157581b4f48ae6e3d708cd09b0df50457c2d48ea",
+      "signedEntryTimestampB64": "MEUCIQCp5N/bdnF9AnKir8jLd5FEfQmWRI8h2rYxGjkWYU/+lwIgAhuKiJInhKTW1e+6ghtz6l/0DzqtFxpiwrDfv7pzDjM=",
+      "inclusionProof": {
+        "logIndex": 0,
+        "treeSize": 1,
+        "rootHash": "62c6f2b51527be5ddf55d0eb9ce8f2761e57e9c2d5d6c0d53549fa0dd229ffdd",
+        "hashes": []
+      },
+      "checkpoint": "ens-gdi-rekor-fixture - 17955985777157487613\n1\nYsbytRUnvl3fVdDrnOjydh5X6cLV1sDVNUn6DdIp/90=\n\n\u2014 ens-gdi-rekor-fixture +TB57TBGAiEAxfdAi5Lc9deKD4cnRxThTZZjBca+2HxzpUHHfazizoACIQCVBhruU6nUozwT0RQR8D+soVz2oJOg5jCCtDtqANTtAg==\n",
+      "uuid": "fixture-8140b6fffda75dd6"
+    }
+  },
+  "revealStatus": "revealed",
+  "manifest": {
+    "manifestVersion": "1",
+    "programId": "ens-gdi-phase2-retrospective-public",
+    "roundId": "marketplace-like-illustrative-2026",
+    "applicationDeadline": "2026-08-05T23:59:00Z",
+    "createdAt": "2026-07-15T00:00:00Z",
+    "models": [
+      {
+        "provider": "hosted-generative-api",
+        "model": "frontier-class-hosted",
+        "version": "unspecified-hosted",
+        "replayable": false
+      }
+    ],
+    "instructions": {
+      "text": "Illustrative screening instructions. Apply the published public rubric surfaces only. Do not invent applicant facts. Do not issue a funding decision."
+    },
+    "retrieval": {
+      "mode": "public-forum-uris-only",
+      "sources": [
+        "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+        "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+        "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+        "https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939"
+      ]
+    },
+    "tools": {
+      "allowed": [
+        "retrieve-public-uri"
+      ]
+    },
+    "parameters": {
+      "temperature": "0",
+      "maxTokens": "1024"
+    },
+    "aggregation": {
+      "method": "single-hosted-draft-then-human-review"
+    },
+    "humanReviewPolicy": "A human decision authority must review any AI draft. AI output is advisory and cannot approve, reject, suspend, or release funding.",
+    "canonicalization": "RFC8785"
+  },
+  "saltHex": "21042d10f507aeee79560a96ec0b7dd5fb7daf7266eafedd51379005502a0f0b",
+  "selectiveAuditResult": null,
+  "runAttestation": {
+    "payload": "eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCJwcmVkaWNhdGUiOnsiZW52aXJvbm1lbnQiOnsibm90ZSI6InRlc3QgaGFybmVzczsgbm90IGEgcHJvZHVjdGlvbiBldmFsdWF0b3IgaG9zdCJ9LCJodW1hblJldmlld1N0YXRlIjoicGVuZGluZy1odW1hbi1yZXZpZXciLCJpbXBsZW1lbnRhdGlvbiI6eyJkaWdlc3RTaGEyNTYiOiIxMTZjM2RhZDAyMzNiN2VlMDhiOTc1NTdmMTE0Y2JlODc3MmY1ZWNmNzQxZDA1OTM5ZjIzMzA2NzMyNzNkYzM4IiwibmFtZSI6ImVucy1nZGktcGhhc2UyLXJlZmVyZW5jZS1yZXBsYXkifSwiaW5wdXRTbmFwc2hvdHMiOnsiYXBwbGljYXRpb25TaGEyNTYiOiJkNWZmZDk0NTMyNDY0MjgyN2FjMTA5MjEyOGI5NDU2OGJkMGYyZjY1ZWNiOGRmNjFjNjZhYTk0MmQ3ZDRlMzZhIiwiZXZpZGVuY2VTaGEyNTYiOiIxNTRlZTk2ZmQ4ZjQwOWU5ZjJlMmY3MGJmZTFlMmM4YmUyYjEzMzc1MTUyOTg3ZDcxNGJhM2VjZTBmMDBjYzI2IiwicmV0cmlldmFsU2hhMjU2IjoiZGEzN2M3M2VkNjY1NzVkZWY0MDE4ZTM3MmZlMDgwMzU3ZjMwMDNkYWQ4YjJkYWZhODRkNTM4MmU3MTI5ZTI5YiJ9LCJsYXllckRpZ2VzdHMiOnsiYWdncmVnYXRpb24iOiJmMjFiMDU0ZmI2ZDgwOTg4NjYwNWE2MGU4Y2IxYjg3NjY4NjQ0YzllNWQxYjg3MDhkMWE1NWZmYTdjOGMwYzM3IiwiaG9zdGVkLWdlbmVyYXRpb24iOiJhNjc2NTM4YjA5YmZmM2VlM2VmODhlZGU4ZDRmNzlhNDk4Y2IzYjlkMjVkOGE0ZDdjOWU3YjVmYTg3ZmM4MTFiIiwicHJlcHJvY2Vzc2luZyI6Ijk5Y2NjYmRhZDdhZjZkMjEwZDI5Y2Q2ZjU4ZWNhYTRhZWM0OWVlNmZkNDE4ZTk5ZDY3MzA5NjVkNjQ5ZTc3YTAiLCJyZXRyaWV2YWwtc25hcHNob3QiOiJkYTM3YzczZWQ2NjU3NWRlZjQwMThlMzcyZmUwODAzNTdmMzAwM2RhZDhiMmRhZmE4NGQ1MzgyZTcxMjllMjliIiwic2NvcmluZyI6ImMxZTVlMThjNzc1NWM5ZTEzZGE2NTJlZjUxZWVhYWIwM2UzZDRlYTRmYmI4NWRkM2JhZWVlNzdhNTM2YmEzNjIifSwibWFuaWZlc3RDb21taXRtZW50RGlnZXN0IjoiZTk4NGJmMzkzNDZmMjE3NmExOGZjNjJhYjU0MWNhZDRiNTMxYzE3YjM5OGEyZjE0N2JjODE1Mjk5MjUwYzVhOCIsIm9wZXJhdG9yIjoiaWxsdXN0cmF0aXZlLW9wZXJhdG9yLXRlc3Qta2V5Iiwib3V0cHV0RGlnZXN0IjoiMGFlZTk1NTU4OWRlNTNhNmRhODUwZjhhODMzODhiNmZhMzAyZWNiNDAwNmE5NzU0MjIzMGU5MmQwMGQxMzRmMSIsInByb2dyYW1JZCI6ImVucy1nZGktcGhhc2UyLXJldHJvc3BlY3RpdmUtcHVibGljIiwicm91bmRJZCI6Im1hcmtldHBsYWNlLWxpa2UtaWxsdXN0cmF0aXZlLTIwMjYifSwicHJlZGljYXRlVHlwZSI6InVybjplbnMtZ2RpOnBoYXNlMjpldmFsdWF0b3ItcnVuOnYxIiwic3ViamVjdCI6W3siZGlnZXN0Ijp7InNoYTI1NiI6IjBhZWU5NTU1ODlkZTUzYTZkYTg1MGY4YTgzMzg4YjZmYTMwMmVjYjQwMDZhOTc1NDIyMzBlOTJkMDBkMTM0ZjEifSwibmFtZSI6ImV2YWx1YXRvci1ydW4tb3V0cHV0In1dfQ==",
+    "payloadType": "application/vnd.in-toto+json",
+    "signatures": [
+      {
+        "keyid": "43d85a62c7b659c6e0df561c8407bffd0084999e4e99b1ce94d942a55cf121d0",
+        "sig": "RRt5tDtBNnhdJq0k6143TPxYWnJRR35vc/L16XTVWRAxBDIxaY2oLYGEeEXxDP6hzTY5dPfyQPl+3vvtyb/vCw=="
+      }
+    ]
+  },
+  "runPublicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAwDdIamm3ufrpS8nVPe6cXb3qsDRiLtIP0GlLVUvWPI0=\n-----END PUBLIC KEY-----\n",
+  "replayReport": {
+    "reportVersion": "1",
+    "manifestCommitmentDigest": "e984bf39346f2176a18fc62ab541cad4b531c17b398a2f147bc815299250c5a8",
+    "layers": [
+      {
+        "layerId": "preprocessing",
+        "outcome": "exact-match",
+        "attestedDigest": "99cccbdad7af6d210d29cd6f58ecaa4aec49ee6fd418e99d6730965d649e77a0",
+        "recomputedDigest": "99cccbdad7af6d210d29cd6f58ecaa4aec49ee6fd418e99d6730965d649e77a0",
+        "bound": null,
+        "reason": null
+      },
+      {
+        "layerId": "retrieval-snapshot",
+        "outcome": "exact-match",
+        "attestedDigest": "da37c73ed66575def4018e372fe080357f3003dad8b2dafa84d5382e7129e29b",
+        "recomputedDigest": "da37c73ed66575def4018e372fe080357f3003dad8b2dafa84d5382e7129e29b",
+        "bound": null,
+        "reason": null
+      },
+      {
+        "layerId": "scoring",
+        "outcome": "exact-match",
+        "attestedDigest": "c1e5e18c7755c9e13da652ef51eeaab03e3d4ea4fbb85dd3baeee77a536ba362",
+        "recomputedDigest": "c1e5e18c7755c9e13da652ef51eeaab03e3d4ea4fbb85dd3baeee77a536ba362",
+        "bound": null,
+        "reason": null
+      },
+      {
+        "layerId": "aggregation",
+        "outcome": "exact-match",
+        "attestedDigest": "f21b054fb6d809886605a60e8cb1b87668644c9e5d1b8708d1a55ffa7c8c0c37",
+        "recomputedDigest": "f21b054fb6d809886605a60e8cb1b87668644c9e5d1b8708d1a55ffa7c8c0c37",
+        "bound": null,
+        "reason": null
+      },
+      {
+        "layerId": "hosted-generation",
+        "outcome": "not-replayable",
+        "attestedDigest": "a676538b09bff3ee3ef88ede8d4f79a498cb3b9d25d8a4d7c9e7b5fa87fc811b",
+        "recomputedDigest": null,
+        "bound": null,
+        "reason": "Hosted generation is not replayable: model identity and decoding behavior are not under this protocol's control."
+      }
+    ]
+  },
+  "layerInputs": {
+    "preprocessing": {
+      "normalizedApplication": "illustrative-applicant",
+      "policyUris": [
+        "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309"
+      ]
+    },
+    "retrieval-snapshot": {
+      "uris": [
+        "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+        "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+        "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086"
+      ]
+    },
+    "scoring": {
+      "rubric": [
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5"
+      ],
+      "scores": null,
+      "note": "no real applicant scored"
+    },
+    "aggregation": {
+      "method": "single-hosted-draft-then-human-review",
+      "aggregate": null
+    },
+    "hosted-generation": {
+      "draft": "not-replayable-hosted-output"
+    }
+  },
+  "decisionRecord": {
+    "schemaVersion": "0.1",
+    "recordId": "illustrative-phase2-retrospective-public",
+    "recordType": "service-provider-decision",
+    "program": {
+      "name": "SPP3 Marketplace RFP",
+      "roundId": "marketplace-rfp-2026",
+      "authority": "SPP3 Committee under the DAO-approved Marketplace RFP and SPP3 committee model",
+      "programUri": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+      "submissionDeadline": "2026-08-05T23:59:00Z",
+      "materialityTier": "C-enhanced",
+      "budgetCurrency": "USD"
+    },
+    "application": {
+      "applicationId": "illustrative-applicant",
+      "applicantName": "Illustrative Applicant \u2014 not a real submission",
+      "requestedAmount": 400000,
+      "currency": "USD",
+      "confidential": true
+    },
+    "governingPolicy": {
+      "policyId": "SPP3-MARKETPLACE-RFP-2026",
+      "version": "public-artifacts-2026-07-20",
+      "effectiveAt": "2026-07-20T21:48:00Z",
+      "publicRulesUri": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+      "sources": [
+        "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+        "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+        "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086"
+      ],
+      "surfaceSources": {
+        "mandate": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+        "eligibility": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+        "evaluationCriteria": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+        "conflictRules": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+        "decisionProcedure": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086"
+      },
+      "changeDuringReview": false,
+      "changeSummary": null,
+      "previousVersion": null,
+      "changeNoticeUri": null,
+      "priorEvaluationsRerun": null
+    },
+    "eligibility": {
+      "status": "pending",
+      "checkedAt": "2026-08-05T23:59:00Z",
+      "rules": [
+        {
+          "ruleId": "E1",
+          "description": "Operational ENS marketplace scope",
+          "result": "pending",
+          "evidenceIds": [
+            "POLICY-RFP"
+          ]
+        },
+        {
+          "ruleId": "E2",
+          "description": "Requested amount between $200,000 and $500,000",
+          "result": "pass",
+          "evidenceIds": [
+            "POLICY-RFP"
+          ]
+        },
+        {
+          "ruleId": "E3",
+          "description": "Live product or credible go-live path measured in weeks",
+          "result": "pending",
+          "evidenceIds": [
+            "POLICY-RFP"
+          ]
+        },
+        {
+          "ruleId": "E4",
+          "description": "Primary deliverable is a service to ENS",
+          "result": "pending",
+          "evidenceIds": [
+            "POLICY-RFP"
+          ]
+        },
+        {
+          "ruleId": "E5",
+          "description": "No active committee conflict under SPP3 standards",
+          "result": "pending",
+          "evidenceIds": [
+            "POLICY-RUBRIC",
+            "POLICY-SPP3-COMMITTEE"
+          ]
+        },
+        {
+          "ruleId": "E6",
+          "description": "Applicant is not a ratified SPP3 cohort provider",
+          "result": "pending",
+          "evidenceIds": [
+            "POLICY-RUBRIC"
+          ]
+        },
+        {
+          "ruleId": "E7",
+          "description": "Application acknowledges the SPP3 Program Terms and Award Notice",
+          "result": "pending",
+          "evidenceIds": [
+            "POLICY-RUBRIC"
+          ]
+        }
+      ],
+      "rationale": "Illustrative record only. No real applicant eligibility determination is represented."
+    },
+    "evaluators": [
+      {
+        "evaluatorId": "committee",
+        "displayName": "SPP3 Committee",
+        "kind": "committee",
+        "role": "evaluation and award recommendation",
+        "participated": false,
+        "recused": false,
+        "recusalReason": null
+      },
+      {
+        "evaluatorId": "hosted-screener",
+        "displayName": "Illustrative hosted screening model",
+        "kind": "ai",
+        "role": "advisory screen",
+        "participated": true,
+        "recused": false,
+        "recusalReason": null,
+        "materiallyInformedRecommendation": true
+      }
+    ],
+    "conflicts": [],
+    "evidence": [
+      {
+        "evidenceId": "POLICY-RFP",
+        "kind": "forum",
+        "description": "Public Marketplace RFP authorization, scope, award structure, milestones, and committee rules.",
+        "uri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+        "observedAt": "2026-08-15T13:00:00Z",
+        "disclosure": "public"
+      },
+      {
+        "evidenceId": "POLICY-RUBRIC",
+        "kind": "forum",
+        "description": "Marketplace RFP timeline, eligibility gate, M1\u2013M5 rubric, threshold, payment structure, and committee process.",
+        "uri": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+        "observedAt": "2026-08-15T13:00:00Z",
+        "disclosure": "public"
+      },
+      {
+        "evidenceId": "POLICY-SPP3-COMMITTEE",
+        "kind": "forum",
+        "description": "SPP3 committee model defining quorum, voting, committee roles, and accountability.",
+        "uri": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+        "observedAt": "2026-08-15T13:00:00Z",
+        "disclosure": "public"
+      }
+    ],
+    "evaluation": {
+      "criteria": [
+        {
+          "criterionId": "M1",
+          "name": "Prior Delivery and Marketplace Impact",
+          "weight": 0.25,
+          "score": null,
+          "scoreScale": "1\u20135 in 0.5 increments",
+          "findingIds": []
+        },
+        {
+          "criterionId": "M2",
+          "name": "Scope Clarity and Milestone Credibility",
+          "weight": 0.2,
+          "score": null,
+          "scoreScale": "1\u20135 in 0.5 increments",
+          "findingIds": []
+        },
+        {
+          "criterionId": "M3",
+          "name": "Revenue and Adoption",
+          "weight": 0.35,
+          "score": null,
+          "scoreScale": "1\u20135 in 0.5 increments",
+          "findingIds": []
+        },
+        {
+          "criterionId": "M4",
+          "name": "ENS Alignment and ENSv2 Readiness",
+          "weight": 0.1,
+          "score": null,
+          "scoreScale": "1\u20135 in 0.5 increments",
+          "findingIds": []
+        },
+        {
+          "criterionId": "M5",
+          "name": "Post-Award Self-Sustainability",
+          "weight": 0.1,
+          "score": null,
+          "scoreScale": "1\u20135 in 0.5 increments",
+          "findingIds": []
+        }
+      ],
+      "materialFindings": [],
+      "disagreements": [],
+      "aggregateScore": null,
+      "aggregateScale": "0\u20135; award threshold 3.0"
+    },
+    "evaluatorManifest": {
+      "manifestVersion": "1",
+      "commitment": {
+        "algorithm": "other",
+        "digest": "e984bf39346f2176a18fc62ab541cad4b531c17b398a2f147bc815299250c5a8",
+        "committedAt": "2026-07-20T12:00:00Z"
+      },
+      "revealStatus": "revealed",
+      "revealUri": "https://github.com/fraware/ens-grant-decision-integrity/blob/phase-ii-evaluator-provenance/phase2/examples/retrospective-public.bundle.json",
+      "models": [
+        {
+          "provider": "hosted-generative-api",
+          "model": "frontier-class-hosted",
+          "version": "unspecified-hosted"
+        }
+      ],
+      "humanReviewPolicy": "A human decision authority must review any AI draft. AI output is advisory and cannot approve, reject, suspend, or release funding."
+    },
+    "decision": {
+      "status": "pending",
+      "authority": "SPP3 Committee; a subsequent ENS executable vote funds the selected award",
+      "authorityKind": "committee",
+      "decidedAt": null,
+      "awardedAmount": null,
+      "currency": "USD",
+      "rationale": "Illustrative pending record. No real committee judgment is represented.",
+      "aiRecommendationOverridden": false,
+      "aiOverrideRationale": null,
+      "quorum": "Three of four SPP3 Member seats active and participating",
+      "decisionRule": "Simple majority of participating SPP3 Members; the Chair votes only as a tiebreaker.",
+      "voteRecordUri": null
+    },
+    "challenge": {
+      "status": "not-open",
+      "deadline": null,
+      "scope": "The reviewed public Marketplace RFP and SPP3 process artifacts do not identify a post-decision process for correcting factual errors or procedural deviations. This records the public-process mapping and does not assert that no internal or unpublished procedure exists.",
+      "processDefined": false,
+      "processUri": null,
+      "submissionUri": null,
+      "resolution": null
+    },
+    "deliveryConditions": [
+      {
+        "conditionId": "D1",
+        "description": "Go-live milestone with objective acceptance criteria.",
+        "targetDate": null,
+        "reviewWindow": "Defined in the eventual service agreement.",
+        "verificationMethod": "Independent verification defined in the service agreement; the stream pauses if go-live is missed without committee approval.",
+        "verifier": "SPP3 accountability body or designated verifier",
+        "dependencies": [],
+        "paymentAmount": null,
+        "currency": "USD",
+        "status": "pending",
+        "evidenceIds": [
+          "POLICY-RFP",
+          "POLICY-RUBRIC"
+        ],
+        "consequence": "The build stream may pause if the required go-live milestone is missed."
+      },
+      {
+        "conditionId": "D2",
+        "description": "Post-go-live traction gates tied to marketplace usage.",
+        "targetDate": null,
+        "reviewWindow": "Defined in the eventual service agreement.",
+        "verificationMethod": "On-chain or otherwise independently verifiable evidence such as attributed protocol revenue, active wallets, completed secondary sales with anti-wash filters, or retention.",
+        "verifier": "SPP3 accountability body or designated verifier",
+        "dependencies": [
+          "Final thresholds are negotiated using baseline data at award signing."
+        ],
+        "paymentAmount": null,
+        "currency": "USD",
+        "status": "pending",
+        "evidenceIds": [
+          "POLICY-RFP",
+          "POLICY-RUBRIC"
+        ],
+        "consequence": "Unreleased amounts return to the DAO treasury at term end."
+      }
+    ],
+    "disclosure": {
+      "classification": "mixed",
+      "publicRecord": true,
+      "redactions": [
+        {
+          "field": "application",
+          "basis": "commercial",
+          "explanation": "The public RFP states that submissions are stored confidentially during review; this example uses a fictional applicant."
+        }
+      ]
+    },
+    "timestamps": {
+      "createdAt": "2026-08-15T13:00:00Z",
+      "updatedAt": "2026-08-15T13:00:00Z"
+    },
+    "integrity": {
+      "sourceUri": "https://github.com/fraware/ens-grant-decision-integrity/blob/phase-ii-evaluator-provenance/phase2/examples/retrospective-public.bundle.json"
+    },
+    "notes": [
+      "Fictional Phase II retrospective example. Not an evaluation of any real applicant.",
+      "Anchor is a rekor-v1-recorded-fixture receipt, not production Rekor inclusion.",
+      "Hosted generation is not-replayable. Deterministic layers are exact-match.",
+      "AI output is advisory. Decision authority remains human-governed and pending."
+    ]
+  },
+  "notes": [
+    "Fictional, non-evaluative retrospective example.",
+    "Uses only public ENS forum URIs. No real applicant is identified or scored.",
+    "Anchor is rekor-v1-recorded-fixture with a test-log key; not production Rekor inclusion.",
+    "Hosted generation is not-replayable. Deterministic layers are exact-match.",
+    "Test keys only. A real program must supply its own signing identity.",
+    "AI output is advisory and cannot populate decision.authorityKind."
+  ]
+}
