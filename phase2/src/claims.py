@@ -67,6 +67,22 @@ FIXTURE_TRUST_BOUNDARY = (
     "with the fixture. They do not establish inclusion in the public Sigstore Rekor log."
 )
 
+RFC3161_TRUST_BOUNDARY = (
+    "RFC 3161 temporal claims depend on the pinned TSA certificate chain and the "
+    "signed TimeStampToken over the envelope digest. TSA honesty and clock accuracy "
+    "are explicit trust assumptions."
+)
+
+RFC3161_FIXTURE_TRUST_BOUNDARY = (
+    "rfc3161-recorded-fixture tokens are verified under a test TSA key shipped with "
+    "the fixture. They do not establish a third-party TSA attestation."
+)
+
+ETHEREUM_FIXTURE_TRUST_BOUNDARY = (
+    "ethereum-calldata-fixture receipts are verified against recorded block metadata "
+    "shipped with the fixture. They do not establish mainnet inclusion."
+)
+
 COMMITMENT_ALGORITHM_ID = "sha256-salted-jcs-rfc8785-v1"
 COMMITMENT_DOMAIN = "ens-gdi/evaluator-manifest/v1"
 ENVELOPE_TYPE = "ens-gdi-evaluator-manifest-commitment"

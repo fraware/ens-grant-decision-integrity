@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "0.2",
+  "recordId": "illustrative-tier-a-simplified-grant-approved",
+  "recordType": "grant-decision",
+  "program": {
+    "name": "ENS Small Grants — Tier A Illustrative Round",
+    "roundId": "tier-a-illustrative-2026",
+    "authority": "ENS Foundation grants committee (illustrative)",
+    "programUri": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+    "submissionDeadline": "2026-06-01T23:59:59Z",
+    "materialityTier": "A-simplified",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "tier-a-fictional-001",
+    "applicantName": "Fictional Builder Collective — not a real applicant",
+    "requestedAmount": 15000,
+    "currency": "USD",
+    "confidential": true
+  },
+  "governingPolicy": {
+    "policyId": "ENS-TIER-A-ILLUSTRATIVE-2026",
+    "version": "illustrative-v1",
+    "effectiveAt": "2026-05-01T00:00:00Z",
+    "publicRulesUri": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+    "sources": [
+      "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+      "eligibility": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+      "evaluationCriteria": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+      "conflictRules": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+      "decisionProcedure": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086"
+    },
+    "changeDuringReview": false,
+    "changeSummary": null,
+    "previousVersion": null,
+    "changeNoticeUri": null,
+    "priorEvaluationsRerun": null
+  },
+  "policyPinning": {
+    "algorithm": "sha256",
+    "pinnedAt": "2026-05-01T12:00:00Z",
+    "sources": [
+      {
+        "uri": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+        "contentHash": "sha256:a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+        "surface": "mandate"
+      }
+    ]
+  },
+  "authorityIdentity": {
+    "authorityKind": "committee",
+    "committeeId": "ens-foundation-grants-illustrative",
+    "displayName": "Illustrative ENS Foundation grants committee",
+    "members": [
+      {
+        "memberId": "member-illustrative-1",
+        "evaluatorId": "human-chair",
+        "role": "chair",
+        "publicKeyFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "memberId": "member-illustrative-2",
+        "evaluatorId": "human-reviewer-a",
+        "role": "member",
+        "publicKeyFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000002"
+      }
+    ]
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": "2026-06-02T10:00:00Z",
+    "rules": [
+      {
+        "ruleId": "A1",
+        "description": "Illustrative Tier A scope alignment",
+        "result": "pass",
+        "evidenceIds": ["EVID-PUBLIC-RULES"]
+      }
+    ],
+    "rationale": "Illustrative eligibility only. No real applicant assessed."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "human-chair",
+      "displayName": "Illustrative chair",
+      "kind": "human",
+      "role": "committee chair",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    },
+    {
+      "evaluatorId": "human-reviewer-a",
+      "displayName": "Illustrative reviewer",
+      "kind": "human",
+      "role": "committee member",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "EVID-PUBLIC-RULES",
+      "kind": "forum",
+      "description": "Public SPP3 committee model cited as illustrative governing artifact.",
+      "uri": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+      "contentHash": "sha256:a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+      "observedAt": "2026-05-01T12:00:00Z",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "A-M1",
+        "name": "Illustrative simplified merit",
+        "weight": 1.0,
+        "score": 4.0,
+        "scoreScale": "1-5",
+        "findingIds": ["F1"]
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F1",
+        "statement": "Illustrative finding supporting a fictional Tier A approval.",
+        "classification": "judgment",
+        "evidenceIds": [],
+        "evaluatorIds": ["human-reviewer-a"],
+        "materiality": "medium"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": 4.0,
+    "aggregateScale": "1-5"
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "approved",
+    "authority": "Illustrative ENS Foundation grants committee",
+    "authorityKind": "committee",
+    "decidedAt": "2026-06-10T14:00:00Z",
+    "awardedAmount": 12000,
+    "currency": "USD",
+    "rationale": "Illustrative Tier A approval. Fictional applicant and amounts only.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": "Two participating human members",
+    "decisionRule": "Simple majority of participating committee members",
+    "voteRecordUri": null
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "Illustrative record; no correction process modeled.",
+    "processDefined": true,
+    "processUri": "https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086",
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [
+    {
+      "conditionId": "TA-D1",
+      "description": "Publish an illustrative milestone deliverable.",
+      "targetDate": "2026-09-01",
+      "reviewWindow": null,
+      "verificationMethod": "Public repository tag or forum post.",
+      "verifier": "Illustrative program administrator",
+      "dependencies": [],
+      "paymentAmount": 12000,
+      "currency": "USD",
+      "status": "pending",
+      "evidenceIds": ["EVID-PUBLIC-RULES"],
+      "consequence": "Illustrative only."
+    }
+  ],
+  "disclosure": {
+    "classification": "mixed",
+    "publicRecord": true,
+    "redactions": [
+      {
+        "field": "application",
+        "basis": "privacy",
+        "explanation": "Applicant identity withheld from the public Tier A projection."
+      }
+    ]
+  },
+  "timestamps": {
+    "createdAt": "2026-06-10T15:00:00Z",
+    "updatedAt": "2026-06-10T15:00:00Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Fictional Tier A simplified grant example for Wave 4.",
+    "Demonstrates schema 0.2 policyPinning and authorityIdentity without AI authority.",
+    "Use projection/examples/tier-a-projection-spec.json to derive the public record."
+  ]
+}

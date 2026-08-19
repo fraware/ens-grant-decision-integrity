@@ -14,7 +14,7 @@ SRC_DIR = Path(__file__).resolve().parent
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from anchors.base import Rfc3161Adapter, EthereumAdapter, select_adapter  # noqa: E402
+from anchors.base import select_adapter  # noqa: E402
 from attest import attest_run, load_ed25519_private, load_ed25519_public, verify_run  # noqa: E402
 from claims import CLAIM_BY_ID, NON_CLAIMS  # noqa: E402
 from envelope import commit_manifest, envelope_bytes  # noqa: E402
@@ -92,8 +92,37 @@ def cmd_anchor(args: argparse.Namespace) -> int:
         else:
             adapter = select_adapter(args.profile, **kwargs)
             receipt = adapter.anchor(env_bytes)
-    elif args.profile in {"rfc3161", "ethereum"}:
-        adapter = Rfc3161Adapter() if args.profile == "rfc3161" else EthereumAdapter()
+    elif args.profile in {"rfc3161", "rfc3161-recorded-fixture"}:
+        if args.profile == "rfc3161-recorded-fixture":
+            if not args.fixture_key:
+                raise Phase2Error("rfc3161-recorded-fixture requires --fixture-key", code="CLI004")
+            kwargs["fixture_private_key_pem"] = Path(args.fixture_key).read_text(encoding="utf-8")
+            if args.trust_root:
+                kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
+            if args.tsa_cert:
+                kwargs["fixture_certificate_pem"] = Path(args.tsa_cert).read_text(encoding="utf-8")
+        elif args.trust_root:
+            kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
+        adapter = select_adapter(args.profile, **kwargs)
+        if args.profile == "rfc3161-recorded-fixture" and args.at:
+            when = datetime.fromisoformat(args.at.replace("Z", "+00:00")).astimezone(timezone.utc)
+            receipt = adapter.anchor_at(env_bytes, integrated_time=when)  # type: ignore[attr-defined]
+        else:
+            receipt = adapter.anchor(env_bytes)
+    elif args.profile == "ethereum-calldata-fixture":
+        adapter = select_adapter(args.profile, **kwargs)
+        when = (
+            datetime.fromisoformat(args.at.replace("Z", "+00:00")).astimezone(timezone.utc)
+            if args.at
+            else datetime(2026, 7, 1, 12, 0, 0, tzinfo=timezone.utc)
+        )
+        receipt = adapter.anchor_fixture(  # type: ignore[attr-defined]
+            env_bytes,
+            tx_hash=args.tx_hash or "0xillustrative0000000000000000000000000000000000000000000000000001",
+            block_timestamp=when,
+        )
+    elif args.profile == "ethereum":
+        adapter = select_adapter(args.profile, **kwargs)
         receipt = adapter.anchor(env_bytes)
     else:
         if args.artifact_key:
@@ -253,10 +282,20 @@ def build_parser() -> argparse.ArgumentParser:
     anchor.add_argument(
         "--profile",
         required=True,
-        choices=["rekor-v1", "rekor-v1-recorded-fixture", "rfc3161", "ethereum"],
+        choices=[
+            "rekor-v1",
+            "rekor-v1-recorded-fixture",
+            "rfc3161",
+            "rfc3161-recorded-fixture",
+            "ethereum",
+            "ethereum-calldata-fixture",
+        ],
     )
     anchor.add_argument("--fixture-key")
     anchor.add_argument("--artifact-key")
+    anchor.add_argument("--trust-root")
+    anchor.add_argument("--tsa-cert", help="TSA certificate PEM for rfc3161-recorded-fixture issuance.")
+    anchor.add_argument("--tx-hash", help="Transaction hash for ethereum-calldata-fixture.")
     anchor.add_argument("--at", help="RFC 3339 time for recorded-fixture receipts only.")
     anchor.add_argument("--out", required=True)
     anchor.set_defaults(func=cmd_anchor)

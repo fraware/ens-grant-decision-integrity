@@ -1,0 +1,33 @@
+{
+  "specVersion": "1",
+  "domain": "ens-gdi/public-projection/v1",
+  "sourceUri": "https://github.com/fraware/ens-grant-decision-integrity",
+  "fieldAllowlist": [
+    "schemaVersion",
+    "recordId",
+    "recordType",
+    "program",
+    "governingPolicy",
+    "policyPinning",
+    "authorityIdentity",
+    "eligibility",
+    "evaluators",
+    "conflicts",
+    "evidence",
+    "evaluation",
+    "decision",
+    "challenge",
+    "deliveryConditions",
+    "disclosure",
+    "timestamps",
+    "integrity",
+    "notes"
+  ],
+  "redactions": [
+    {
+      "path": "application",
+      "category": "privacy",
+      "explanation": "Applicant identity and requested terms remain confidential in Tier A simplified grants."
+    }
+  ]
+}
