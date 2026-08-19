@@ -61,7 +61,7 @@ python phase2/src/cli.py replay --attestation attestation.json --layer-inputs la
 python phase2/src/cli.py verify-graph --bundle bundle.json
 ```
 
-`anchor --profile rekor-v1` submits to `https://rekor.sigstore.dev`. `rfc3161` and `ethereum` raise `NotImplementedError`.
+`anchor --profile rekor-v1` submits to `https://rekor.sigstore.dev`. `rfc3161` requires a pinned TSA trust root at issuance and verification time. `rfc3161-recorded-fixture` and `ethereum-calldata-fixture` issue offline fixture receipts. Live Ethereum anchoring (`ethereum`) raises `NotImplementedError`.
 
 Signing keys in tests and in the public example are test keys. A real program must supply its own signing identity.
 
@@ -85,4 +85,4 @@ Pinned in `requirements.txt`. Production canonicalization uses `rfc8785`. Tests 
 
 ## Out of scope
 
-No dashboard, grant-scoring model, new cryptographic primitive, ZK selective disclosure, universal DAO identity, production KMS, RFC 3161 TSA, or Ethereum anchor in this version.
+No dashboard, grant-scoring model, new cryptographic primitive, ZK selective disclosure, universal DAO identity, production KMS, or live Ethereum mainnet anchoring in this reference client.

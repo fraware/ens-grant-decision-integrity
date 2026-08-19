@@ -31,7 +31,7 @@ VECTORS = PHASE2 / "vectors"
 EXAMPLES = PHASE2 / "examples"
 SOURCE_URI = (
     "https://github.com/fraware/ens-grant-decision-integrity/blob/"
-    "phase-ii-evaluator-provenance/phase2/examples/retrospective-public.bundle.json"
+    "main/phase2/examples/retrospective-public.bundle.json"
 )
 
 

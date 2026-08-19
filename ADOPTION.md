@@ -1,6 +1,6 @@
 # Adoption pathway
 
-This note describes how ENS Foundation or DAO grant programs can adopt the draft Charter, v0.1 decision-record profile, Phase II commitment stack, and Wave 4 extensions without treating the repository as adopted ENS policy.
+This note describes how ENS Foundation or DAO grant programs can adopt the draft Charter, v0.1 decision-record profile, Phase II commitment stack, and schema 0.2 extensions without treating the repository as adopted ENS policy.
 
 ## 1. Decide materiality tier
 
@@ -67,9 +67,8 @@ A passing validator establishes internal consistency under the declared profile.
 
 ## 8. What adoption does not require
 
-- Making this repository public.
 - Live Rekor inclusion when rigorous recorded fixtures are documented (`phase2/ADMIN-BURDEN.md`).
 - Ethereum mainnet anchoring (fixture profile documents the pattern only).
 - Cryptographic selective disclosure or ZK proofs.
 
-Simocracy funding for this work allocated a cumulative **$219** across five decisions. v0.1 implements the first $200 Charter and schema item; Phase II and Wave 4 implement subsequent proposal mechanisms described in the handoff plan.
+Simocracy funding for this work allocated a cumulative **$219** across five decisions. v0.1 implements the first $200 Charter and schema item; Phase II implements evaluator-manifest commitment and anchoring; schema 0.2 extensions add policy pinning, structured authority, public projection, and alternate anchor fixture profiles.

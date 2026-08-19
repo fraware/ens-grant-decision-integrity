@@ -138,9 +138,9 @@ These rows are additive. They do not rewrite T1–T11 above. v0.1 still does not
 
 Details: `phase2/CLAIM-MATRIX.md` and `phase2/PROTOCOL.md`.
 
-## 4.2 Wave 4 controls (additive)
+## 4.2 Schema 0.2 controls (additive)
 
-| ID | Failure mode | Wave 4 control |
+| ID | Failure mode | Schema 0.2 control |
 |---|---|---|
 | W1 | Governing-policy URIs drift without detectable content change. | Optional schema 0.2 `policyPinning` with `sha256:` content hashes; POL007–POL010. |
 | W2 | Committee authority is only a free string with no member linkage. | Optional schema 0.2 `authorityIdentity` linked to evaluator IDs; AUTH004–AUTH007. |

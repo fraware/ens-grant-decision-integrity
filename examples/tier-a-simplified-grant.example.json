@@ -196,7 +196,7 @@
   },
   "integrity": null,
   "notes": [
-    "Fictional Tier A simplified grant example for Wave 4.",
+    "Fictional Tier A simplified grant example with schema 0.2 extensions.",
     "Demonstrates schema 0.2 policyPinning and authorityIdentity without AI authority.",
     "Use projection/examples/tier-a-projection-spec.json to derive the public record."
   ]

@@ -7,5 +7,5 @@ authors:
   - family-names: Petel
     given-names: Mateo
 license: MIT
-abstract: "A Grants Charter and machine-readable decision-record schema for inspectable, human-authorized grant adjudication, Phase II evaluator-manifest commitment and anchoring, Wave 4 schema 0.2 extensions, and deterministic public projection."
+abstract: "A Grants Charter and machine-readable decision-record schema for inspectable, human-authorized grant adjudication, Phase II evaluator-manifest commitment and anchoring, schema 0.2 extensions, and deterministic public projection."
 repository-code: "https://github.com/fraware/ens-grant-decision-integrity"

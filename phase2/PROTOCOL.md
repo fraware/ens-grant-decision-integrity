@@ -101,9 +101,13 @@ See `CLAIM-MATRIX.md` for the trust boundary.
 
 Same receipt shape and verification algorithm, with a test-log key. Does not establish public Rekor inclusion.
 
-### 7.3 rfc3161 and ethereum
+### 7.3 rfc3161
 
-Interface-compatible stubs. Methods raise `NotImplementedError`. No synthetic timestamps.
+Profile `rfc3161` posts a timestamp query to a configured TSA endpoint and verifies the returned CMS `TimeStampToken` under a pinned trust root. Profile `rfc3161-recorded-fixture` issues and verifies signed `TSTInfo` fixtures under a test TSA key shipped with the repository. See `CLAIM-MATRIX.md` for trust boundaries.
+
+### 7.4 ethereum
+
+Profile `ethereum-calldata-fixture` verifies recorded transaction calldata of the form `gdi:<sha256(envelope)>` against fixture block metadata. Live Ethereum anchoring (`ethereum`) is not implemented. See `DEFERRED.md` and `src/anchors/ethereum.py`.
 
 ## 8. Run attestation
 
