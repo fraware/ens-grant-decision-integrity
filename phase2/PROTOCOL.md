@@ -2,7 +2,7 @@
 
 Claim-bounded evaluator-manifest commitment, anchoring, run attestation, and replay evidence. Implementers MUST treat `CLAIM-MATRIX.md` as the ceiling of what a verifier may say.
 
-The evaluator manifest, commitment envelope, anchor receipt, run predicate, and evidence-bundle surfaces retain their existing version-1 identifiers. Replay reports are independently versioned: historical replay report v1 is preserved, while corrected artifact-recomputation semantics are emitted as replay report v2. The v0.1 grant-decision `schemaVersion` remains `"0.1"`.
+The evaluator manifest, commitment envelope, anchor receipt, and run predicate retain their existing version-1 identifiers. Replay reports and evidence bundles are independently versioned: historical replay report v1 and evidence-bundle v1 remain schema-frozen, while corrected artifact-recomputation semantics are emitted as replay report v2 and carried by evidence-bundle v2. The v0.1 grant-decision `schemaVersion` remains `"0.1"`.
 
 ## 1. Design target
 
@@ -132,23 +132,23 @@ Signing keys in this repository are test keys generated in the harness. A real p
 
 The reference implementation performs **canonical artifact recomputation**: it canonicalizes supplied layer objects and compares their SHA-256 digests with attested layer digests. It does not invoke or re-execute the implementation named in the run attestation. Therefore an artifact match MUST NOT be reported as proof of implementation re-execution.
 
-The defined layer set is exactly `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`, and `hosted-generation`. Missing or unexpected attested layer identifiers fail with `RPL010`; duplicate report layer identifiers or a non-exact report layer set fail with `RPL004`. Verification must not silently collapse duplicate identifiers through map construction.
+The defined layer set is exactly `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`, and `hosted-generation`. Missing or unexpected attested layer identifiers fail with `RPL010`; duplicate or non-exact report layer sets fail closed. The verifier also recomputes and checks each reported `recomputedDigest`; an outcome label alone is insufficient evidence.
 
 ### Replay report v1 — historical wire format
 
 Historical `schema/replay-report.schema.json` has `reportVersion: "1"` and includes `bounded-match`. The schema is retained unchanged for compatibility. The current verifier refuses any v1 `bounded-match` or non-null `bound` with `RPL008`. Cryptographic hash distance is not a meaningful approximation metric for the underlying computation.
 
-A historical v1 report containing only `exact-match`, `diverged`, and `not-replayable` outcomes may still be verified.
+A historical v1 report containing only `exact-match`, `diverged`, and `not-replayable` outcomes may still be verified when its evidence fields are consistent with recomputation.
 
 ### Replay report v2 — current emitted format
 
-Current `schema/replay-report-v2.schema.json` has `reportVersion: "2"` and outcomes:
+Current `schema/replay-report-v2.schema.json` has `reportVersion: "2"`, exactly five layer records, complete attested/recomputed evidence fields, and outcomes:
 
 | Outcome | Meaning |
 |---|---|
 | `exact-match` | Canonical digest of the supplied layer artifact equals the attested digest. |
 | `diverged` | Canonical digest of the supplied layer artifact does not equal the attested digest. |
-| `not-replayable` | The layer is not available for this artifact-recomputation check; a reason is required. |
+| `not-replayable` | The layer is not available for this artifact-recomputation check; `recomputedDigest` is null and a reason is required. |
 
 Digest is SHA-256 of JCS(layer input).
 
@@ -160,11 +160,11 @@ Actual implementation re-execution is a distinct future protocol surface and wou
 
 ## 10. Evidence bundle and graph
 
-Schema: `schema/evidence-bundle.schema.json`.
+Historical `schema/evidence-bundle.schema.json` has `bundleVersion: "1"` and remains byte-for-byte compatible with the released v1 wire format; its optional replay report is replay-report v1. New evidence carrying replay-report v2 uses `schema/evidence-bundle-v2.schema.json` with `bundleVersion: "2"`.
 
-`verify-graph` schema-validates the bundle, verifies the selected anchor, applies reveal policy, verifies run DSSE if present, checks an accepted replay report if present, links the v0.1 record, and enforces C6.
+`verify-graph` selects the bundle schema from `bundleVersion`, verifies the selected anchor, applies reveal policy, verifies run DSSE if present, checks the version-compatible replay report if present, links the v0.1 record, and enforces C6. Unsupported bundle versions fail closed.
 
-The evidence-bundle wire version remains `"1"`; its optional `replayReport` member accepts historical replay report v1 and current replay report v2. This additive acceptance does not redefine the v1 replay-report schema.
+This parent-container versioning prevents corrected replay semantics from being silently inserted into the historical bundle-v1 contract.
 
 ## 11. v0.1 linkage
 
@@ -188,7 +188,7 @@ python phase2/src/cli.py commit|anchor|verify-commitment|reveal|attest-run|verif
 
 Every command prints the hard non-claims from `CLAIM-MATRIX.md`.
 
-The `replay` command emits replay report v2. The verifier retains safe read compatibility for historical v1 reports but rejects v1 bounded-match evidence.
+The `replay` command emits replay report v2. New bundles containing that report use `bundleVersion: "2"`. The verifier retains safe read compatibility for historical bundle-v1/replay-v1 evidence but rejects v1 bounded-match evidence.
 
 ## 13. What this protocol will not do
 
