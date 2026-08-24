@@ -30,6 +30,7 @@
     "replayReport": {
       "oneOf": [
         { "$ref": "replay-report.schema.json" },
+        { "$ref": "replay-report-v2.schema.json" },
         { "type": "null" }
       ]
     },
