@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source-artifact.schema.json",
+  "title": "ENS GDI Preserved Source Artifact",
+  "description": "A captured governing-policy or evidence artifact. Content identity does not establish institutional adoption, truth, completeness, or authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifactVersion",
+    "artifactId",
+    "sourceUri",
+    "retrievedAt",
+    "mediaType",
+    "byteLength",
+    "sha256",
+    "capture"
+  ],
+  "properties": {
+    "artifactVersion": { "const": "1" },
+    "artifactId": { "type": "string", "minLength": 1 },
+    "sourceUri": { "type": "string", "format": "uri" },
+    "resolvedUri": { "type": ["string", "null"], "format": "uri" },
+    "retrievedAt": { "type": "string", "format": "date-time" },
+    "httpStatus": { "type": ["integer", "null"], "minimum": 100, "maximum": 599 },
+    "mediaType": { "type": "string", "minLength": 1 },
+    "byteLength": { "type": "integer", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "storedPath": { "type": ["string", "null"], "minLength": 1 },
+    "archiveUri": { "type": ["string", "null"], "format": "uri" },
+    "surfaces": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "mandate",
+          "eligibility",
+          "evaluationCriteria",
+          "conflictRules",
+          "decisionProcedure",
+          "challengeProcedure",
+          "delivery",
+          "evidence",
+          "other"
+        ]
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "tool", "toolVersion"],
+      "properties": {
+        "method": { "type": "string", "enum": ["http", "manual-export", "api", "repository", "onchain", "other"] },
+        "tool": { "type": "string", "minLength": 1 },
+        "toolVersion": { "type": "string", "minLength": 1 },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "contentEncoding": { "type": ["string", "null"] },
+    "observations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
