@@ -2,7 +2,7 @@
 
 A versioned draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
-The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions **allocated** a cumulative **$219** to that proposal. Those allocations were **never received or paid**. v0.1 implements the first $200 work item described in that proposal: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 added optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
+The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions **allocated** a cumulative **$219** to that proposal. The repository's current provenance snapshot records those amounts as allocation decisions and does not record payment or receipt evidence. v0.1 implements the first $200 work item described in that proposal: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 added optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
 
 **Releases:** [v0.3.2](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.2) (latest) · [v0.3.1](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.1) · [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
 
@@ -45,7 +45,7 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `CONTRIBUTING.md` | Contribution preferences and pre-change validation |
 | `SECURITY.md` | Sensitive-disclosure reporting |
 | `CITATION.cff` | Citation metadata for the latest tagged release |
-| `provenance/simocracy-funding.json` | Recorded Simocracy allocation provenance ($219 allocated; not paid) |
+| `provenance/simocracy-funding.json` | Recorded Simocracy allocation provenance ($219 allocated; payment/receipt tracked separately) |
 
 ## Quickstart
 
@@ -132,7 +132,7 @@ This project governs the integrity of the decision record. It does not determine
 | Phase II versions | manifest/envelope/anchor/run predicate v1; replay report v1 historical and v2 current; evidence bundle v1 historical and v2 current |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
-| Funding provenance | $219 allocated across five Simocracy decisions; never received or paid |
+| Funding provenance | $219 allocated across five Simocracy decisions; no payment or receipt evidence recorded in the current provenance snapshot |
 | Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
 
 For adoption guidance, see `ADOPTION.md`. For security-sensitive reports, see `SECURITY.md`.
