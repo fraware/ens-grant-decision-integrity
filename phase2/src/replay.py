@@ -38,6 +38,22 @@ def layer_digest(layer_input: Any) -> str:
     return sha256_hex(canonicalize(layer_input))
 
 
+def _require_attested_layers(attested_layer_digests: dict[str, str]) -> None:
+    missing = sorted(set(ALL_LAYERS) - set(attested_layer_digests))
+    extra = sorted(set(attested_layer_digests) - set(ALL_LAYERS))
+    if missing or extra:
+        parts: list[str] = []
+        if missing:
+            parts.append("missing: " + ", ".join(missing))
+        if extra:
+            parts.append("unexpected: " + ", ".join(extra))
+        raise Phase2Error(
+            "attested replay layer set does not match the defined layers (" + "; ".join(parts) + ")",
+            code="RPL010",
+            claim="C5",
+        )
+
+
 def replay(
     *,
     attested_layer_digests: dict[str, str],
@@ -58,6 +74,7 @@ def replay(
             code="RPL008",
             claim="C5",
         )
+    _require_attested_layers(attested_layer_digests)
 
     layers: list[dict[str, Any]] = []
     for layer_id in ALL_LAYERS:
@@ -78,7 +95,7 @@ def replay(
             )
             continue
         if layer_id not in layer_inputs:
-            raise Phase2Error(f"missing layer input for {layer_id}", code="RPL001")
+            raise Phase2Error(f"missing layer input for {layer_id}", code="RPL001", claim="C5")
         recomputed = layer_digest(layer_inputs[layer_id])
         if recomputed == attested:
             outcome = "exact-match"
@@ -122,6 +139,7 @@ def verify_replay_report(
             claim="C5",
         )
     validate_schema(report, schema_name)
+    _require_attested_layers(attested_layer_digests)
 
     if report["manifestCommitmentDigest"] != manifest_commitment_digest:
         raise Phase2Error("replay report commitment digest does not match envelope", code="RPL003", claim="C5")
