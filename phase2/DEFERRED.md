@@ -15,8 +15,9 @@ Items intentionally not shipped as production guarantees because half-built cryp
 3. RFC 3161 / RFC 5816 certificate-identification semantics, TSA timestamping authorization/EKU and applicable policy constraints are enforced.
 4. Message imprint and request/response bindings are verified, including nonce semantics when the request uses a nonce.
 5. Certificate-path validation is performed against the independent trust policy with explicit handling of validity and revocation policy.
-6. Interoperability/golden vectors from real standards-conformant TSA responses and adversarial negative vectors pass.
-7. `CLAIM-MATRIX.md` states exactly what the profile establishes and what remains trusted before the profile is enabled.
+6. Malformed CMS/ASN.1/base64 input, signature failure, invalid trust configuration, and certificate-path failure become structured verifier failures, not uncaught parser/cryptography exceptions.
+7. Interoperability/golden vectors from real standards-conformant TSA responses and adversarial negative vectors pass.
+8. `CLAIM-MATRIX.md` states exactly what the profile establishes and what remains trusted before the profile is enabled.
 
 Until then, the production profile MUST fail closed. The recorded fixture is test evidence only and MUST NOT be described as third-party timestamp evidence.
 
