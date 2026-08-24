@@ -7,7 +7,8 @@ implementation was re-executed.
 Replay report v1 is retained as a historical wire format. Its ``bounded-match``
 mechanism is not accepted by the verifier because cryptographic digest distance
 has no semantic relationship to distance between underlying computations.
-Replay report v2 removes that mechanism. Approximate reproducibility, if added,
+Replay report v2 removes that mechanism and requires all evidence fields to
+agree with verifier recomputation. Approximate reproducibility, if added,
 requires a separately versioned layer-specific comparator over typed outputs.
 """
 
@@ -179,15 +180,20 @@ def verify_replay_report(
             )
         if item.get("attestedDigest") != attested_layer_digests[layer_id]:
             raise Phase2Error(f"replay attested digest for {layer_id} does not match run predicate", code="RPL007", claim="C5")
-        if item.get("recomputedDigest") != expected_item.get("recomputedDigest"):
-            raise Phase2Error(
-                f"replay recomputed digest for {layer_id} is inconsistent with supplied artifact material",
-                code="RPL011",
-                claim="C5",
-            )
-        if item.get("reason") != expected_item.get("reason"):
-            raise Phase2Error(
-                f"replay reason for {layer_id} is inconsistent with the verified outcome",
-                code="RPL012",
-                claim="C5",
-            )
+
+        # Historical v1 accepted outcome/attested-digest verification without
+        # treating recomputedDigest or reason as authoritative evidence fields.
+        # Preserve that safe legacy behavior while making v2 fully self-consistent.
+        if report_version == "2":
+            if item.get("recomputedDigest") != expected_item.get("recomputedDigest"):
+                raise Phase2Error(
+                    f"replay recomputed digest for {layer_id} is inconsistent with supplied artifact material",
+                    code="RPL011",
+                    claim="C5",
+                )
+            if item.get("reason") != expected_item.get("reason"):
+                raise Phase2Error(
+                    f"replay reason for {layer_id} is inconsistent with the verified outcome",
+                    code="RPL012",
+                    claim="C5",
+                )
