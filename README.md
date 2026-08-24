@@ -83,7 +83,7 @@ Optional schema `0.2` extensions do not mutate v0.1 behavior:
 
 - `schema/grant-decision-record-0.2.schema.json` — optional `policyPinning` and `authorityIdentity`
 - `schema/grant-decision-public-projection-0.2.schema.json` — relaxed requirements for projected public records
-- `projection/` — deterministic confidential-to-public record projection with withheld commitments; projection v1 uses top-level redaction paths and fails closed on silent top-level omission or ambiguous publish/withhold disposition
+- `projection/` — deterministic confidential-to-public record projection with withheld commitments; projection v1 uses top-level redaction paths, fails closed on silent top-level omission or ambiguous publish/withhold disposition, and refuses to overwrite non-null source integrity metadata
 - `phase2/src/anchors/rfc3161.py` — reserved production RFC 3161 profile plus recorded test fixture; production `rfc3161` currently fails closed until standards-conformant CMS/RFC 3161 verification is implemented
 - `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`); live mainnet anchoring is not implemented
 - `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
