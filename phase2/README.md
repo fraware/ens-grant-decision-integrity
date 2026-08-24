@@ -33,7 +33,7 @@ python -m pytest phase2/tests
 
 T1 compares the production RFC 8785 adapter (`rfc8785`) with a second independent implementation (`jcs`, the cyberphone/RFC-author lineage) and with RFC 8785 vectors.
 
-T6 and T7 use `rekor-v1-recorded-fixture` receipts so they do not depend on live Sigstore availability or on a controllable production timestamp. T13 exercises RFC 3161 trust-boundary regressions; production RFC 3161 remains deliberately fail-closed. T14 covers the Ethereum calldata fixture. See [ADMIN-BURDEN.md](ADMIN-BURDEN.md) for operational cost, key handling, and proportionality notes.
+T6 and T7 use `rekor-v1-recorded-fixture` receipts so they do not depend on live Sigstore availability or on a controllable production timestamp. T13 exercises RFC 3161 trust-boundary regressions, malformed fixture inputs, and production fail-closed behavior; production RFC 3161 remains deliberately disabled. T14 covers the Ethereum calldata fixture. See [ADMIN-BURDEN.md](ADMIN-BURDEN.md) for operational cost, key handling, and proportionality notes.
 
 ### Live Rekor v1 observation (2026-08-19)
 
@@ -69,7 +69,7 @@ python phase2/src/cli.py replay --attestation attestation.json --layer-inputs la
 python phase2/src/cli.py verify-graph --bundle bundle.json
 ```
 
-`anchor --profile rekor-v1` submits to the Rekor v1 endpoint. `rfc3161` is a reserved production profile and currently fails closed with `TS3178`; it must not be represented as production timestamp support. `rfc3161-recorded-fixture` and `ethereum-calldata-fixture` are offline test profiles. Live Ethereum anchoring (`ethereum`) is not implemented.
+`anchor --profile rekor-v1` submits to the Rekor v1 endpoint. `rfc3161` is a reserved production profile and currently fails closed with `TS3178`; it must not be represented as production timestamp support. `rfc3161-recorded-fixture` requires independently supplied `--trust-root`, and fixture issuance also requires `--fixture-key` and `--tsa-cert`. Malformed fixture encodings/signatures/trust material fail as structured protocol errors. `ethereum-calldata-fixture` is an offline test profile. Live Ethereum anchoring (`ethereum`) is not implemented.
 
 Signing keys in tests and in the public example are test keys. A real program must supply its own signing identity and independently configured verifier trust.
 
