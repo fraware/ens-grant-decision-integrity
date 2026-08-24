@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import copy
 from datetime import datetime, timezone
 
 import pytest
-from cryptography.exceptions import InvalidSignature
 
 from anchors.rfc3161 import Rfc3161Adapter, generate_fixture_tsa_key
 from envelope import commit_manifest, envelope_bytes
@@ -92,8 +92,28 @@ def test_receipt_embedded_certificate_cannot_replace_verifier_trust_root() -> No
         profile_id="rfc3161-recorded-fixture",
         trust_root_pem=cert_b,
     )
-    with pytest.raises(InvalidSignature):
+    with pytest.raises(Phase2Error) as exc:
         verifier.verify(env_bytes, receipt)
+    assert exc.value.code == "TS3179"
+    assert exc.value.claim == "C2"
+
+
+def test_malformed_fixture_base64_fails_as_protocol_error(tsa_material: tuple[str, str, str]) -> None:
+    private_pem, _, cert_pem = tsa_material
+    manifest = sample_manifest(programId="rfc3161-malformed-base64")
+    envelope, _salt = commit_manifest(manifest)
+    env_bytes = envelope_bytes(envelope)
+    adapter = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        fixture_private_key_pem=private_pem,
+        fixture_certificate_pem=cert_pem,
+        trust_root_pem=cert_pem,
+    )
+    receipt = copy.deepcopy(adapter.anchor(env_bytes))
+    receipt["verifierMaterial"]["signatureB64"] = "not valid base64 !!!"
+    with pytest.raises(Phase2Error) as exc:
+        adapter.verify(env_bytes, receipt)
+    assert exc.value.code == "TS3180"
 
 
 def test_production_rfc3161_fails_closed(tsa_material: tuple[str, str, str]) -> None:
