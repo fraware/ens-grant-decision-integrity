@@ -105,18 +105,19 @@ def project_record(confidential: dict[str, Any], spec: dict[str, Any]) -> Projec
 
     output_fields = {"withheldCommitments"}
     allowlisted_source = {field for field in allowlist if field not in output_fields}
-    undisposed = sorted(set(source) - allowlisted_source - redacted_top_level)
-    if undisposed:
-        raise ProjectionError(
-            "projection spec silently omits top-level source fields: " + ", ".join(undisposed),
-            code="PROJ011",
-        )
 
     overlap = sorted(allowlisted_source & redacted_top_level)
     if overlap:
         raise ProjectionError(
             "projection fields cannot be both published and withheld: " + ", ".join(overlap),
             code="PROJ012",
+        )
+
+    undisposed = sorted(set(source) - allowlisted_source - redacted_top_level)
+    if undisposed:
+        raise ProjectionError(
+            "projection spec silently omits top-level source fields: " + ", ".join(undisposed),
+            code="PROJ011",
         )
 
     projected: dict[str, Any] = {}
