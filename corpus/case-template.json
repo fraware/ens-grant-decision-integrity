@@ -1,0 +1,37 @@
+{
+  "caseVersion": "1",
+  "caseId": "replace-me",
+  "program": "replace-me",
+  "decisionType": "replace-me",
+  "historical": true,
+  "publicOnly": true,
+  "annotation": {
+    "annotatorIds": [],
+    "elapsedMinutes": null,
+    "sourceArtifactCount": 0,
+    "fieldClassifications": {
+      "directSource": 0,
+      "derived": 0,
+      "interpretive": 0,
+      "unknown": 0,
+      "notApplicable": 0
+    }
+  },
+  "verification": {
+    "initialErrors": [],
+    "initialWarnings": [],
+    "confirmedProcessGaps": [],
+    "annotationOrModelDefects": [],
+    "unresolved": []
+  },
+  "review": {
+    "independentDoubleAnnotation": false,
+    "reviewerDisagreementCount": null,
+    "notes": []
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness or institutional legitimacy."
+  ]
+}
