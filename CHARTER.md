@@ -281,4 +281,4 @@ A program MAY state that a decision record is **“ENS Grant Decision Integrity 
 
 Passing the v0.1 schema and conformance validator establishes structural and declared cross-field consistency. It does not establish the truth of cited evidence, the quality of substantive judgment, or institutional adoption of this Charter.
 
-This draft is an implementation proposal, not adopted ENS policy.
+This draft is an implementation proposal, not adopted ENS policy. Passing validators establishes declared consistency under the selected profile; it does not establish institutional adoption, evidence truth, or funding authority.

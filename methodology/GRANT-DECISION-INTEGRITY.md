@@ -76,4 +76,4 @@ A review should produce:
 
 ## Relationship to repository releases
 
-Pin reviews to a repository tag or commit SHA. v0.1 records remain valid without Phase II bundles. Schema 0.2 extensions are additive; v0.1 records must continue to validate unchanged.
+Pin reviews to a repository tag or commit SHA (current documentation baseline: `v0.3.2`). v0.1 records remain valid without Phase II bundles. Schema 0.2 extensions are additive; v0.1 records must continue to validate unchanged. The Charter and this methodology remain drafts until ENS governance adopts them.

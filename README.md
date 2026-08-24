@@ -2,11 +2,11 @@
 
 A versioned draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
-The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions allocated a cumulative **$219** to that proposal. v0.1 implements its first $200 work item: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 adds optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
+The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions **allocated** a cumulative **$219** to that proposal. Those allocations were **never received or paid**. v0.1 implements the first $200 work item described in that proposal: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 added optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
 
-**Releases:** [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) (latest) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
+**Releases:** [v0.3.2](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.2) (latest) · [v0.3.1](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.1) · [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
 
-## What v0.1 provides
+## What this repository provides
 
 The profile records enough information for a third party to reconstruct the procedural basis of a material funding decision:
 
@@ -19,16 +19,17 @@ The profile records enough information for a third party to reconstruct the proc
 - delivery conditions for funded awards;
 - minimum provenance when AI materially informs a recommendation.
 
-JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express.
+JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, and deterministic confidential-to-public projection.
 
 ## Repository layout
 
 | Path | Purpose |
 |---|---|
-| `CHARTER.md` | Normative decision-integrity requirements (draft governance proposal) |
+| `CHARTER.md` | Normative decision-integrity requirements (draft governance proposal — not adopted ENS policy) |
 | `schema/grant-decision-record.schema.json` | JSON Schema Draft 2020-12 record format (default `schemaVersion` `"0.1"`) |
 | `schema/grant-decision-record-0.2.schema.json` | Optional schema 0.2 extensions (`policyPinning`, `authorityIdentity`) |
-| `CONFORMANCE.md` | Cross-field conformance rules and severity model |
+| `schema/grant-decision-public-projection-0.2.schema.json` | Relaxed schema for projected public records with `withheldCommitments` |
+| `CONFORMANCE.md` | Cross-field conformance rules, severity model, and rule-ID index |
 | `scripts/conformance.py` | Semantic conformance validator |
 | `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, and replay |
 | `projection/` | Deterministic confidential-to-public record projection |
@@ -38,6 +39,11 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `VALIDATION.md` | Validation contract and expected outcomes |
 | `DESIGN-NOTES.md` | Design rationale, threat model, and scope boundaries |
 | `RELEASE-INTEGRITY.md` | Release-identity and archive-integrity procedure |
+| `REVIEW.md` | Adversarial review guide |
+| `CONTRIBUTING.md` | Contribution preferences and pre-change validation |
+| `SECURITY.md` | Sensitive-disclosure reporting |
+| `CITATION.cff` | Citation metadata |
+| `provenance/simocracy-funding.json` | Recorded Simocracy allocation provenance ($219 allocated; not paid) |
 
 ## Quickstart
 
@@ -51,7 +57,7 @@ python scripts/test_conformance.py
 python scripts/test_regressions.py
 ```
 
-The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract.
+The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including Phase II, schema 0.2, and projection suites.
 
 ## Phase II (evaluator provenance)
 
@@ -67,13 +73,13 @@ python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-pub
 
 Rekor tests and the public example use `rekor-v1-recorded-fixture` receipts verified under a shipped test-log key. That profile does **not** establish inclusion in the public Sigstore Rekor log. See `phase2/ADMIN-BURDEN.md`.
 
-## Schema 0.2 extensions (v0.3)
+## Schema 0.2 extensions and projection (v0.3)
 
 Optional schema `0.2` extensions do not mutate v0.1 behavior:
 
 - `schema/grant-decision-record-0.2.schema.json` — optional `policyPinning` and `authorityIdentity`
 - `schema/grant-decision-public-projection-0.2.schema.json` — relaxed requirements for projected public records
-- `projection/` — deterministic confidential-to-public record projection with withheld commitments
+- `projection/` — deterministic confidential-to-public record projection with withheld commitments (top-level redaction paths in the v1 reference)
 - `phase2/src/anchors/rfc3161.py` — RFC 3161 TSA profile (`rfc3161`, `rfc3161-recorded-fixture`)
 - `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`); live mainnet anchoring is not implemented
 - `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
@@ -91,9 +97,9 @@ Selective disclosure remains deferred; see `phase2/DEFERRED.md`.
 
 ## What validators prove and do not prove
 
-**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a bundle is present.
+**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a bundle is present; deterministic projection under a declared projection spec.
 
-**Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying the selected anchor profile; execution of a committed evaluator configuration; funding authority.
+**Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying the selected anchor profile; execution of a committed evaluator configuration; funding authority; payment or receipt of Simocracy allocations.
 
 ## AI provenance boundary
 
@@ -113,10 +119,13 @@ This project governs the integrity of the decision record. It does not determine
 
 | Item | Value |
 |---|---|
-| Repository version | `0.3.0` |
+| Repository version | `0.3.2` |
 | Default grant-decision `schemaVersion` | `"0.1"` |
 | Optional extensions | schema `"0.2"` (additive) |
+| Phase II protocol object version | `1` |
 | Charter status | Draft governance proposal — not adopted ENS policy |
+| Methodology status | Draft — not a frozen ENS standard |
+| Funding provenance | $219 allocated across five Simocracy decisions; never received or paid |
 | Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
 
 For adoption guidance, see `ADOPTION.md`. For security-sensitive reports, see `SECURITY.md`.

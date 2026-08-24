@@ -169,6 +169,36 @@ When `authorityIdentity` is present:
 
 Public projections with non-empty `withheldCommitments` validate against `schema/grant-decision-public-projection-0.2.schema.json`.
 
+## Rule ID index
+
+Codes emitted by `scripts/conformance.py` (plus schema failures). Severity is **error** unless noted as **warning**.
+
+| Code | Surface |
+|---|---|
+| `SCHEMA` | JSON Schema validation failure |
+| `REF001`–`REF008` | Duplicate identifiers (evaluators, evidence, findings, criteria, disagreements, conflicts, delivery conditions, eligibility rules) |
+| `REF101`–`REF107` | Unresolved cross-references |
+| `EVID001` | `supported-fact` without evidence |
+| `EVID003` | **warning** — non-public evidence lacks URI and content hash |
+| `EVID004` | Failed eligibility rule without evidence |
+| `EVAL001`–`EVAL002` | Criterion weight completeness / sum |
+| `EVAL003`–`EVAL005` | Finding and disagreement attribution |
+| `POL001`–`POL006` | Governing-policy change and source traceability |
+| `POL007`–`POL010` | Schema 0.2 `policyPinning` |
+| `ELIG001`–`ELIG002` | Eligibility status consistency |
+| `DEC001`–`DEC013` | Decision-state, award, rationale, and finding requirements |
+| `DEL001` | Approved/suspended award missing delivery conditions |
+| `DEL002`–`DEL003` | **warning** — Tier C delivery verifier / timing gaps |
+| `PAY001` | Delivery currency mismatch |
+| `PAY002`–`PAY003` | **warning** — tranche sum / award vs requested amount |
+| `COI001`–`COI009` | Conflict disclosure, recusal, and substitution |
+| `AUTH000`–`AUTH003` | Decision-authority type and committee fields |
+| `AUTH004`–`AUTH007` | Schema 0.2 `authorityIdentity` |
+| `AI001`–`AI010` | AI materiality, manifest, timing, and departure |
+| `CHAL001`–`CHAL006` | Challenge process and lifecycle (`CHAL003` is **warning**) |
+| `DISC001`–`DISC003` | Disclosure classification consistency |
+| `TIME001`, `TIME003`–`TIME005` | Timestamp ordering (no `TIME002`) |
+
 ## Scope boundary
 
 The validator checks record structure and declared cross-field consistency. It does not determine whether cited evidence is true, whether substantive judgment is correct, whether a commitment existed at the declared time without an external anchor, whether a committed evaluator configuration actually ran, or whether the governing policy itself is legitimate.

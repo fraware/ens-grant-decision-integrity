@@ -11,7 +11,7 @@ Do not place sensitive material in a public issue. If GitHub private vulnerabili
 Examples that should be reported privately include:
 
 - a validator bypass that can incorrectly establish conformance;
-- disclosure or redaction behavior that could expose protected applicant material;
+- disclosure, redaction, or projection behavior that could expose protected applicant material;
 - release-integrity ambiguity that could cause a reviewer to verify the wrong artifact;
 - leaked credentials, keys, or security-sensitive evaluator configuration.
 
@@ -19,4 +19,4 @@ Provide only the minimum information needed to reproduce and assess the concern.
 
 ## Public issues
 
-Public issues are appropriate for non-sensitive threat-model gaps, protocol-design concerns, schema interoperability problems, disclosure-classification questions, and implementation feedback.
+Public issues are appropriate for non-sensitive threat-model gaps, protocol-design concerns, schema interoperability problems, disclosure-classification questions, and implementation feedback. The Charter is a draft proposal, not adopted ENS policy; design challenges belong in public issues when they do not expose protected material.

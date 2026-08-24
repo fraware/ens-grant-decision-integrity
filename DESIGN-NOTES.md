@@ -1,10 +1,10 @@
-# Design Notes — ENS Grant Decision Integrity v0.1
+# Design Notes — ENS Grant Decision Integrity
 
 ## 1. Scope
 
-Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same proposal mechanism. Marginal value declined after roughly the first $200 of cumulative funding.
+Simocracy ballot reasoning repeatedly highlighted the Grants Charter and commit–reveal treatment of AI-assisted screening. Evidence-linked decision records were part of the same proposal mechanism. Marginal value declined after roughly the first $200 of cumulative funding. Five decisions allocated a cumulative $219; those allocations were never received or paid.
 
-v0.1 implements the proposal's $200 Charter and decision-record schema work item. It records the minimum evaluator-provenance envelope needed to represent the Charter's pre-deadline commitment rule. Commitment generation, external timestamp or publication anchoring, a complete evaluator-manifest format, selective disclosure proofs, and evaluator replay remain outside this release.
+v0.1 implements the proposal's $200 Charter and decision-record schema work item. It records the minimum evaluator-provenance envelope needed to represent the Charter's pre-deadline commitment rule. Later additive releases add Phase II commitment and anchoring (`v0.2`), then schema 0.2 extensions, public projection, and alternate anchor fixture profiles (`v0.3`). Cryptographic selective-disclosure proofs and live Ethereum mainnet anchoring remain deferred.
 
 ## 2. Existing ENS practices preserved
 
@@ -36,7 +36,7 @@ The record model therefore distinguishes `decision.status=ineligible` from `deci
 
 The Marketplace RFP stores applications confidentially during review. The Charter distinguishes public decision records, selectively disclosed audit material, and confidential source material.
 
-v0.1 does not define a deterministic public projection of a confidential canonical record. That boundary is retained as an explicit review question. Non-public evidence without a URI or content hash is surfaced as a warning, preserving privacy without treating an unlocatable evidence reference as fully auditable.
+Schema 0.1 alone does not define a deterministic public projection. The additive `projection/` module (repository v0.3) maps a confidential canonical record to a public record under a versioned projection spec, with SHA-256 commitments for withheld top-level fields. It does not claim Merkle or ZK selective disclosure. Non-public evidence without a URI or content hash is surfaced as a warning, preserving privacy without treating an unlocatable evidence reference as fully auditable.
 
 ## 3. AI-assisted screening
 
@@ -185,9 +185,9 @@ This permits retrospective testing of historical decisions without misrepresenti
 
 ## 8. Release integrity boundary
 
-v0.1 does not define canonical JSON serialization, record signing, or proof binding. The optional record-level `integrity` object remains descriptive.
+Schema 0.1 does not define canonical JSON serialization, record signing, or proof binding for the optional record-level `integrity` object; that object remains descriptive under schema 0.1 alone. Projection outputs may set a projection-specific `integrity.recordHash` under `sha256-jcs-projection-v1`.
 
-Release identity is anchored to the reviewed Git commit SHA. A release archive receives a published SHA-256 digest for that exact artifact. `RELEASE-INTEGRITY.md` defines the procedure and its limits.
+Release identity is anchored to the reviewed Git commit SHA. A release archive receives a published SHA-256 digest for that exact artifact. `RELEASE-INTEGRITY.md` defines the procedure, current tag lineage, and limits.
 
 ## 9. Source map
 

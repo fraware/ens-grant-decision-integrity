@@ -1,6 +1,14 @@
 # Phase II release procedure
 
-Phase II releases remain anchored to a Git commit SHA under the repository-wide procedure in `RELEASE-INTEGRITY.md`. Repository version `0.2.0` tagged Phase II; `0.3.0` added schema 0.2 extensions and projection. Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is separately specified.
+Phase II releases remain anchored to a Git commit SHA under the repository-wide procedure in `RELEASE-INTEGRITY.md`.
+
+Repository version lineage relevant to this tree:
+
+- `0.2.0` — Phase II commitment, anchoring, run attestation, and replay;
+- `0.3.0` — schema 0.2 extensions, projection, and alternate anchor fixtures;
+- `0.3.1` / `0.3.2` — documentation and public-readiness corrections (no Phase II claim-matrix change).
+
+Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is separately specified. Phase II protocol objects remain version `"1"`.
 
 ## Pre-tag checklist
 
@@ -13,7 +21,7 @@ Phase II releases remain anchored to a Git commit SHA under the repository-wide 
 
 ## Tag and notes
 
-1. Create an annotated tag (for example `v0.3.0`) on the reviewed commit.
+1. Create an annotated tag (for example `v0.3.2`) on the reviewed commit.
 2. Publish tag, commit SHA, archive filename, and SHA-256 digest together.
 3. State explicitly what Phase II graph verification establishes (`CLAIM-MATRIX.md`) and what it does not.
 4. A Rekor envelope over an evaluator-manifest commitment is not a signed release of this repository and must not be described as one.

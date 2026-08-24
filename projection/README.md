@@ -31,20 +31,49 @@ python projection/src/cli.py \
   --out /tmp/tier-a-public.json
 ```
 
+Arguments:
+
+| Flag | Meaning |
+|---|---|
+| `--confidential` | Canonical confidential record JSON |
+| `--spec` | Projection spec JSON |
+| `--out` | Output path for the public record JSON |
+
+On success the CLI writes the public record and prints JSON including `ok`, `publicRecord`, `projectionDigestSha256`, and `withheldCommitments`. On failure it prints `ok: false` with an error `code` and exits non-zero.
+
 The output public record validates against `schema/grant-decision-public-projection-0.2.schema.json` when top-level fields are withheld.
 
-## Spec domain
+## Library API
 
-Projection specs use domain string `ens-gdi/public-projection/v1`. The projection digest is SHA-256 over RFC 8785 JCS bytes of the spec and redaction metadata.
+From `projection/src/project.py`:
+
+- `project_record(confidential, spec) -> ProjectionResult` — deterministic mapping;
+- `verify_withheld_commitment(confidential, path, expected_digest) -> bool` — reopen a withheld top-level digest;
+- `ProjectionResult` fields: `public_record`, `projection_digest`, `withheld_commitments`;
+- `ProjectionError` carries an optional machine-readable `code`.
+
+## Spec domain and limits
+
+Projection specs use domain string `ens-gdi/public-projection/v1` and `specVersion` `"1"`. The projection digest is SHA-256 over RFC 8785 JCS bytes of a projection envelope that binds domain, spec version, record id, public record, and withheld digests.
+
+Reference limits for v1:
+
+- `fieldAllowlist` must be non-empty;
+- redaction paths must be **top-level** field names (nested paths raise `PROJ008`);
+- redaction categories are `privacy`, `security`, `commercial`, `legal`, `contractual`, `other`;
+- allowlisted fields must exist on the confidential record;
+- projection does not mutate the confidential input.
+
+Error codes: `PROJ001` (path not found), `PROJ003` (unknown category), `PROJ004` (unsupported spec version), `PROJ005` (domain mismatch), `PROJ006` (empty allowlist), `PROJ007` (missing allowlisted field), `PROJ008` (nested redaction path).
 
 ## Trust boundary
 
 A projection pass establishes:
 
 - deterministic mapping from confidential input to public output under the declared spec;
-- SHA-256 commitments over withheld subtrees listed in `withheldCommitments`.
+- SHA-256 commitments over withheld top-level subtrees listed in `withheldCommitments`.
 
-It does **not** establish that the confidential input is complete, that redaction policy was followed outside this object, or that withheld material matches the commitments without separate reveal verification.
+It does **not** establish that the confidential input is complete, that redaction policy was followed outside this object, Merkle or ZK selective disclosure, or that withheld material matches the commitments without separate reveal verification.
 
 ## Related documents
 

@@ -25,7 +25,7 @@ The Charter remains a draft proposal until ENS governance adopts it. This reposi
 
 1. Author a versioned evaluator manifest before applications close.
 2. Commit with RFC 8785 JCS and a domain-separated salted digest.
-3. Anchor the public envelope with a selected profile (`rekor-v1`, `rfc3161`, or recorded fixture for tests).
+3. Anchor the public envelope with a selected profile (`rekor-v1`, `rfc3161`, or a recorded fixture for tests). `ethereum-calldata-fixture` documents a calldata pattern only; live mainnet anchoring is not implemented in the reference client.
 4. Map outputs into the v0.1 `evaluatorManifest` block using verified anchor time for `committedAt`.
 5. Attest and replay only when the program accepts the operational cost; replay is not fairness proof.
 
@@ -60,8 +60,11 @@ python -m pip install -r requirements-dev.txt
 python scripts/conformance.py path/to/record.json
 python -m pip install -r phase2/requirements.txt
 python -m pytest phase2/tests
+python phase2/src/cli.py verify-graph --bundle path/to/bundle.json
 python projection/src/cli.py --confidential confidential.json --spec projection/examples/tier-a-projection-spec.json --out public.json
 ```
+
+For the full repository contract and expected outcomes, see `VALIDATION.md`.
 
 A passing validator establishes internal consistency under the declared profile. It does not establish evidence truth, operator honesty, or funding authority.
 
@@ -70,5 +73,6 @@ A passing validator establishes internal consistency under the declared profile.
 - Live Rekor inclusion when rigorous recorded fixtures are documented (`phase2/ADMIN-BURDEN.md`).
 - Ethereum mainnet anchoring (fixture profile documents the pattern only).
 - Cryptographic selective disclosure or ZK proofs.
+- Payment or receipt of the Simocracy allocations recorded in this repository.
 
-Simocracy funding for this work allocated a cumulative **$219** across five decisions. v0.1 implements the first $200 Charter and schema item; Phase II implements evaluator-manifest commitment and anchoring; schema 0.2 extensions add policy pinning, structured authority, public projection, and alternate anchor fixture profiles.
+Simocracy funding decisions for this work **allocated** a cumulative **$219** across five decisions. Those allocations were **never received or paid**. v0.1 implements the first $200 Charter and schema item described in the originating proposal; Phase II implements evaluator-manifest commitment and anchoring; schema 0.2 extensions add policy pinning, structured authority, public projection, and alternate anchor fixture profiles.
