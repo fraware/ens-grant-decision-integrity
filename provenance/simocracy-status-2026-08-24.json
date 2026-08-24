@@ -1,0 +1,63 @@
+{
+  "snapshotVersion": "1",
+  "proposal": {
+    "title": "No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed",
+    "uri": "at://did:plc:rndk4oyhki3ae3kzx4z2lnqi/org.hypercerts.claim.activity/3mruyyweysc2t"
+  },
+  "observedOn": "2026-08-24",
+  "sourceUri": "https://www.simocracy.org/funding",
+  "aggregateAllocationUsd": 219,
+  "rounds": [
+    {
+      "round": 1,
+      "decisionUri": "at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.decision/3mrx2unfvqx2f",
+      "mechanism": "S-process",
+      "allocationUsd": 65,
+      "platformDecisionStatus": "ratified"
+    },
+    {
+      "round": 2,
+      "decisionUri": "at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.decision/3mrx4xru5av2h",
+      "mechanism": "Quadratic voting",
+      "allocationUsd": 59,
+      "platformDecisionStatus": "ratified"
+    },
+    {
+      "round": 3,
+      "decisionUri": "at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.decision/3mrx5tkkjti2g",
+      "mechanism": "S-process",
+      "allocationUsd": 20,
+      "platformDecisionStatus": "ratified"
+    },
+    {
+      "round": 4,
+      "decisionUri": "at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.decision/3ms67jpot6q2c",
+      "mechanism": "Merit-curve",
+      "allocationUsd": 51,
+      "platformDecisionStatus": "provisional"
+    },
+    {
+      "round": 5,
+      "decisionUri": "at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.decision/3msbt3sspbn2u",
+      "mechanism": "S-process",
+      "allocationUsd": 24,
+      "platformDecisionStatus": "provisional"
+    }
+  ],
+  "summary": {
+    "ratifiedRoundCount": 3,
+    "provisionalRoundCount": 2
+  },
+  "financialEvidence": {
+    "paymentAuthorization": null,
+    "transfer": null,
+    "receipt": null,
+    "settlement": null
+  },
+  "nonClaims": [
+    "The aggregate allocation amount is not a payment or receipt claim.",
+    "A platform decision status does not establish a later financial state.",
+    "Null financial-evidence fields mean this snapshot does not contain that evidence; they do not prove the event did not occur elsewhere.",
+    "This status snapshot does not establish institutional adoption of the repository or completion of funded work."
+  ]
+}
