@@ -22,7 +22,7 @@ Expected results:
 - the worked example emits only warning `CHAL003` while the reviewed public process lacks a documented factual/procedural correction route;
 - the adversarial suites reject the specified inconsistent states;
 - valid edge cases, including retrospective records and legitimate recusals, remain accepted;
-- the recorded Simocracy allocations in `provenance/simocracy-funding.json` reconcile to $219 (allocation figures only; those funds were never received or paid).
+- the recorded Simocracy allocation amounts in `provenance/simocracy-funding.json` reconcile to $219; allocation is a separate proposition from payment or receipt, and the current provenance snapshot records no payment or receipt evidence.
 
 `python scripts/conformance.py --strict examples/spp3-marketplace-rfp.example.json` intentionally fails while `CHAL003` is present, because strict mode promotes warnings to failures.
 
