@@ -2,6 +2,8 @@
 
 Never copies Phase II fields into decision.authorityKind. Anchor trust roots are
 verifier policy inputs; receipt material cannot promote itself into a trust root.
+Historical evidence-bundle v1 remains schema-frozen; bundle v2 carries current
+replay-report v2 evidence.
 """
 
 from __future__ import annotations
@@ -36,6 +38,10 @@ from support import PHASE2_ROOT, VECTOR_DIR, Phase2Error, VerificationResult, va
 
 REPO_ROOT = PHASE2_ROOT.parent
 V01_SCHEMA_PATH = REPO_ROOT / "schema" / "grant-decision-record.schema.json"
+BUNDLE_SCHEMAS = {
+    "1": "evidence-bundle.schema.json",
+    "2": "evidence-bundle-v2.schema.json",
+}
 
 
 def _parse_dt(value: str) -> datetime:
@@ -205,7 +211,14 @@ def verify_graph(
     fixture_private_key_pem: str | bytes | None = None,
     trust_root_pem: str | None = None,
 ) -> VerificationResult:
-    validate_schema(bundle, "evidence-bundle.schema.json")
+    bundle_version = bundle.get("bundleVersion")
+    schema_name = BUNDLE_SCHEMAS.get(bundle_version)
+    if schema_name is None:
+        raise Phase2Error(
+            f"unsupported evidence bundle version {bundle_version!r}",
+            code="GRP009",
+        )
+    validate_schema(bundle, schema_name)
     authority_before = copy.deepcopy(bundle.get("decisionRecord", {}).get("decision", {}).get("authorityKind"))
     assert_phase2_has_no_authority_fields(bundle)
 
@@ -229,6 +242,7 @@ def verify_graph(
         "trustBoundary": claim.trust_boundary,
         "anchoredAt": receipt["anchoredAt"],
         "profileId": receipt["profileId"],
+        "bundleVersion": bundle_version,
     }
     if not claim.precedes(deadline):
         raise Phase2Error(
