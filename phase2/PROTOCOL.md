@@ -1,8 +1,8 @@
 # Phase II Protocol
 
-Claim-bounded evaluator-manifest commitment, anchoring, run attestation, and replay. Implementers MUST treat `CLAIM-MATRIX.md` as the ceiling of what a verifier may say.
+Claim-bounded evaluator-manifest commitment, anchoring, run attestation, and replay evidence. Implementers MUST treat `CLAIM-MATRIX.md` as the ceiling of what a verifier may say.
 
-This protocol is version `1` of the Phase II objects. The v0.1 grant-decision `schemaVersion` remains `"0.1"`.
+The evaluator manifest, commitment envelope, anchor receipt, run predicate, and evidence-bundle surfaces retain their existing version-1 identifiers. Replay reports are independently versioned: historical replay report v1 is preserved, while corrected artifact-recomputation semantics are emitted as replay report v2. The v0.1 grant-decision `schemaVersion` remains `"0.1"`.
 
 ## 1. Design target
 
@@ -11,7 +11,7 @@ Close four gaps left open by v0.1 (`CHARTER.md` §5.3, `DESIGN-NOTES.md` §3):
 1. Deterministic manifest canonicalization.
 2. Hiding and binding commitment, round-bound.
 3. Independent external existence-before-deadline evidence under an explicit profile.
-4. Signed run and replay evidence that cannot become decision authority.
+4. Signed run assertions and replay evidence that cannot become decision authority.
 
 ## 2. Canonicalization
 
@@ -89,21 +89,25 @@ AnchorAdapter.anchor(envelope_bytes) -> receipt
 AnchorAdapter.verify(envelope_bytes, receipt) -> TemporalClaim
 ```
 
-### 7.1 rekor-v1 (implemented)
+### 7.1 rekor-v1 (implemented historical profile)
 
 Hashedrekord of SHA-256(JCS(envelope)). Receipt stores log index, UUID, signed entry timestamp, inclusion proof, signed checkpoint, and hashedrekord body. Verification uses the client-pinned Rekor v1 production public key, not a key carried solely in the receipt.
 
 `TemporalClaim.anchored_at` is the SET `integratedTime` as UTC. C2 succeeds only when `anchored_at < applicationDeadline`.
 
-See `CLAIM-MATRIX.md` for the trust boundary.
+See `CLAIM-MATRIX.md` for the trust boundary. Rekor v1 remains supported for existing evidence; a successor profile should be introduced under a new profile identifier instead of silently changing v1 semantics.
 
 ### 7.2 rekor-v1-recorded-fixture (test and retrospective illustration)
 
 Same receipt shape and verification algorithm, with a test-log key. Does not establish public Rekor inclusion.
 
-### 7.3 rfc3161
+### 7.3 rfc3161 (reserved; production fail-closed)
 
-Profile `rfc3161` posts a timestamp query to a configured TSA endpoint and verifies the returned CMS `TimeStampToken` under a pinned trust root. Profile `rfc3161-recorded-fixture` issues and verifies signed `TSTInfo` fixtures under a test TSA key shipped with the repository. See `CLAIM-MATRIX.md` for trust boundaries.
+The profile identifier `rfc3161` is reserved for standards-conformant production RFC 3161 timestamp verification. The current implementation intentionally refuses production issuance and verification with `TS3178`.
+
+It MUST NOT establish C2 until verification covers the CMS/RFC 3161 obligations named in `CLAIM-MATRIX.md`, including signer selection, signed attributes, message imprint, TSA certificate identification, timestamping authorization/EKU and applicable policy, certificate-path validation against independently configured verifier trust, and request/response binding. Receipt-carried certificate material MUST NOT act as its own trust root.
+
+`rfc3161-recorded-fixture` is an offline test profile. It verifies the repository's simplified signed-`TSTInfo` fixture under an independently supplied test TSA trust root. It is not evidence of third-party TSA service or production RFC 3161 conformance.
 
 ### 7.4 ethereum
 
@@ -124,26 +128,41 @@ Subject is the run output digest. The predicate binds `manifestCommitmentDigest`
 
 Signing keys in this repository are test keys generated in the harness. A real program MUST supply its own signing identity. This protocol does not provide a production key-management service.
 
-## 9. Replay
+## 9. Replay evidence
 
-Per-layer outcomes:
+The reference implementation performs **canonical artifact recomputation**: it canonicalizes supplied layer objects and compares their SHA-256 digests with attested layer digests. It does not invoke or re-execute the implementation named in the run attestation. Therefore an artifact match MUST NOT be reported as proof of implementation re-execution.
+
+### Replay report v1 — historical wire format
+
+Historical `schema/replay-report.schema.json` has `reportVersion: "1"` and includes `bounded-match`. The schema is retained unchanged for compatibility. The current verifier refuses any v1 `bounded-match` or non-null `bound` with `RPL008`. Cryptographic hash distance is not a meaningful approximation metric for the underlying computation.
+
+A historical v1 report containing only `exact-match`, `diverged`, and `not-replayable` outcomes may still be verified.
+
+### Replay report v2 — current emitted format
+
+Current `schema/replay-report-v2.schema.json` has `reportVersion: "2"` and outcomes:
 
 | Outcome | Meaning |
 |---|---|
-| `exact-match` | Recomputed digest equals the attested digest. |
-| `bounded-match` | Distance is within a declared numeric bound. |
-| `diverged` | Recomputed digest does not match. |
-| `not-replayable` | The layer cannot be replayed; a reason is required. |
+| `exact-match` | Canonical digest of the supplied layer artifact equals the attested digest. |
+| `diverged` | Canonical digest of the supplied layer artifact does not equal the attested digest. |
+| `not-replayable` | The layer is not available for this artifact-recomputation check; a reason is required. |
 
 Deterministic layers in this implementation: `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`. Digest is SHA-256 of JCS(layer input).
 
-`hosted-generation` is `not-replayable` unless a program marks a model `replayable: true` and supplies replay material. Hosted-model non-replayability does not void independent deterministic-layer outcomes.
+`hosted-generation` is `not-replayable` unless a program marks the layer replayable and supplies the corresponding artifact material. Hosted-model non-replayability does not void independent deterministic-layer artifact outcomes.
+
+If approximate reproducibility is introduced later, it MUST use a separately versioned, type-aware comparator over underlying outputs with explicit algorithm, parameters, units/semantics, and claim boundary. It MUST NOT use distance between cryptographic digest strings.
+
+Actual implementation re-execution is a distinct future protocol surface and would require a versioned execution environment, implementation invocation, input/output capture, comparator semantics, and evidence of what was actually executed.
 
 ## 10. Evidence bundle and graph
 
 Schema: `schema/evidence-bundle.schema.json`.
 
-`verify-graph` schema-validates the bundle, verifies the selected anchor, applies reveal policy, verifies run DSSE if present, checks replay if present, links the v0.1 record, and enforces C6.
+`verify-graph` schema-validates the bundle, verifies the selected anchor, applies reveal policy, verifies run DSSE if present, checks an accepted replay report if present, links the v0.1 record, and enforces C6.
+
+The evidence-bundle wire version remains `"1"`; its optional `replayReport` member accepts historical replay report v1 and current replay report v2. This additive acceptance does not redefine the v1 replay-report schema.
 
 ## 11. v0.1 linkage
 
@@ -167,6 +186,8 @@ python phase2/src/cli.py commit|anchor|verify-commitment|reveal|attest-run|verif
 
 Every command prints the hard non-claims from `CLAIM-MATRIX.md`.
 
+The `replay` command emits replay report v2. The verifier retains safe read compatibility for historical v1 reports but rejects v1 bounded-match evidence.
+
 ## 13. What this protocol will not do
 
-It will not introduce a dashboard, scoring model, new cryptographic primitive, ZK disclosure, DAO identity system, or production KMS. It will not give AI funding authority.
+It will not introduce a dashboard, scoring model, new cryptographic primitive, ZK disclosure, DAO identity system, production KMS, or live Ethereum mainnet anchoring in this reference client. It will not give AI funding authority. It will not represent artifact recomputation as actual implementation re-execution or production RFC 3161 support while those capabilities are absent.
