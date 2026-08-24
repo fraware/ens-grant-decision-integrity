@@ -1,4 +1,4 @@
-"""Reveal, withheld, and selective-audit verification."""
+"""Reveal, committed, withheld, and selective-audit verification."""
 
 from __future__ import annotations
 
@@ -35,13 +35,21 @@ def verify_reveal(
     established: list[str] = []
     details: dict[str, Any] = {"revealStatus": reveal_status}
 
-    if reveal_status == "withheld":
+    if reveal_status in {"committed", "withheld"}:
         if manifest is not None or salt is not None:
-            raise Phase2Error("withheld reveal must not carry manifest or salt", code="REV002")
-        details["establishedNote"] = (
-            "Withheld disclosure reports only envelope-supported claims after anchor verification. "
-            "Manifest contents were not checked."
-        )
+            raise Phase2Error(
+                f"{reveal_status} disclosure state must not carry manifest or salt",
+                code="REV002",
+            )
+        if reveal_status == "committed":
+            details["establishedNote"] = (
+                "Commitment remains unopened. Manifest contents were not checked."
+            )
+        else:
+            details["establishedNote"] = (
+                "Withheld disclosure reports only envelope-supported claims after anchor verification. "
+                "Manifest contents were not checked."
+            )
         return VerificationResult(ok=True, established=established, details=details)
 
     if reveal_status == "selective-audit":
