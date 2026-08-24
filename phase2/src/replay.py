@@ -168,9 +168,10 @@ def verify_replay_report(
     )
     expected_by_id = {item["layerId"]: item for item in expected["layers"]}
     for layer_id, item in by_id.items():
+        expected_item = expected_by_id[layer_id]
         if item["outcome"] not in OUTCOMES:
             raise Phase2Error(f"invalid outcome for {layer_id}", code="RPL005", claim="C5")
-        if item["outcome"] != expected_by_id[layer_id]["outcome"]:
+        if item["outcome"] != expected_item["outcome"]:
             raise Phase2Error(
                 f"replay outcome for {layer_id} is inconsistent with recomputation",
                 code="RPL006",
@@ -178,3 +179,9 @@ def verify_replay_report(
             )
         if item["attestedDigest"] != attested_layer_digests[layer_id]:
             raise Phase2Error(f"replay attested digest for {layer_id} does not match run predicate", code="RPL007", claim="C5")
+        if item.get("recomputedDigest") != expected_item.get("recomputedDigest"):
+            raise Phase2Error(
+                f"replay recomputed digest for {layer_id} is inconsistent with supplied artifact material",
+                code="RPL011",
+                claim="C5",
+            )
