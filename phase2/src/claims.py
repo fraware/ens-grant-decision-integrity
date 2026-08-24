@@ -15,41 +15,44 @@ C5_ID = "C5"
 C6_ID = "C6"
 
 C1_ESTABLISHED = (
-    "Revealed manifest and salt reopen the anchored digest."
+    "Revealed manifest and salt reopen the commitment digest in the supplied envelope, "
+    "and the manifest's programId, roundId, and applicationDeadline match that envelope."
 )
 C2_ESTABLISHED = (
     "Selected anchor profile places the envelope before the application deadline."
 )
 C3_ESTABLISHED = (
-    "programId, roundId, applicationDeadline, and domain string bind the commitment."
+    "The verified anchor binds the public envelope's programId, roundId, applicationDeadline, "
+    "commitment algorithm, and commitment digest as one anchored object."
 )
 C4_ESTABLISHED = (
     "Signer asserts this run used the bound commitment, input snapshots, "
     "environment, and output digest."
 )
 C5_ESTABLISHED = (
-    "Replay report records per-layer exact-match, bounded-match, diverged, "
-    "or not-replayable outcomes."
+    "Accepted replay evidence records per-layer exact-match, diverged, or not-replayable outcomes "
+    "from canonical artifact recomputation."
 )
 C6_ESTABLISHED = (
     "No Phase II object populated decision.authorityKind."
 )
 
-C1_DOES_NOT = "execution, operator honesty, or evaluator correctness"
+C1_DOES_NOT = "anchor validity, temporal precedence, execution, operator honesty, or evaluator correctness"
 C2_DOES_NOT = "universal time; the named profile's trust root and monitoring assumptions apply"
 C3_DOES_NOT = (
-    "prevention of cross-program reuse if programId, roundId, deadline, and "
-    "domain are copied deliberately"
+    "that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check"
 )
 C4_DOES_NOT = "that the signer actually used that configuration or that the output is sound"
 C5_DOES_NOT = (
-    "fairness, legitimacy, hosted-model identity over time, or substantive merit"
+    "re-execution of the recorded implementation unless separately demonstrated; fairness, "
+    "legitimacy, hosted-model identity over time, or substantive merit"
 )
 C6_DOES_NOT = "institutional approval, committee adoption, or funding authority"
 
 NON_CLAIMS: tuple[str, ...] = (
     "A valid commitment is not evidence of execution.",
     "A signed run is an assertion by the signer, not proof of operator honesty or that the committed configuration was used.",
+    "Artifact replay agreement is not proof that the recorded implementation was re-executed unless a separate re-execution protocol establishes that fact.",
     "Replay agreement is not correctness, fairness, or legitimacy.",
     "Hosted models may be not-replayable; that outcome does not void independent deterministic-layer results.",
     "Hashes and log inclusion are not institutional approval or funding authority.",
@@ -68,14 +71,12 @@ FIXTURE_TRUST_BOUNDARY = (
 )
 
 RFC3161_TRUST_BOUNDARY = (
-    "RFC 3161 temporal claims depend on the pinned TSA certificate chain and the "
-    "signed TimeStampToken over the envelope digest. TSA honesty and clock accuracy "
-    "are explicit trust assumptions."
+    "Production RFC 3161 verification is disabled until complete CMS/RFC 3161 trust validation is integrated."
 )
 
 RFC3161_FIXTURE_TRUST_BOUNDARY = (
-    "rfc3161-recorded-fixture tokens are verified under a test TSA key shipped with "
-    "the fixture. They do not establish a third-party TSA attestation."
+    "rfc3161-recorded-fixture tokens are verified under an independently supplied test TSA trust root. "
+    "They do not establish a third-party TSA attestation."
 )
 
 ETHEREUM_FIXTURE_TRUST_BOUNDARY = (

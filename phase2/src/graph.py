@@ -1,6 +1,9 @@
 """Evidence-bundle graph verifier and v0.1 linkage.
 
-Never copies Phase II fields into decision.authorityKind.
+Never copies Phase II fields into decision.authorityKind. Anchor trust roots are
+verifier policy inputs; receipt material cannot promote itself into a trust root.
+Historical evidence-bundle v1 remains schema-frozen; bundle v2 carries current
+replay-report v2 evidence.
 """
 
 from __future__ import annotations
@@ -35,6 +38,10 @@ from support import PHASE2_ROOT, VECTOR_DIR, Phase2Error, VerificationResult, va
 
 REPO_ROOT = PHASE2_ROOT.parent
 V01_SCHEMA_PATH = REPO_ROOT / "schema" / "grant-decision-record.schema.json"
+BUNDLE_SCHEMAS = {
+    "1": "evidence-bundle.schema.json",
+    "2": "evidence-bundle-v2.schema.json",
+}
 
 
 def _parse_dt(value: str) -> datetime:
@@ -87,11 +94,7 @@ def fill_v01_evaluator_manifest(
     reveal_uri: str | None = None,
     source_uri: str | None = None,
 ) -> dict[str, Any]:
-    """Project Phase II outputs onto the existing v0.1 evaluatorManifest envelope.
-
-    Does not read or write decision.authorityKind. Uses algorithm "other" because
-    v0.1 has no salted-JCS identifier; "sha256" would describe a different function.
-    """
+    """Project Phase II outputs onto the existing v0.1 evaluatorManifest envelope."""
     updated = copy.deepcopy(record)
     v01_status = map_v01_reveal_status(reveal_status)
     manifest = {
@@ -166,34 +169,70 @@ def _check_v01_linkage(
         raise Phase2Error("v0.1 decision.authorityKind must not be ai", code="LNK009", claim="C6")
 
 
+def _anchor_adapter_kwargs(
+    profile_id: str,
+    *,
+    fixture_private_key_pem: str | bytes | None,
+    trust_root_pem: str | None,
+) -> dict[str, Any]:
+    """Build adapter arguments from verifier policy, never receipt-selected trust."""
+    kwargs: dict[str, Any] = {}
+    if profile_id == "rekor-v1-recorded-fixture":
+        default_root = VECTOR_DIR / "rekor-fixture-trust-root.pem"
+        if fixture_private_key_pem:
+            kwargs["fixture_private_key_pem"] = fixture_private_key_pem
+        if trust_root_pem:
+            kwargs["trust_root_pem"] = trust_root_pem
+        elif default_root.is_file():
+            kwargs["trust_root_pem"] = default_root.read_text(encoding="utf-8")
+        elif "fixture_private_key_pem" not in kwargs:
+            raise Phase2Error(
+                "recorded-fixture graph verify requires the test-log public or private key",
+                code="GRP001",
+            )
+    elif profile_id in {"rfc3161", "rfc3161-recorded-fixture"}:
+        if not trust_root_pem:
+            raise Phase2Error(
+                "RFC 3161 graph verification requires an independently supplied --trust-root",
+                code="GRP008",
+                claim="C2",
+            )
+        kwargs["trust_root_pem"] = trust_root_pem
+        if profile_id == "rfc3161-recorded-fixture" and fixture_private_key_pem:
+            kwargs["fixture_private_key_pem"] = fixture_private_key_pem
+    elif trust_root_pem and profile_id == "rekor-v1":
+        kwargs["trust_root_pem"] = trust_root_pem
+    return kwargs
+
+
 def verify_graph(
     bundle: dict[str, Any],
     *,
     fixture_private_key_pem: str | bytes | None = None,
     trust_root_pem: str | None = None,
 ) -> VerificationResult:
-    validate_schema(bundle, "evidence-bundle.schema.json")
+    bundle_version = bundle.get("bundleVersion")
+    schema_name = BUNDLE_SCHEMAS.get(bundle_version)
+    if schema_name is None:
+        raise Phase2Error(
+            f"unsupported evidence bundle version {bundle_version!r}",
+            code="GRP009",
+        )
+    validate_schema(bundle, schema_name)
     authority_before = copy.deepcopy(bundle.get("decisionRecord", {}).get("decision", {}).get("authorityKind"))
     assert_phase2_has_no_authority_fields(bundle)
 
     envelope = bundle["envelope"]
     receipt = bundle["receipt"]
     env_bytes = envelope_bytes(envelope)
-    adapter_kwargs: dict[str, Any] = {}
-    if receipt["profileId"] == "rekor-v1-recorded-fixture":
-        default_root = VECTOR_DIR / "rekor-fixture-trust-root.pem"
-        if fixture_private_key_pem:
-            adapter_kwargs["fixture_private_key_pem"] = fixture_private_key_pem
-        if trust_root_pem:
-            adapter_kwargs["trust_root_pem"] = trust_root_pem
-        elif default_root.is_file():
-            adapter_kwargs["trust_root_pem"] = default_root.read_text(encoding="utf-8")
-        elif "fixture_private_key_pem" not in adapter_kwargs:
-            raise Phase2Error(
-                "recorded-fixture graph verify requires the test-log public or private key",
-                code="GRP001",
-            )
-    adapter = select_adapter(receipt["profileId"], **adapter_kwargs)
+    adapter = select_adapter(
+        receipt["profileId"],
+        **_anchor_adapter_kwargs(
+            receipt["profileId"],
+            fixture_private_key_pem=fixture_private_key_pem,
+            trust_root_pem=trust_root_pem,
+        ),
+    )
     claim = adapter.verify(env_bytes, receipt)
     deadline = _parse_dt(envelope["applicationDeadline"])
     established = [C2_ID, C3_ID]
@@ -203,6 +242,7 @@ def verify_graph(
         "trustBoundary": claim.trust_boundary,
         "anchoredAt": receipt["anchoredAt"],
         "profileId": receipt["profileId"],
+        "bundleVersion": bundle_version,
     }
     if not claim.precedes(deadline):
         raise Phase2Error(

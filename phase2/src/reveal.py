@@ -1,10 +1,10 @@
-"""Reveal, withheld, and selective-audit verification."""
+"""Reveal, committed, withheld, and selective-audit verification."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from claims import C1_ESTABLISHED, C1_ID, C3_ESTABLISHED, C3_ID, COMMITMENT_DOMAIN
+from claims import C1_ESTABLISHED, C1_ID, COMMITMENT_DOMAIN
 from commitment import open_commitment
 from envelope import assert_round_binding
 from support import Phase2Error, VerificationResult, validate_schema
@@ -32,16 +32,28 @@ def verify_reveal(
     salt: bytes | None = None,
     domain: str = COMMITMENT_DOMAIN,
 ) -> VerificationResult:
+    if reveal_status not in V01_REVEAL_MAP:
+        raise Phase2Error(f"unknown reveal status {reveal_status}", code="REV001")
+    if domain != COMMITMENT_DOMAIN:
+        raise Phase2Error("unsupported commitment domain for evaluator-manifest reveal", code="REV004", claim="C1")
+
     established: list[str] = []
     details: dict[str, Any] = {"revealStatus": reveal_status}
 
-    if reveal_status == "withheld":
+    if reveal_status in {"committed", "withheld"}:
         if manifest is not None or salt is not None:
-            raise Phase2Error("withheld reveal must not carry manifest or salt", code="REV002")
-        details["establishedNote"] = (
-            "Withheld disclosure reports only envelope-supported claims after anchor verification. "
-            "Manifest contents were not checked."
-        )
+            raise Phase2Error(
+                f"{reveal_status} disclosure state must not carry manifest or salt",
+                code="REV002",
+            )
+        if reveal_status == "committed":
+            details["establishedNote"] = (
+                "Commitment remains unopened. Manifest contents were not checked."
+            )
+        else:
+            details["establishedNote"] = (
+                "Withheld disclosure leaves the commitment unopened. Manifest contents were not checked."
+            )
         return VerificationResult(ok=True, established=established, details=details)
 
     if reveal_status == "selective-audit":
@@ -57,7 +69,6 @@ def verify_reveal(
     validate_schema(envelope, "commitment-envelope.schema.json")
     open_commitment(digest_hex=envelope["commitmentDigest"], manifest=manifest, salt=salt, domain=domain)
     assert_round_binding(envelope, manifest)
-    established.extend([C1_ID, C3_ID])
+    established.append(C1_ID)
     details[C1_ID] = C1_ESTABLISHED
-    details[C3_ID] = C3_ESTABLISHED
     return VerificationResult(ok=True, established=established, details=details)

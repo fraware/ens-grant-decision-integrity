@@ -200,6 +200,12 @@ def build_bundle(
     predicate_overrides: dict[str, Any] | None = None,
     corrupt_receipt: Any | None = None,
 ) -> dict[str, Any]:
+    """Build a current-protocol test bundle.
+
+    Historical bundle v1 is covered by the checked-in retrospective example.
+    Newly generated fixtures use bundle v2 so replay-report v2 is never placed
+    inside the frozen v1 container.
+    """
     manifest = sample_manifest(**(mutate_manifest or {}))
     salt = salt or generate_salt()
     envelope = build_envelope(manifest, salt)
@@ -211,8 +217,6 @@ def build_bundle(
     predicate = sample_predicate(envelope["commitmentDigest"], inputs)
     if predicate_overrides:
         predicate.update(predicate_overrides)
-        if "layerDigests" not in predicate_overrides:
-            pass
     attestation = None
     replay_report = None
     if include_run:
@@ -225,8 +229,8 @@ def build_bundle(
                 manifest_commitment_digest=envelope["commitmentDigest"],
             )
     source_uri = (
-        "https://github.com/fraware/ens-grant-decision-integrity/blob/"
-        "https://github.com/fraware/ens-grant-decision-integrity/blob/main/phase2/examples/retrospective-public.bundle.json"
+        "https://github.com/fraware/ens-grant-decision-integrity/"
+        "blob/main/phase2/examples/retrospective-public.bundle.json"
     )
     record = v01_record(
         digest=envelope["commitmentDigest"],
@@ -235,13 +239,14 @@ def build_bundle(
         manifest=manifest,
         source_uri=source_uri,
     )
+    opened = reveal_status in {"revealed", "selective-audit"}
     bundle = {
-        "bundleVersion": "1",
+        "bundleVersion": "2",
         "envelope": envelope,
         "receipt": receipt,
         "revealStatus": reveal_status,
-        "manifest": manifest if reveal_status != "withheld" else None,
-        "saltHex": salt.hex() if reveal_status != "withheld" else None,
+        "manifest": manifest if opened else None,
+        "saltHex": salt.hex() if opened else None,
         "selectiveAuditResult": None,
         "runAttestation": attestation,
         "runPublicKeyPem": public_pem.decode("utf-8") if include_run else None,

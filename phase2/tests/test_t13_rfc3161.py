@@ -1,7 +1,8 @@
-"""Tests for RFC 3161 anchor profile."""
+"""Tests for RFC 3161 anchor profiles."""
 
 from __future__ import annotations
 
+import copy
 from datetime import datetime, timezone
 
 import pytest
@@ -19,7 +20,7 @@ def tsa_material() -> tuple[str, str, str]:
 
 
 def test_rfc3161_fixture_anchor_and_verify(tsa_material: tuple[str, str, str]) -> None:
-    private_pem, public_pem, cert_pem = tsa_material
+    private_pem, _public_pem, cert_pem = tsa_material
     manifest = sample_manifest(programId="rfc3161-fixture-test")
     envelope, _salt = commit_manifest(manifest)
     env_bytes = envelope_bytes(envelope)
@@ -72,3 +73,75 @@ def test_rfc3161_deadline_after_anchor_fails(tsa_material: tuple[str, str, str])
     claim = adapter.verify(env_bytes, receipt)
     deadline = datetime.fromisoformat("2026-01-01T00:00:00Z")
     assert not claim.precedes(deadline)
+
+
+def test_receipt_embedded_certificate_cannot_replace_verifier_trust_root() -> None:
+    private_a, _, _, cert_a = generate_fixture_tsa_key()
+    _private_b, _, _, cert_b = generate_fixture_tsa_key()
+    manifest = sample_manifest(programId="rfc3161-trust-root-substitution")
+    envelope, _salt = commit_manifest(manifest)
+    env_bytes = envelope_bytes(envelope)
+    issuer = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        fixture_private_key_pem=private_a,
+        fixture_certificate_pem=cert_a,
+        trust_root_pem=cert_a,
+    )
+    receipt = issuer.anchor(env_bytes)
+    verifier = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        trust_root_pem=cert_b,
+    )
+    with pytest.raises(Phase2Error) as exc:
+        verifier.verify(env_bytes, receipt)
+    assert exc.value.code == "TS3179"
+    assert exc.value.claim == "C2"
+
+
+def test_malformed_fixture_base64_fails_as_protocol_error(tsa_material: tuple[str, str, str]) -> None:
+    private_pem, _, cert_pem = tsa_material
+    manifest = sample_manifest(programId="rfc3161-malformed-base64")
+    envelope, _salt = commit_manifest(manifest)
+    env_bytes = envelope_bytes(envelope)
+    adapter = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        fixture_private_key_pem=private_pem,
+        fixture_certificate_pem=cert_pem,
+        trust_root_pem=cert_pem,
+    )
+    receipt = copy.deepcopy(adapter.anchor(env_bytes))
+    receipt["verifierMaterial"]["signatureB64"] = "not valid base64 !!!"
+    with pytest.raises(Phase2Error) as exc:
+        adapter.verify(env_bytes, receipt)
+    assert exc.value.code == "TS3180"
+
+
+def test_invalid_configured_trust_root_fails_as_protocol_error(tsa_material: tuple[str, str, str]) -> None:
+    private_pem, _, cert_pem = tsa_material
+    manifest = sample_manifest(programId="rfc3161-invalid-trust-root")
+    envelope, _salt = commit_manifest(manifest)
+    env_bytes = envelope_bytes(envelope)
+    issuer = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        fixture_private_key_pem=private_pem,
+        fixture_certificate_pem=cert_pem,
+        trust_root_pem=cert_pem,
+    )
+    receipt = issuer.anchor(env_bytes)
+    verifier = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        trust_root_pem="-----BEGIN PUBLIC KEY-----\ninvalid\n-----END PUBLIC KEY-----\n",
+    )
+    with pytest.raises(Phase2Error) as exc:
+        verifier.verify(env_bytes, receipt)
+    assert exc.value.code == "TS3182"
+
+
+def test_production_rfc3161_fails_closed(tsa_material: tuple[str, str, str]) -> None:
+    _private_pem, _, cert_pem = tsa_material
+    manifest = sample_manifest(programId="rfc3161-production-disabled")
+    envelope, _salt = commit_manifest(manifest)
+    adapter = Rfc3161Adapter(profile_id="rfc3161", trust_root_pem=cert_pem)
+    with pytest.raises(Phase2Error) as exc:
+        adapter.anchor(envelope_bytes(envelope))
+    assert exc.value.code == "TS3178"

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "replay-report-v2.schema.json",
+  "title": "ENS GDI Phase II Replay Report v2",
+  "description": "Per-layer canonical artifact recomputation outcomes. Exact digest agreement is identity evidence, not correctness, fairness, legitimacy, or proof that the recorded implementation was re-executed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reportVersion", "manifestCommitmentDigest", "layers"],
+  "properties": {
+    "reportVersion": { "const": "2" },
+    "manifestCommitmentDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "layerId",
+          "outcome",
+          "attestedDigest",
+          "recomputedDigest",
+          "bound",
+          "reason"
+        ],
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "enum": [
+              "preprocessing",
+              "retrieval-snapshot",
+              "scoring",
+              "aggregation",
+              "hosted-generation"
+            ]
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["exact-match", "diverged", "not-replayable"]
+          },
+          "attestedDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "recomputedDigest": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bound": { "type": "null" },
+          "reason": { "type": ["string", "null"] }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "outcome": { "const": "exact-match" } },
+              "required": ["outcome"]
+            },
+            "then": {
+              "properties": {
+                "recomputedDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "reason": { "type": "null" }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "outcome": { "const": "diverged" } },
+              "required": ["outcome"]
+            },
+            "then": {
+              "properties": {
+                "recomputedDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "reason": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "outcome": { "const": "not-replayable" } },
+              "required": ["outcome"]
+            },
+            "then": {
+              "properties": {
+                "recomputedDigest": { "type": "null" },
+                "reason": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

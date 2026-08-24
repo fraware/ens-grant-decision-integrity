@@ -1,24 +1,27 @@
 """RFC 3161 timestamp authority adapter.
 
 Profiles:
-- ``rfc3161``: live HTTP TSA query against a configured endpoint (default DigiCert).
+- ``rfc3161``: reserved production profile. Live issuance/verification currently
+  fails closed until a standards-conformant CMS/RFC 3161 verifier with independent
+  trust-anchor validation is integrated.
 - ``rfc3161-recorded-fixture``: offline fixture tokens signed by a test TSA key.
 
-The recorded-fixture profile wraps a signed ``TSTInfo`` structure. Verification pins
-the TSA certificate or an explicit trust root. A copied PEM inside a receipt is not
-an independent root.
+A certificate copied inside a receipt is verifier material, never an independent
+trust root. Production C2 claims MUST NOT be established by this module until the
+full CMS signer, signed-attributes, TSA certificate, EKU/policy, and chain checks
+are implemented against a verifier-pinned trust policy.
 """
 
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
-import urllib.error
-import urllib.request
 from datetime import datetime, timezone
 from typing import Any
 
-from asn1crypto import algos, cms, core, tsp, x509
+from asn1crypto import algos, core, tsp
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
 from cryptography.hazmat.primitives.asymmetric.types import PrivateKeyTypes, PublicKeyTypes
@@ -29,29 +32,35 @@ from support import Phase2Error, sha256_hex, validate_schema
 
 DEFAULT_TSA_URL = "http://timestamp.digicert.com"
 RFC3161_TRUST_BOUNDARY = (
-    "RFC 3161 temporal claims depend on the pinned TSA certificate chain and the "
-    "signed TimeStampToken over the envelope digest. TSA honesty and clock accuracy "
-    "are explicit trust assumptions. This client does not operate a TSA monitor."
+    "Production RFC 3161 verification is disabled in this implementation. A future "
+    "profile must validate CMS/RFC 3161 semantics and a TSA chain against an "
+    "independently pinned verifier trust policy before establishing C2."
 )
 RFC3161_FIXTURE_TRUST_BOUNDARY = (
-    "rfc3161-recorded-fixture tokens are verified under a test TSA key shipped with "
-    "the fixture. They do not establish a third-party TSA attestation."
+    "rfc3161-recorded-fixture tokens are verified under an independently supplied "
+    "test TSA trust root. They do not establish a third-party TSA attestation."
 )
 
 OID_SHA256 = "2.16.840.1.101.3.4.2.1"
 
 
 def _load_private_key(pem: str | bytes) -> PrivateKeyTypes:
-    return serialization.load_pem_private_key(
-        pem.encode("utf-8") if isinstance(pem, str) else pem,
-        password=None,
-    )
+    try:
+        return serialization.load_pem_private_key(
+            pem.encode("utf-8") if isinstance(pem, str) else pem,
+            password=None,
+        )
+    except (TypeError, ValueError) as exc:
+        raise Phase2Error("invalid RFC 3161 fixture private key PEM", code="TS3183") from exc
 
 
 def _load_public_key(pem: str | bytes) -> PublicKeyTypes:
-    return serialization.load_pem_public_key(
-        pem.encode("utf-8") if isinstance(pem, str) else pem,
-    )
+    try:
+        return serialization.load_pem_public_key(
+            pem.encode("utf-8") if isinstance(pem, str) else pem,
+        )
+    except (TypeError, ValueError) as exc:
+        raise Phase2Error("invalid RFC 3161 trust public key PEM", code="TS3182", claim="C2") from exc
 
 
 def _sign_digest(private_key: PrivateKeyTypes, digest: bytes) -> bytes:
@@ -132,8 +141,18 @@ def _trust_public_key(trust_pem: str | bytes) -> PublicKeyTypes:
     if b"BEGIN CERTIFICATE" in raw:
         from cryptography import x509 as cx509
 
-        return cx509.load_pem_x509_certificate(raw).public_key()
+        try:
+            return cx509.load_pem_x509_certificate(raw).public_key()
+        except ValueError as exc:
+            raise Phase2Error("invalid RFC 3161 trust certificate PEM", code="TS3182", claim="C2") from exc
     return _load_public_key(raw)
+
+
+def _strict_b64(value: str, *, field: str) -> bytes:
+    try:
+        return base64.b64decode(value, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise Phase2Error(f"invalid base64 in RFC 3161 fixture field {field}", code="TS3180", claim="C2") from exc
 
 
 def _verify_fixture_token(
@@ -143,34 +162,17 @@ def _verify_fixture_token(
     envelope_digest_hex: str,
     trust_pem: str | bytes,
 ) -> datetime:
-    imprint, unix_time = _parse_tst_info(tst_info_der)
+    try:
+        imprint, unix_time = _parse_tst_info(tst_info_der)
+    except (ValueError, TypeError, KeyError) as exc:
+        raise Phase2Error("malformed RFC 3161 fixture TSTInfo", code="TS3181", claim="C2") from exc
     if imprint.hex() != envelope_digest_hex.lower():
         raise Phase2Error("timestamp token imprint does not match envelope digest", code="TS3165", claim="C2")
     tst_digest = hashlib.sha256(tst_info_der).digest()
-    _verify_digest(_trust_public_key(trust_pem), tst_digest, signature)
-    return datetime.fromtimestamp(unix_time, tz=timezone.utc)
-
-
-def _verify_live_token(
-    *,
-    token_bytes: bytes,
-    envelope_digest_hex: str,
-    trust_pem: str | bytes,
-) -> datetime:
-    content_info = cms.ContentInfo.load(token_bytes)
-    if content_info["content_type"].native != "signed_data":
-        raise Phase2Error("timestamp token is not CMS SignedData", code="TS3163", claim="C2")
-    signed_data = content_info["content"]
-    tst_info_der = signed_data["encap_content_info"]["content"].native
-    imprint, unix_time = _parse_tst_info(tst_info_der)
-    if imprint.hex() != envelope_digest_hex.lower():
-        raise Phase2Error("timestamp token imprint does not match envelope digest", code="TS3165", claim="C2")
-    signer_infos = signed_data["signer_infos"]
-    if not signer_infos:
-        raise Phase2Error("timestamp token has no signer info", code="TS3166", claim="C2")
-    signature = signer_infos[0]["signature"].native
-    tst_digest = hashlib.sha256(tst_info_der).digest()
-    _verify_digest(_trust_public_key(trust_pem), tst_digest, signature)
+    try:
+        _verify_digest(_trust_public_key(trust_pem), tst_digest, signature)
+    except InvalidSignature as exc:
+        raise Phase2Error("RFC 3161 fixture signature does not verify under the configured trust root", code="TS3179", claim="C2") from exc
     return datetime.fromtimestamp(unix_time, tz=timezone.utc)
 
 
@@ -219,23 +221,12 @@ class Rfc3161Adapter(AnchorAdapter):
         self.tsa_url = tsa_url.rstrip("/")
         self._fixture_key = _load_private_key(fixture_private_key_pem) if fixture_private_key_pem else None
         self._fixture_cert_pem = fixture_certificate_pem
-        if profile_id == "rfc3161":
-            if not trust_root_pem:
-                raise Phase2Error(
-                    "rfc3161 profile requires a pinned TSA trust root PEM for verification",
-                    code="TS3168",
-                )
-            self._trust_pem = trust_root_pem
-        else:
-            if trust_root_pem:
-                self._trust_pem = trust_root_pem
-            elif fixture_certificate_pem:
-                self._trust_pem = fixture_certificate_pem
-            else:
-                raise Phase2Error(
-                    "rfc3161-recorded-fixture requires fixture certificate or trust root PEM",
-                    code="TS3169",
-                )
+        if not trust_root_pem:
+            raise Phase2Error(
+                f"{profile_id} requires an independently supplied pinned TSA trust root PEM",
+                code="TS3168" if profile_id == "rfc3161" else "TS3169",
+            )
+        self._trust_pem = trust_root_pem
 
     def _trust_boundary(self) -> str:
         return RFC3161_FIXTURE_TRUST_BOUNDARY if self.profile_id == "rfc3161-recorded-fixture" else RFC3161_TRUST_BOUNDARY
@@ -244,7 +235,11 @@ class Rfc3161Adapter(AnchorAdapter):
         digest = sha256_hex(envelope_bytes)
         if self.profile_id == "rfc3161-recorded-fixture":
             return self._anchor_fixture(envelope_bytes, digest, integrated_time=None)
-        return self._anchor_live(envelope_bytes, digest)
+        raise Phase2Error(
+            "production RFC 3161 issuance is disabled until standards-conformant CMS verification is integrated",
+            code="TS3178",
+            claim="C2",
+        )
 
     def anchor_at(self, envelope_bytes: bytes, *, integrated_time: datetime) -> dict[str, Any]:
         if self.profile_id != "rfc3161-recorded-fixture":
@@ -286,41 +281,6 @@ class Rfc3161Adapter(AnchorAdapter):
         self.verify(envelope_bytes, receipt)
         return receipt
 
-    def _anchor_live(self, envelope_bytes: bytes, digest: str) -> dict[str, Any]:
-        request = urllib.request.Request(
-            self.tsa_url,
-            data=_build_ts_req(digest),
-            headers={"Content-Type": "application/timestamp-query"},
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=60) as response:
-                ts_resp = tsp.TimeStampResp.load(response.read())
-        except urllib.error.URLError as exc:
-            raise Phase2Error(f"RFC 3161 TSA network error: {exc}", code="TS3172") from exc
-        if ts_resp["status"]["status"].native != "granted":
-            raise Phase2Error("RFC 3161 TSA rejected the timestamp request", code="TS3176")
-        token = ts_resp["time_stamp_token"].dump()
-        anchored_at = _verify_live_token(token_bytes=token, envelope_digest_hex=digest, trust_pem=self._trust_pem)
-        receipt = {
-            "profileId": "rfc3161",
-            "envelopeDigestSha256": digest,
-            "anchorId": f"tsa-live:{digest[:16]}",
-            "anchoredAt": anchored_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "logIndex": None,
-            "verifierMaterial": {
-                "kind": "rfc3161-offline",
-                "tsTokenB64": base64.b64encode(token).decode("ascii"),
-                "tsaCertificatePem": (
-                    self._trust_pem.decode("utf-8")
-                    if isinstance(self._trust_pem, bytes)
-                    else str(self._trust_pem)
-                ),
-            },
-        }
-        validate_schema(receipt, "anchor-receipt.schema.json")
-        return receipt
-
     def verify(self, envelope_bytes: bytes, receipt: dict[str, Any]) -> TemporalClaim:
         validate_schema(receipt, "anchor-receipt.schema.json")
         if receipt["profileId"] != self.profile_id:
@@ -333,23 +293,21 @@ class Rfc3161Adapter(AnchorAdapter):
         if receipt["envelopeDigestSha256"] != digest:
             raise Phase2Error("receipt envelope digest does not match envelope bytes", code="TS3174", claim="C2")
         material = receipt["verifierMaterial"]
-        trust_pem = material.get("tsaCertificatePem") or self._trust_pem
         kind = material.get("kind")
-        if kind == "rfc3161-fixture-v1":
-            anchored_at = _verify_fixture_token(
-                tst_info_der=base64.b64decode(material["tstInfoDerB64"]),
-                signature=base64.b64decode(material["signatureB64"]),
-                envelope_digest_hex=digest,
-                trust_pem=trust_pem,
+        if self.profile_id == "rfc3161":
+            raise Phase2Error(
+                "production RFC 3161 verification is disabled until complete CMS/RFC 3161 trust validation is integrated",
+                code="TS3178",
+                claim="C2",
             )
-        elif kind == "rfc3161-offline":
-            anchored_at = _verify_live_token(
-                token_bytes=base64.b64decode(material["tsTokenB64"]),
-                envelope_digest_hex=digest,
-                trust_pem=trust_pem,
-            )
-        else:
-            raise Phase2Error(f"unsupported RFC 3161 verifier material kind {kind!r}", code="TS3177", claim="C2")
+        if kind != "rfc3161-fixture-v1":
+            raise Phase2Error(f"unsupported RFC 3161 fixture material kind {kind!r}", code="TS3177", claim="C2")
+        anchored_at = _verify_fixture_token(
+            tst_info_der=_strict_b64(material["tstInfoDerB64"], field="tstInfoDerB64"),
+            signature=_strict_b64(material["signatureB64"], field="signatureB64"),
+            envelope_digest_hex=digest,
+            trust_pem=self._trust_pem,
+        )
         claimed = datetime.fromisoformat(receipt["anchoredAt"].replace("Z", "+00:00"))
         if int(claimed.timestamp()) != int(anchored_at.timestamp()):
             raise Phase2Error("receipt anchoredAt does not match token genTime", code="TS3175", claim="C2")

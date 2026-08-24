@@ -14,16 +14,18 @@ This repository currently ships:
 - grant-decision schema `0.1` and optional schema `0.2` extensions;
 - a conformance validator and adversarial suites;
 - a fictional mapping of the public SPP3 Marketplace process;
-- Phase II evaluator-manifest commitment, anchoring, run attestation, and replay (additive);
+- Phase II evaluator-manifest commitment, anchor verification, run attestation, and canonical artifact-recomputation evidence (additive);
 - deterministic confidential-to-public projection (additive; top-level redaction paths in the v1 reference).
 
-Cryptographic selective-disclosure proofs and live Ethereum mainnet anchoring remain deferred (`phase2/DEFERRED.md`).
+Production RFC 3161 verification, actual evaluator implementation re-execution, cryptographic selective-disclosure proofs, and live Ethereum mainnet anchoring are not shipped as production guarantees; see `phase2/DEFERRED.md`.
 
 The worked Marketplace record is a dated, fictional process snapshot. It does not identify, score, recommend, or reject a real applicant, and it does not prescribe changes to the mapped process.
 
 ## Validation
 
 The repository carries a reproducible validation contract in `VALIDATION.md`. The worked example is expected to have no conformance errors and to emit only `CHAL003` while the reviewed public process does not identify a factual/procedural correction route.
+
+Validation results are evidence only for the exact commit and configuration that ran. A successful historical or fixture test must not be generalized into a production guarantee outside its stated trust boundary.
 
 ## Primary review question
 
@@ -47,7 +49,7 @@ A simpler mechanism is preferable wherever it preserves the same guarantees.
 - Does the challenge model correctly distinguish factual/procedural correction from relitigation of substantive judgment?
 - Does the existing process already provide a correction route that the reviewed public Marketplace artifacts do not identify?
 - Do delivery-condition fields support accountability without giving the verifier authority to re-evaluate grant merit?
-- Is the projection allowlist/redaction model usable for publishing without overclaiming selective disclosure?
+- Is the projection allowlist/redaction model usable for publishing without overclaiming selective disclosure or source completeness?
 - Which information should remain confidential or selectively disclosed?
 
 ### AI-assisted evaluation
@@ -55,7 +57,8 @@ A simpler mechanism is preferable wherever it preserves the same guarantees.
 - Is `materiallyInformedRecommendation` the right threshold for triggering evaluator-manifest provenance?
 - Which evaluator-manifest elements must be fixed before applications close, and which should remain undisclosed until later?
 - Does the declared pre-deadline commitment requirement address configuration drift without implying stronger assurance than the record provides?
-- Which anchor profile (`rekor-v1`, `rfc3161`, fixture profiles) is operationally realistic, and are its trust boundaries clear?
+- If a production temporal-precedence claim is required, which currently supported anchor profile and trust policy are acceptable? `rekor-v1` is retained as a historical compatibility profile; production `rfc3161` is currently fail-closed, and recorded fixture profiles are test evidence only.
+- Does canonical artifact recomputation provide enough audit value without being mistaken for implementation re-execution?
 - Could the manifest, conformance rules, or claim matrix themselves create a gaming surface?
 
 ## Suggested response format

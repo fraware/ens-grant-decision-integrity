@@ -8,18 +8,18 @@ This note records the operational cost of constructing one fictional public retr
 
 2. **Commitment** — Generate a 32-byte CSPRNG salt, compute the domain-separated SHA-256 digest over RFC 8785 JCS bytes, and publish only the envelope (no salt, no hidden prompt text).
 
-3. **Anchor profile selection** — Choose `rekor-v1` for production Sigstore Rekor or `rekor-v1-recorded-fixture` for tests and the public example. Retain offline-verifiable receipt material (hashedrekord body, signed entry timestamp, Merkle inclusion proof, signed checkpoint). Pin the trust root; do not treat a live `/api/v1/log/publicKey` response as the root.
+3. **Anchor profile selection** — Choose a supported anchor profile and retain its offline-verifiable receipt material. The public example uses `rekor-v1-recorded-fixture`; that choice is test evidence, not public Rekor inclusion. Pin verifier trust independently; do not let receipt-carried material choose its own trust root.
 
 4. **Run attestation** — Generate an Ed25519 test key, sign an in-toto Statement v1 + DSSE envelope over the custom run predicate, and retain the public key for verification.
 
-5. **Replay** — Compute deterministic layer snapshots, record an honest `not-replayable` outcome for the hosted-generation layer, and keep deterministic layers at `exact-match` where inputs are available.
+5. **Replay evidence** — Materialize deterministic layer artifacts, recompute their RFC 8785 JCS SHA-256 digests, and record an honest `not-replayable` outcome for the hosted-generation layer. This is artifact recomputation, not invocation or re-execution of the recorded implementation. Replay report v2 does not support approximate digest-distance matching.
 
 6. **v0.1 linkage** — Fill `evaluatorManifest.commitment.algorithm` with `"other"`, copy the Phase II digest, set `committedAt` to the **verified anchor time** (never a self-declared wall clock), map reveal status, and point `integrity.sourceUri` at the evidence bundle. Confirm the pending record still emits only `CHAL003`.
 
 ## What a live committee would additionally do
 
 - **Before applications close:** decide reveal policy (`revealed`, `withheld`, or `selective-audit`); keep salt and hidden manifest contents off the public envelope; assign who may sign run attestations.
-- **During the round:** monitor the chosen anchor trust root; treat run signatures as operator assertions, not proof of honest use; refuse to let AI output or replay results set `decision.authorityKind`.
+- **During the round:** maintain the chosen anchor trust policy; treat run signatures as operator assertions, not proof of honest use; refuse to let AI output or replay results set `decision.authorityKind`.
 - **After the round:** reveal or audit per policy; publish only claim-bounded verification results; retain keys and receipts under the program's secrets policy.
 
 ## Keys and secrets handling
@@ -28,33 +28,33 @@ This note records the operational cost of constructing one fictional public retr
 |---|---|---|
 | Manifest salt | Test vector; disclosed on reveal | CSPRNG; withheld until reveal or selective audit |
 | Rekor artifact signing key | Ephemeral test key inside hashedrekord | Program-controlled key; not reused across rounds without policy |
-| Rekor log trust root | Pinned production PEM (`rekor-v1`) or test-log PEM (fixture) | Pin and monitor; rotate only with documented ceremony |
+| Rekor v1 log trust root | Pinned production PEM (`rekor-v1`) or test-log PEM (fixture) | Pin and monitor if using this historical profile; rotate only with documented evidence |
 | Run attestation key | Test Ed25519 in `vectors/` | Program-controlled; not the test harness key |
 
 Test private keys in `phase2/vectors/` exist only for the harness and the public example. They must not be reused for a live program.
 
-## Anchor steps (Rekor v1)
+## Anchor steps (Rekor v1 historical profile)
 
 1. JCS-canonicalize the envelope bytes.
-2. POST a hashedrekord to `https://rekor.sigstore.dev` (`rekor-v1`) or issue a fixture receipt (`rekor-v1-recorded-fixture`).
+2. POST a hashedrekord to the selected Rekor v1 endpoint (`rekor-v1`) or issue a fixture receipt (`rekor-v1-recorded-fixture`).
 3. Store the receipt with offline verifier material, not merely a URL.
 4. Verify under the pinned trust root: hashedrekord digest match, SET signature, Merkle inclusion, checkpoint signature.
 5. Compare verified `integratedTime` strictly before `applicationDeadline`.
 
-## Live Rekor status (2026-08-19)
+## Live Rekor v1 observation (2026-08-19)
 
 POST to `https://rekor.sigstore.dev/api/v1/log/entries` failed with `ConnectionResetError` from the development environment. T6, T7, and the public example therefore use `rekor-v1-recorded-fixture` receipts verified under the shipped test-log key (`vectors/rekor-fixture-trust-root.pem`). That profile does **not** establish inclusion in the public Sigstore Rekor log.
 
-When live Rekor is reachable, record a hashedrekord with:
+When a live Rekor v1 endpoint is reachable and that historical profile is intentionally being tested, a hashedrekord may be recorded with:
 
 ```bash
 python phase2/src/cli.py commit --manifest MANIFEST.json --out-envelope /tmp/envelope.json --out-salt /tmp/salt.json
 python phase2/src/cli.py anchor --envelope /tmp/envelope.json --profile rekor-v1 --out /tmp/receipt.json
 ```
 
-Then write `vectors/rekor-live-hashedrekord.json` with `envelopeBytesUtf8` (UTF-8 JCS envelope bytes) and `receipt`. T7's `test_recorded_from_live_rekor_if_present` verifies it under the pinned production key.
+Then write `vectors/rekor-live-hashedrekord.json` with `envelopeBytesUtf8` (UTF-8 JCS envelope bytes) and `receipt`. T7's optional live-recorded case verifies it under the pinned production key. Absence or skipping of that network-dependent vector must not be described as a successful live Rekor test.
 
-## Fixture verification semantics (rigorous, not a public claim)
+## Fixture verification semantics (rigorous within its test boundary, not a public claim)
 
 `rekor-v1-recorded-fixture` verification establishes:
 
@@ -65,9 +65,11 @@ Then write `vectors/rekor-live-hashedrekord.json` with `envelopeBytesUtf8` (UTF-
 
 It does **not** establish that any entry appears in production Sigstore Rekor, universal time, or institutional approval.
 
+`rfc3161-recorded-fixture` likewise exists only for trust-binding and protocol tests under a test TSA root. Production `rfc3161` currently fails closed; it must not be substituted for the fixture or described as available production C2 evidence. Malformed fixture encodings, invalid configured trust material, and signature mismatch should terminate as structured verifier failures rather than uncaught parser/cryptography exceptions.
+
 ## Proportionality notes
 
-- Phase II adds people-time for manifest design, key ceremony, anchor monitoring, reveal policy, and claim-bounded publication.
+- Phase II adds people-time for manifest design, key ceremony, anchor trust management, reveal policy, artifact materialization, and claim-bounded publication.
 - A committee should weigh that cost against round materiality: a low-stakes advisory screen may not warrant full commitment + anchor + run attestation for every round.
 - v0.1 remains valid without a Phase II bundle; absence of a bundle is not a v0.1 defect.
-- Do not describe fixture receipts as production Rekor inclusion. Do not describe a valid commitment as execution or a signed run as funding authority.
+- Do not describe fixture receipts as production inclusion or third-party timestamp evidence. Do not describe a valid commitment as execution, an artifact replay match as implementation re-execution, or a signed run as funding authority.

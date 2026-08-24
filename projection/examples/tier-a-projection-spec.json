@@ -15,6 +15,7 @@
     "conflicts",
     "evidence",
     "evaluation",
+    "evaluatorManifest",
     "decision",
     "challenge",
     "deliveryConditions",

@@ -53,3 +53,30 @@ def test_missing_allowlist_field_fails() -> None:
     bad_spec["fieldAllowlist"] = ["recordId", "nonexistentField"]
     with pytest.raises(ProjectionError):
         project_record(CONFIDENTIAL, bad_spec)
+
+
+def test_silent_top_level_omission_fails() -> None:
+    bad_spec = copy.deepcopy(SPEC)
+    bad_spec["fieldAllowlist"].remove("challenge")
+    with pytest.raises(ProjectionError) as exc:
+        project_record(CONFIDENTIAL, bad_spec)
+    assert exc.value.code == "PROJ011"
+
+
+def test_publish_and_withhold_same_field_fails() -> None:
+    bad_spec = copy.deepcopy(SPEC)
+    bad_spec["fieldAllowlist"].append("application")
+    with pytest.raises(ProjectionError) as exc:
+        project_record(CONFIDENTIAL, bad_spec)
+    assert exc.value.code == "PROJ012"
+
+
+def test_non_null_source_integrity_fails_instead_of_being_overwritten() -> None:
+    record = copy.deepcopy(CONFIDENTIAL)
+    record["integrity"] = {
+        "recordHashAlgorithm": "sha256",
+        "recordHash": "source-integrity-must-not-disappear",
+    }
+    with pytest.raises(ProjectionError) as exc:
+        project_record(record, SPEC)
+    assert exc.value.code == "PROJ013"

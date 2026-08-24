@@ -78,6 +78,20 @@ def cmd_commit(args: argparse.Namespace) -> int:
 
 
 def cmd_anchor(args: argparse.Namespace) -> int:
+    fixture_time_profiles = {
+        "rekor-v1-recorded-fixture",
+        "rfc3161-recorded-fixture",
+        "ethereum-calldata-fixture",
+    }
+    if args.at and args.profile not in fixture_time_profiles:
+        raise Phase2Error("--at is only valid for recorded fixture profiles", code="CLI008")
+    if args.tx_hash and args.profile != "ethereum-calldata-fixture":
+        raise Phase2Error("--tx-hash is only valid for ethereum-calldata-fixture", code="CLI009")
+    if args.tsa_cert and args.profile != "rfc3161-recorded-fixture":
+        raise Phase2Error("--tsa-cert is only valid for rfc3161-recorded-fixture", code="CLI010")
+    if args.artifact_key and args.profile not in {"rekor-v1", "rekor-v1-recorded-fixture"}:
+        raise Phase2Error("--artifact-key is only valid for Rekor profiles", code="CLI011")
+
     envelope = _load_json(args.envelope)
     env_bytes = envelope_bytes(envelope)
     kwargs: dict[str, Any] = {}
@@ -85,24 +99,25 @@ def cmd_anchor(args: argparse.Namespace) -> int:
         if not args.fixture_key:
             raise Phase2Error("rekor-v1-recorded-fixture requires --fixture-key", code="CLI001")
         kwargs["fixture_private_key_pem"] = Path(args.fixture_key).read_text(encoding="utf-8")
+        if args.artifact_key:
+            kwargs["artifact_private_key_pem"] = Path(args.artifact_key).read_text(encoding="utf-8")
+        adapter = select_adapter(args.profile, **kwargs)
         if args.at:
-            adapter = select_adapter(args.profile, **kwargs)
             when = datetime.fromisoformat(args.at.replace("Z", "+00:00")).astimezone(timezone.utc)
             receipt = adapter.anchor_at(env_bytes, integrated_time=when)  # type: ignore[attr-defined]
         else:
-            adapter = select_adapter(args.profile, **kwargs)
             receipt = adapter.anchor(env_bytes)
     elif args.profile in {"rfc3161", "rfc3161-recorded-fixture"}:
+        if not args.trust_root:
+            raise Phase2Error(f"{args.profile} requires --trust-root", code="CLI005")
+        kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
         if args.profile == "rfc3161-recorded-fixture":
             if not args.fixture_key:
                 raise Phase2Error("rfc3161-recorded-fixture requires --fixture-key", code="CLI004")
+            if not args.tsa_cert:
+                raise Phase2Error("rfc3161-recorded-fixture issuance requires --tsa-cert", code="CLI006")
             kwargs["fixture_private_key_pem"] = Path(args.fixture_key).read_text(encoding="utf-8")
-            if args.trust_root:
-                kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
-            if args.tsa_cert:
-                kwargs["fixture_certificate_pem"] = Path(args.tsa_cert).read_text(encoding="utf-8")
-        elif args.trust_root:
-            kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
+            kwargs["fixture_certificate_pem"] = Path(args.tsa_cert).read_text(encoding="utf-8")
         adapter = select_adapter(args.profile, **kwargs)
         if args.profile == "rfc3161-recorded-fixture" and args.at:
             when = datetime.fromisoformat(args.at.replace("Z", "+00:00")).astimezone(timezone.utc)
@@ -148,6 +163,9 @@ def cmd_anchor(args: argparse.Namespace) -> int:
 
 
 def cmd_verify_commitment(args: argparse.Namespace) -> int:
+    if bool(args.manifest) != bool(args.salt):
+        raise Phase2Error("--manifest and --salt must be supplied together", code="CLI007", claim="C1")
+
     envelope = _load_json(args.envelope)
     receipt = _load_json(args.receipt)
     kwargs: dict[str, Any] = {}
@@ -245,7 +263,8 @@ def cmd_replay(args: argparse.Namespace) -> int:
             "established": [],
             "failed": [],
             "details": {
-                "note": "Local layer outcomes. C5 is not established until verify-graph accepts the report.",
+                "note": "Local canonical artifact-recomputation outcomes. C5 is not established until verify-graph accepts the report.",
+                "reportVersion": report["reportVersion"],
                 "outcomes": {item["layerId"]: item["outcome"] for item in report["layers"]},
             },
             "nonClaims": list(NON_CLAIMS),
@@ -267,7 +286,7 @@ def cmd_verify_graph(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Phase II evaluator-manifest commitment, anchor, attest, and replay tools."
+        description="Phase II evaluator-manifest commitment, anchor, attest, and replay-evidence tools."
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -326,7 +345,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify_r.add_argument("--public-key", required=True)
     verify_r.set_defaults(func=cmd_verify_run)
 
-    replay_cmd = sub.add_parser("replay", help="Recompute layer outcomes.")
+    replay_cmd = sub.add_parser("replay", help="Recompute canonical layer-artifact outcomes.")
     replay_cmd.add_argument("--attestation", required=True)
     replay_cmd.add_argument("--public-key", required=True)
     replay_cmd.add_argument("--layer-inputs", required=True)
