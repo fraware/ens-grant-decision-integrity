@@ -177,7 +177,7 @@ def verify_replay_report(
                 code="RPL006",
                 claim="C5",
             )
-        if item["attestedDigest"] != attested_layer_digests[layer_id]:
+        if item.get("attestedDigest") != attested_layer_digests[layer_id]:
             raise Phase2Error(f"replay attested digest for {layer_id} does not match run predicate", code="RPL007", claim="C5")
         if item.get("recomputedDigest") != expected_item.get("recomputedDigest"):
             raise Phase2Error(
