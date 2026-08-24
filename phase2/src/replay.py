@@ -1,14 +1,14 @@
-"""Layer-specific replay and artifact verification.
+"""Layer-specific replay artifact verification.
 
-Exact digest equality establishes byte/object identity under the declared JCS
-serialization. Agreement is not correctness or fairness.
+Exact digest equality establishes object identity under the declared JCS
+serialization. Agreement is not correctness, fairness, or proof that a recorded
+implementation was re-executed.
 
-The historical ``bounded-match`` surface is intentionally fail-closed here.
-Cryptographic digest distance has no semantic relationship to distance between
-underlying computations because SHA-256 is avalanche-sensitive. Approximate
-reproducibility requires a versioned, layer-specific comparator over the
-underlying typed outputs; that is a separate protocol surface and MUST NOT be
-implemented by comparing hash strings.
+Replay report v1 is retained as a historical wire format. Its ``bounded-match``
+mechanism is not accepted by the verifier because cryptographic digest distance
+has no semantic relationship to distance between underlying computations.
+Replay report v2 removes that mechanism. Approximate reproducibility, if added,
+requires a separately versioned layer-specific comparator over typed outputs.
 """
 
 from __future__ import annotations
@@ -27,6 +27,11 @@ DETERMINISTIC_LAYERS = (
 HOSTED_LAYER = "hosted-generation"
 ALL_LAYERS = DETERMINISTIC_LAYERS + (HOSTED_LAYER,)
 OUTCOMES = ("exact-match", "diverged", "not-replayable")
+CURRENT_REPORT_VERSION = "2"
+REPORT_SCHEMAS = {
+    "1": "replay-report.schema.json",
+    "2": "replay-report-v2.schema.json",
+}
 
 
 def layer_digest(layer_input: Any) -> str:
@@ -44,8 +49,8 @@ def replay(
     """Recompute canonical layer digests and report exact identity or divergence.
 
     ``bounds`` remains in the call signature only to fail closed for callers of
-    the historical API. A bounded comparison over SHA-256 digest characters is
-    methodologically invalid and is no longer accepted.
+    the historical v1 API. A bounded comparison over SHA-256 digest characters is
+    methodologically invalid and is not emitted by replay report v2.
     """
     if bounds:
         raise Phase2Error(
@@ -92,11 +97,11 @@ def replay(
             }
         )
     report = {
-        "reportVersion": "1",
+        "reportVersion": CURRENT_REPORT_VERSION,
         "manifestCommitmentDigest": manifest_commitment_digest,
         "layers": layers,
     }
-    validate_schema(report, "replay-report.schema.json")
+    validate_schema(report, REPORT_SCHEMAS[CURRENT_REPORT_VERSION])
     return report
 
 
@@ -108,18 +113,35 @@ def verify_replay_report(
     hosted_replayable: bool,
     manifest_commitment_digest: str,
 ) -> None:
-    validate_schema(report, "replay-report.schema.json")
+    report_version = report.get("reportVersion")
+    schema_name = REPORT_SCHEMAS.get(report_version)
+    if schema_name is None:
+        raise Phase2Error(
+            f"unsupported replay report version {report_version!r}",
+            code="RPL009",
+            claim="C5",
+        )
+    validate_schema(report, schema_name)
+
     if report["manifestCommitmentDigest"] != manifest_commitment_digest:
         raise Phase2Error("replay report commitment digest does not match envelope", code="RPL003", claim="C5")
+
+    layer_ids = [item["layerId"] for item in report["layers"]]
     by_id = {item["layerId"]: item for item in report["layers"]}
+    if len(by_id) != len(layer_ids):
+        raise Phase2Error("replay report contains duplicate layer ids", code="RPL004", claim="C5")
     if set(by_id) != set(ALL_LAYERS):
-        raise Phase2Error("replay report must include every defined layer", code="RPL004", claim="C5")
+        raise Phase2Error("replay report must include every defined layer exactly once", code="RPL004", claim="C5")
+
+    # v1 remains parseable for historical compatibility, but its approximate
+    # hash-distance mechanism is not evidence this verifier is willing to accept.
     if any(item.get("outcome") == "bounded-match" or item.get("bound") not in {None, ""} for item in report["layers"]):
         raise Phase2Error(
             "bounded replay over cryptographic digest distance is not accepted",
             code="RPL008",
             claim="C5",
         )
+
     expected = replay(
         attested_layer_digests=attested_layer_digests,
         layer_inputs=layer_inputs or {},
