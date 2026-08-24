@@ -74,7 +74,7 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | T10 | Perturbing deterministic preprocessing, scoring, or aggregation is detected as `diverged`. |
 | T11 | Hosted-model `not-replayable` does not void deterministic-layer claims. |
 | T12 | No Phase II object can populate or imply v0.1 `decision.authorityKind`. |
-| T13 | RFC 3161 fixture verification is bound to independently supplied verifier trust; receipt-selected trust substitution and production-profile overclaim fail closed. |
+| T13 | RFC 3161 fixture verification is bound to independently supplied verifier trust; receipt-selected trust substitution, malformed fixture material, and production-profile overclaim fail closed with structured verifier errors. |
 | T14 | Ethereum calldata fixture verification binds the recorded calldata digest under the fixture trust boundary; it does not claim mainnet inclusion. |
 
 Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate replay layers, and projection disclosure completeness.
@@ -112,7 +112,7 @@ The production profile identifier `rfc3161` is reserved, but production issuance
 
 Production support may be enabled only after the verifier validates the relevant CMS/RFC 3161 semantics, including signer selection, signed attributes, message imprint, TSA certificate identification, timestamping authorization/EKU and policy as applicable, certificate-path validation against independently configured verifier trust, and the protocol's request/response bindings. Receipt-carried certificate material must never become an independent trust root merely because it appears in the receipt.
 
-`rfc3161-recorded-fixture` verifies the repository's simplified signed-`TSTInfo` test fixture under an independently supplied test TSA trust root. That fixture is useful for adversarial trust-binding and deadline tests only. It does not establish a third-party TSA attestation or production RFC 3161 conformance.
+`rfc3161-recorded-fixture` verifies the repository's simplified signed-`TSTInfo` test fixture under an independently supplied test TSA trust root. Malformed base64/token material and signature failures are normalized to structured protocol failures. The fixture is useful for adversarial trust-binding and deadline tests only. It does not establish a third-party TSA attestation or production RFC 3161 conformance.
 
 ## Ethereum calldata trust boundary
 
