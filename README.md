@@ -6,6 +6,8 @@ The project originated in the Simocracy proposal **“No Black-Box Grants: Ratif
 
 **Releases:** [v0.3.2](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.2) (latest) · [v0.3.1](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.1) · [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
 
+The latest tagged release remains v0.3.2. Development after that tag is treated as unreleased until a new reviewed tag is created; do not attribute unreleased hardening behavior to v0.3.2.
+
 ## What this repository provides
 
 The profile records enough information for a third party to reconstruct the procedural basis of a material funding decision:
@@ -31,7 +33,7 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `schema/grant-decision-public-projection-0.2.schema.json` | Relaxed schema for projected public records with `withheldCommitments` |
 | `CONFORMANCE.md` | Cross-field conformance rules, severity model, and rule-ID index |
 | `scripts/conformance.py` | Semantic conformance validator |
-| `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, and replay |
+| `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, and replay evidence |
 | `projection/` | Deterministic confidential-to-public record projection |
 | `examples/` | Fictional worked examples (non-evaluative) |
 | `methodology/GRANT-DECISION-INTEGRITY.md` | Draft twelve-step review methodology |
@@ -42,7 +44,7 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `REVIEW.md` | Adversarial review guide |
 | `CONTRIBUTING.md` | Contribution preferences and pre-change validation |
 | `SECURITY.md` | Sensitive-disclosure reporting |
-| `CITATION.cff` | Citation metadata |
+| `CITATION.cff` | Citation metadata for the latest tagged release |
 | `provenance/simocracy-funding.json` | Recorded Simocracy allocation provenance ($219 allocated; not paid) |
 
 ## Quickstart
@@ -61,9 +63,9 @@ The Marketplace example is intentionally pending. It should produce no conforman
 
 ## Phase II (evaluator provenance)
 
-`phase2/` is an additive protocol for evaluator-manifest commitment, Rekor-profile anchoring, run attestation, and replay. Grant-decision `schemaVersion` remains `"0.1"`. Phase II does not change v0.1 Charter, schema, or conformance behavior.
+`phase2/` is an additive protocol for evaluator-manifest commitment, anchor-profile verification, run attestation, and replay evidence. Grant-decision `schemaVersion` remains `"0.1"`. Phase II does not change v0.1 Charter, schema, or conformance behavior.
 
-A Phase II graph pass establishes only the claims in `phase2/CLAIM-MATRIX.md`. A valid commitment is not execution. A signed run is an assertion. Replay agreement is not correctness. Hosted models may be `not-replayable`. Hashes are not legitimacy. AI systems cannot approve, reject, suspend, or release funding.
+A Phase II graph pass establishes only the claims in `phase2/CLAIM-MATRIX.md`. A valid commitment is not execution. A signed run is an assertion. Artifact replay agreement is not proof that the recorded implementation was re-executed and is not correctness, fairness, or legitimacy. Hosted models may be `not-replayable`. Hashes are not institutional authority. AI systems cannot approve, reject, suspend, or release funding.
 
 ```bash
 python -m pip install -r phase2/requirements.txt
@@ -71,16 +73,18 @@ python -m pytest phase2/tests
 python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-public.bundle.json
 ```
 
-Rekor tests and the public example use `rekor-v1-recorded-fixture` receipts verified under a shipped test-log key. That profile does **not** establish inclusion in the public Sigstore Rekor log. See `phase2/ADMIN-BURDEN.md`.
+Rekor tests and the public example use `rekor-v1-recorded-fixture` receipts verified under a shipped test-log key. That profile does **not** establish inclusion in the public Sigstore Rekor log. Rekor v1 remains a historical compatibility profile. See `phase2/ADMIN-BURDEN.md` and `phase2/CLAIM-MATRIX.md`.
 
-## Schema 0.2 extensions and projection (v0.3)
+Current replay generation emits replay-report v2 (`exact-match`, `diverged`, `not-replayable`) from canonical artifact recomputation. Historical replay-report v1 remains schema-frozen for compatibility, but its `bounded-match` digest-distance mechanism is rejected by the current verifier because cryptographic hash distance is not a meaningful approximation measure for the underlying computation.
+
+## Schema 0.2 extensions and projection
 
 Optional schema `0.2` extensions do not mutate v0.1 behavior:
 
 - `schema/grant-decision-record-0.2.schema.json` — optional `policyPinning` and `authorityIdentity`
 - `schema/grant-decision-public-projection-0.2.schema.json` — relaxed requirements for projected public records
-- `projection/` — deterministic confidential-to-public record projection with withheld commitments (top-level redaction paths in the v1 reference)
-- `phase2/src/anchors/rfc3161.py` — RFC 3161 TSA profile (`rfc3161`, `rfc3161-recorded-fixture`)
+- `projection/` — deterministic confidential-to-public record projection with withheld commitments; projection v1 uses top-level redaction paths and fails closed on silent top-level omission or ambiguous publish/withhold disposition
+- `phase2/src/anchors/rfc3161.py` — reserved production RFC 3161 profile plus recorded test fixture; production `rfc3161` currently fails closed until standards-conformant CMS/RFC 3161 verification is implemented
 - `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`); live mainnet anchoring is not implemented
 - `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
 - `ADOPTION.md` — adoption pathway for ENS programs
@@ -93,13 +97,13 @@ python -m pytest projection/tests
 python projection/src/cli.py --confidential examples/tier-a-simplified-grant.example.json --spec projection/examples/tier-a-projection-spec.json --out /tmp/tier-a-public.json
 ```
 
-Selective disclosure remains deferred; see `phase2/DEFERRED.md`.
+Cryptographic selective disclosure remains deferred; see `phase2/DEFERRED.md`.
 
 ## What validators prove and do not prove
 
-**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a bundle is present; deterministic projection under a declared projection spec.
+**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a bundle is present; deterministic projection from the supplied confidential input under a declared projection spec.
 
-**Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying the selected anchor profile; execution of a committed evaluator configuration; funding authority; payment or receipt of Simocracy allocations.
+**Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment or receipt of Simocracy allocations.
 
 ## AI provenance boundary
 
@@ -119,10 +123,11 @@ This project governs the integrity of the decision record. It does not determine
 
 | Item | Value |
 |---|---|
-| Repository version | `0.3.2` |
+| Latest tagged repository release | `0.3.2` |
+| Development state | unreleased changes may exist after the latest tag; exact commit SHA is authoritative |
 | Default grant-decision `schemaVersion` | `"0.1"` |
 | Optional extensions | schema `"0.2"` (additive) |
-| Phase II protocol object version | `1` |
+| Phase II object versions | core version-1 objects; replay report v1 historical, v2 current emission |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
 | Funding provenance | $219 allocated across five Simocracy decisions; never received or paid |
