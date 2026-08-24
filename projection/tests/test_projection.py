@@ -69,3 +69,14 @@ def test_publish_and_withhold_same_field_fails() -> None:
     with pytest.raises(ProjectionError) as exc:
         project_record(CONFIDENTIAL, bad_spec)
     assert exc.value.code == "PROJ012"
+
+
+def test_non_null_source_integrity_fails_instead_of_being_overwritten() -> None:
+    record = copy.deepcopy(CONFIDENTIAL)
+    record["integrity"] = {
+        "recordHashAlgorithm": "sha256",
+        "recordHash": "source-integrity-must-not-disappear",
+    }
+    with pytest.raises(ProjectionError) as exc:
+        project_record(record, SPEC)
+    assert exc.value.code == "PROJ013"
