@@ -33,7 +33,7 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `schema/grant-decision-public-projection-0.2.schema.json` | Relaxed schema for projected public records with `withheldCommitments` |
 | `CONFORMANCE.md` | Cross-field conformance rules, severity model, and rule-ID index |
 | `scripts/conformance.py` | Semantic conformance validator |
-| `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, and replay evidence |
+| `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, replay evidence, and versioned evidence bundles |
 | `projection/` | Deterministic confidential-to-public record projection |
 | `examples/` | Fictional worked examples (non-evaluative) |
 | `methodology/GRANT-DECISION-INTEGRITY.md` | Draft twelve-step review methodology |
@@ -63,7 +63,7 @@ The Marketplace example is intentionally pending. It should produce no conforman
 
 ## Phase II (evaluator provenance)
 
-`phase2/` is an additive protocol for evaluator-manifest commitment, anchor-profile verification, run attestation, and replay evidence. Grant-decision `schemaVersion` remains `"0.1"`. Phase II does not change v0.1 Charter, schema, or conformance behavior.
+`phase2/` is an additive protocol for evaluator-manifest commitment, anchor-profile verification, run attestation, replay evidence, and graph verification. Grant-decision `schemaVersion` remains `"0.1"`. Phase II does not change v0.1 Charter, schema, or conformance behavior.
 
 A Phase II graph pass establishes only the claims in `phase2/CLAIM-MATRIX.md`. A valid commitment is not execution. A signed run is an assertion. Artifact replay agreement is not proof that the recorded implementation was re-executed and is not correctness, fairness, or legitimacy. Hosted models may be `not-replayable`. Hashes are not institutional authority. AI systems cannot approve, reject, suspend, or release funding.
 
@@ -75,7 +75,9 @@ python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-pub
 
 Rekor tests and the public example use `rekor-v1-recorded-fixture` receipts verified under a shipped test-log key. That profile does **not** establish inclusion in the public Sigstore Rekor log. Rekor v1 remains a historical compatibility profile. See `phase2/ADMIN-BURDEN.md` and `phase2/CLAIM-MATRIX.md`.
 
-Current replay generation emits replay-report v2 (`exact-match`, `diverged`, `not-replayable`) from canonical artifact recomputation. Historical replay-report v1 remains schema-frozen for compatibility, but its `bounded-match` digest-distance mechanism is rejected by the current verifier because cryptographic hash distance is not a meaningful approximation measure for the underlying computation.
+Current replay generation emits replay-report v2 (`exact-match`, `diverged`, `not-replayable`) from canonical artifact recomputation. Replay-report v2 requires the exact defined layer set and complete digest evidence, and graph verification checks the reported recomputed digests. Historical replay-report v1 remains schema-frozen for compatibility, but its `bounded-match` digest-distance mechanism is rejected by the current verifier because cryptographic hash distance is not a meaningful approximation measure for the underlying computation.
+
+Historical evidence-bundle v1 also remains schema-frozen and carries replay-report v1. New evidence carrying replay-report v2 uses evidence-bundle v2. This avoids silently changing the released parent-container contract.
 
 ## Schema 0.2 extensions and projection
 
@@ -101,7 +103,7 @@ Cryptographic selective disclosure remains deferred; see `phase2/DEFERRED.md`.
 
 ## What validators prove and do not prove
 
-**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a bundle is present; deterministic projection from the supplied confidential input under a declared projection spec.
+**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec.
 
 **Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment or receipt of Simocracy allocations.
 
@@ -127,7 +129,7 @@ This project governs the integrity of the decision record. It does not determine
 | Development state | unreleased changes may exist after the latest tag; exact commit SHA is authoritative |
 | Default grant-decision `schemaVersion` | `"0.1"` |
 | Optional extensions | schema `"0.2"` (additive) |
-| Phase II object versions | core version-1 objects; replay report v1 historical, v2 current emission |
+| Phase II versions | manifest/envelope/anchor/run predicate v1; replay report v1 historical and v2 current; evidence bundle v1 historical and v2 current |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
 | Funding provenance | $219 allocated across five Simocracy decisions; never received or paid |
