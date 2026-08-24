@@ -8,9 +8,9 @@ v0.1 records without a Phase II evidence bundle still do not prove that a commit
 
 | Claim | Verifier establishes | Must not be claimed |
 |---|---|---|
-| C1 Manifest binding | Revealed manifest and salt reopen the anchored digest. | execution, operator honesty, or evaluator correctness |
+| C1 Manifest binding | Revealed manifest and salt reopen the anchored digest, and the revealed manifest's `programId`, `roundId`, and `applicationDeadline` match the anchored envelope. | execution, operator honesty, or evaluator correctness |
 | C2 Temporal precedence | Selected anchor profile places the envelope before the application deadline. | universal time; the named profile's trust root and monitoring assumptions apply |
-| C3 Round binding | programId, roundId, applicationDeadline, and domain string bind the commitment. | prevention of cross-program reuse if programId, roundId, deadline, and domain are copied deliberately |
+| C3 Round-envelope binding | The verified anchor binds the public envelope's `programId`, `roundId`, `applicationDeadline`, commitment algorithm, and commitment digest as one anchored object. | that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check |
 | C4 Run attribution | Signer asserts this run used the bound commitment, input snapshots, environment, and output digest. | that the signer actually used that configuration or that the output is sound |
 | C5 Replay evidence | Accepted replay evidence records per-layer `exact-match`, `diverged`, or `not-replayable` outcomes from canonical artifact recomputation. | re-execution of the recorded implementation unless separately demonstrated; fairness, legitimacy, hosted-model identity over time, or substantive merit |
 | C6 Human authority | No Phase II object populated decision.authorityKind. | institutional approval, committee adoption, or funding authority |
@@ -21,14 +21,14 @@ v0.1 records without a Phase II evidence bundle still do not prove that a commit
 |---|---|---|
 | `commit` | Local digest construction only. No C1–C6 until later checks succeed. | Existence, time, execution, authority |
 | `anchor` | Submission to the selected profile. C2 is not established until `verify-commitment` succeeds. | Universal time; other profiles |
-| `verify-commitment` | C2 and the public envelope fields used by C3. C1 only after a successful `reveal`. | Execution; manifest contents when withheld |
+| `verify-commitment` | C2 and C3 for the verified anchored envelope. C1 only after a successful reveal/opening. | Hidden manifest contents or hidden-manifest round-field equality when unopened; execution |
 | `reveal` | C1 and C3 when salt and manifest reopen the digest and match envelope round fields. | Execution; that disclosure policy was followed outside this object |
 | `attest-run` | Local DSSE wrapping of an assertion. C4 is not established until `verify-run` succeeds. | Honesty; actual use of the committed configuration |
 | `verify-run` | C4 as a signature over the in-toto statement and custom predicate. | Correctness of outputs; funding authority |
 | `replay` | Local artifact-recomputation outcomes. C5 is not established until `verify-graph` accepts the report. | Re-execution of the recorded implementation; fairness or hosted-model identity over time |
-| `verify-graph` | Conjunction of present, successful checks: C1 if revealed, C2, C3, C4 if attestation present, C5 if accepted replay evidence is present, always C6. | Any claim whose object is absent or failed |
+| `verify-graph` | Conjunction of present, successful checks: C1 if opened, C2, C3, C4 if attestation present, C5 if accepted replay evidence is present, always C6. | Any claim whose object is absent or failed |
 
-`verify-commitment` on a withheld bundle reports C2 and C3 only. It MUST NOT report C1.
+`verify-commitment` on a committed or withheld bundle reports C2 and C3 only. C3 at that stage is an anchored-envelope association claim; it does not establish that hidden manifest round fields match the envelope. C1 is absent until a reveal or authorized audit actually opens the commitment and checks those fields.
 
 ## Replay report versions
 
@@ -39,7 +39,7 @@ Replay reports are independently versioned within the Phase II evidence-bundle s
 
 A safe historical v1 report that contains only exact/diverged/not-replayable outcomes may still be verified. The v1 schema is not silently repurposed.
 
-The defined replay layer set must be complete and exact. Duplicate report layers and missing or unexpected attested layer identifiers fail closed as structured C5 errors.
+The defined replay layer set must be complete and exact. Duplicate report layers and missing or unexpected attested layer identifiers fail closed as structured C5 errors. Reported recomputed digests and explanatory reason fields must agree with verifier recomputation; unverified report text is not accepted as part of a successful replay result.
 
 Neither replay-report version proves that the implementation identified in a run attestation was actually re-executed. A future re-execution protocol would require its own versioned execution environment, implementation invocation, output capture, comparator semantics, and claim boundary.
 
@@ -53,12 +53,12 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | P2 | A material manifest change after commitment still opens. | Digest opening; T2. |
 | P3 | Salt reuse or salt grinding is treated as one commitment. | 32-byte CSPRNG salt; two salts are two commitments; T3. |
 | P4 | Another object type is verified as an evaluator-manifest commitment. | Versioned domain string; T4. |
-| P5 | programId, roundId, or deadline drift after commitment. | Those fields are in the manifest and copied onto the envelope; T5. |
+| P5 | programId, roundId, or deadline drift after commitment. | Those fields are in the manifest and copied onto the envelope; the anchor binds the public envelope, and opening checks manifest/envelope equality; T5. |
 | P6 | A commitment at or after the deadline is treated as pre-deadline. | Profile-verified anchor time compared strictly before deadline; T6. |
 | P7 | A corrupted inclusion proof or substituted digest still verifies. | Offline SET, inclusion, and digest match; T7. |
-| P8 | Withheld state is reported as manifest-content verification. | Reveal-status gate; T8. |
+| P8 | Unopened state is reported as manifest-content verification. | Reveal-status gate; committed/withheld states carry no manifest or salt; T8. |
 | P9 | A run attestation with the wrong commitment or output is accepted. | Predicate binding; T9. |
-| P10 | Artifact recomputation is taken as implementation re-execution, fairness, or Phase II objects become decision authority. | Versioned replay outcomes including honest `not-replayable`; invalid digest-distance bounds and malformed layer sets fail closed; T10–T12 plus replay regressions. Authority stays on the v0.1 `decision` object. |
+| P10 | Artifact recomputation is taken as implementation re-execution, fairness, or Phase II objects become decision authority. | Versioned replay outcomes including honest `not-replayable`; invalid digest-distance bounds, malformed layer sets, and inconsistent replay fields fail closed; T10–T12 plus replay regressions. Authority stays on the v0.1 `decision` object. |
 
 ## Adversarial tests
 
@@ -71,7 +71,7 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | T5 | Changing programId, roundId, or applicationDeadline invalidates opening against the envelope. |
 | T6 | Anchor time at or after the deadline fails C2. |
 | T7 | Corrupted inclusion proof or mismatched digest fails. |
-| T8 | Withheld disclosure reports only anchor-supported claims; no C1. |
+| T8 | Committed and withheld disclosure states remain unopened, carry no manifest/salt into verification, and do not establish C1. |
 | T9 | Run attestation with wrong commitment or output digest fails graph validation. |
 | T10 | Perturbing deterministic preprocessing, scoring, or aggregation is detected as `diverged`. |
 | T11 | Hosted-model `not-replayable` does not void deterministic-layer claims. |
@@ -79,7 +79,7 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | T13 | RFC 3161 fixture verification is bound to independently supplied verifier trust; receipt-selected trust substitution, malformed fixture material, and production-profile overclaim fail closed with structured verifier errors. |
 | T14 | Ethereum calldata fixture verification binds the recorded calldata digest under the fixture trust boundary; it does not claim mainnet inclusion. |
 
-Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate/missing/unexpected replay layers, and projection disclosure completeness.
+Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate/missing/unexpected replay layers, inconsistent recomputed/reason fields, evidence-bundle version separation, and projection disclosure completeness.
 
 ## Hard non-claims
 
