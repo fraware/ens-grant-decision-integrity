@@ -15,11 +15,13 @@ are implemented against a verifier-pinned trust policy.
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 from datetime import datetime, timezone
 from typing import Any
 
 from asn1crypto import algos, core, tsp
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec, padding, rsa
 from cryptography.hazmat.primitives.asymmetric.types import PrivateKeyTypes, PublicKeyTypes
@@ -137,6 +139,13 @@ def _trust_public_key(trust_pem: str | bytes) -> PublicKeyTypes:
     return _load_public_key(raw)
 
 
+def _strict_b64(value: str, *, field: str) -> bytes:
+    try:
+        return base64.b64decode(value, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise Phase2Error(f"invalid base64 in RFC 3161 fixture field {field}", code="TS3180", claim="C2") from exc
+
+
 def _verify_fixture_token(
     *,
     tst_info_der: bytes,
@@ -144,11 +153,17 @@ def _verify_fixture_token(
     envelope_digest_hex: str,
     trust_pem: str | bytes,
 ) -> datetime:
-    imprint, unix_time = _parse_tst_info(tst_info_der)
+    try:
+        imprint, unix_time = _parse_tst_info(tst_info_der)
+    except (ValueError, TypeError, KeyError) as exc:
+        raise Phase2Error("malformed RFC 3161 fixture TSTInfo", code="TS3181", claim="C2") from exc
     if imprint.hex() != envelope_digest_hex.lower():
         raise Phase2Error("timestamp token imprint does not match envelope digest", code="TS3165", claim="C2")
     tst_digest = hashlib.sha256(tst_info_der).digest()
-    _verify_digest(_trust_public_key(trust_pem), tst_digest, signature)
+    try:
+        _verify_digest(_trust_public_key(trust_pem), tst_digest, signature)
+    except InvalidSignature as exc:
+        raise Phase2Error("RFC 3161 fixture signature does not verify under the configured trust root", code="TS3179", claim="C2") from exc
     return datetime.fromtimestamp(unix_time, tz=timezone.utc)
 
 
@@ -279,8 +294,8 @@ class Rfc3161Adapter(AnchorAdapter):
         if kind != "rfc3161-fixture-v1":
             raise Phase2Error(f"unsupported RFC 3161 fixture material kind {kind!r}", code="TS3177", claim="C2")
         anchored_at = _verify_fixture_token(
-            tst_info_der=base64.b64decode(material["tstInfoDerB64"]),
-            signature=base64.b64decode(material["signatureB64"]),
+            tst_info_der=_strict_b64(material["tstInfoDerB64"], field="tstInfoDerB64"),
+            signature=_strict_b64(material["signatureB64"], field="signatureB64"),
             envelope_digest_hex=digest,
             trust_pem=self._trust_pem,
         )
