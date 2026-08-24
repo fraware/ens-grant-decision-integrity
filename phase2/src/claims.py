@@ -28,7 +28,7 @@ C4_ESTABLISHED = (
     "environment, and output digest."
 )
 C5_ESTABLISHED = (
-    "Replay report records per-layer exact-match, diverged, or not-replayable outcomes "
+    "Accepted replay evidence records per-layer exact-match, diverged, or not-replayable outcomes "
     "from canonical artifact recomputation."
 )
 C6_ESTABLISHED = (
