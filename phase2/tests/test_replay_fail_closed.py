@@ -178,6 +178,23 @@ def test_not_replayable_layer_cannot_claim_a_recomputed_digest() -> None:
     assert exc.value.code == "SCHEMA002"
 
 
+def test_tampered_reason_fails_even_when_verified_outcome_is_unchanged() -> None:
+    inputs, attested, report = _report_fixture()
+    tampered = copy.deepcopy(report)
+    scoring = next(item for item in tampered["layers"] if item["layerId"] == "scoring")
+    scoring["reason"] = "unverified explanatory text"
+    with pytest.raises(Phase2Error) as exc:
+        verify_replay_report(
+            tampered,
+            attested_layer_digests=attested,
+            layer_inputs=inputs,
+            hosted_replayable=False,
+            manifest_commitment_digest=tampered["manifestCommitmentDigest"],
+        )
+    assert exc.value.code == "RPL012"
+    assert exc.value.claim == "C5"
+
+
 def test_material_change_remains_diverged_without_approximate_hash_semantics() -> None:
     inputs = layer_inputs()
     attested = attested_digests(inputs)
