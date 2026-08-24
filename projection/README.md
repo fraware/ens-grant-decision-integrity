@@ -9,10 +9,10 @@ Projection does **not** claim Merkle or zero-knowledge selective disclosure. Wit
 ```
 projection/
   schema/projection-spec.schema.json   Versioned projection spec
-  src/project.py                     Core projection logic
-  src/cli.py                         Command-line interface
+  src/project.py                       Core projection logic
+  src/cli.py                           Command-line interface
   examples/tier-a-projection-spec.json Worked example spec
-  tests/                             Determinism and validation tests
+  tests/                               Determinism and validation tests
 ```
 
 ## Install and test
@@ -59,21 +59,25 @@ Projection specs use domain string `ens-gdi/public-projection/v1` and `specVersi
 Reference limits for v1:
 
 - `fieldAllowlist` must be non-empty;
+- every top-level source field must be either explicitly allowlisted for publication or explicitly redacted/withheld; silent omission raises `PROJ011`;
+- a top-level field cannot be both published and withheld; that ambiguity raises `PROJ012`;
 - redaction paths must be **top-level** field names (nested paths raise `PROJ008`);
 - redaction categories are `privacy`, `security`, `commercial`, `legal`, `contractual`, `other`;
 - allowlisted fields must exist on the confidential record;
-- projection does not mutate the confidential input.
+- projection does not mutate the confidential input;
+- v1 uses the public record's `integrity` field for generated projection-integrity metadata. A non-null source `integrity` value therefore raises `PROJ013` rather than being silently overwritten. A future projection version should separate source-integrity disposition from generated projection integrity explicitly.
 
-Error codes: `PROJ001` (path not found), `PROJ003` (unknown category), `PROJ004` (unsupported spec version), `PROJ005` (domain mismatch), `PROJ006` (empty allowlist), `PROJ007` (missing allowlisted field), `PROJ008` (nested redaction path).
+Error codes: `PROJ001` (path not found), `PROJ003` (unknown category), `PROJ004` (unsupported spec version), `PROJ005` (domain mismatch), `PROJ006` (empty allowlist), `PROJ007` (missing allowlisted field), `PROJ008` (nested redaction path), `PROJ009` (duplicate allowlist field), `PROJ010` (duplicate redaction path), `PROJ011` (silent top-level omission), `PROJ012` (publish/withhold overlap), `PROJ013` (non-null source integrity would be overwritten).
 
 ## Trust boundary
 
 A projection pass establishes:
 
-- deterministic mapping from confidential input to public output under the declared spec;
+- deterministic mapping from the supplied confidential input to the public output under the declared spec;
+- explicit top-level disposition: no supplied top-level field disappears silently;
 - SHA-256 commitments over withheld top-level subtrees listed in `withheldCommitments`.
 
-It does **not** establish that the confidential input is complete, that redaction policy was followed outside this object, Merkle or ZK selective disclosure, or that withheld material matches the commitments without separate reveal verification.
+It does **not** establish that the confidential input is complete, that redaction policy was substantively correct or followed outside this object, Merkle or ZK selective disclosure, or that withheld material matches the commitments without separate reveal verification.
 
 ## Related documents
 
