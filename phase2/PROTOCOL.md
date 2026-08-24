@@ -67,7 +67,9 @@ Public object, no salt, no hidden prompt or config:
 }
 ```
 
-The envelope is itself JCS-canonicalized before hashing for the hashedrekord and before anchoring. `programId`, `roundId`, and `applicationDeadline` MUST equal the corresponding manifest fields.
+The envelope is JCS-canonicalized before anchoring. A successful anchor verification therefore binds the public envelope's `programId`, `roundId`, `applicationDeadline`, commitment algorithm, and commitment digest as one anchored object (C3). That envelope-level claim does not establish that an unopened hidden manifest contains matching round fields.
+
+On reveal or authorized audit, `programId`, `roundId`, and `applicationDeadline` MUST equal the corresponding manifest fields. Opening the digest plus that equality check establishes the stronger manifest-binding statement in C1.
 
 ## 6. Reveal states
 
@@ -80,7 +82,9 @@ The envelope is itself JCS-canonicalized before hashing for the hashedrekord and
 
 There is no Merkleized selective disclosure in this version. Selective-audit means a private full manifest and salt to an authorized auditor, who publishes a signed result naming verified claims and the disclosure boundary.
 
-Withheld verification reports C2 and C3 only.
+`committed` and `withheld` are unopened states. Verification MUST reject a current bundle that presents manifest or salt as part of either unopened state. Those states may establish only anchor-supported claims such as C2 and the public-envelope C3. They MUST NOT establish C1 or claim equality between hidden manifest round fields and the envelope.
+
+For the current verifier, `revealed` and `selective-audit` require manifest and salt. The verifier opens the commitment and checks the manifest round fields against the anchored envelope before establishing C1.
 
 ## 7. Anchor profiles
 
@@ -132,7 +136,7 @@ Signing keys in this repository are test keys generated in the harness. A real p
 
 The reference implementation performs **canonical artifact recomputation**: it canonicalizes supplied layer objects and compares their SHA-256 digests with attested layer digests. It does not invoke or re-execute the implementation named in the run attestation. Therefore an artifact match MUST NOT be reported as proof of implementation re-execution.
 
-The defined layer set is exactly `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`, and `hosted-generation`. Missing or unexpected attested layer identifiers fail with `RPL010`; duplicate or non-exact report layer sets fail closed. The verifier also recomputes and checks each reported `recomputedDigest`; an outcome label alone is insufficient evidence.
+The defined layer set is exactly `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`, and `hosted-generation`. Missing or unexpected attested layer identifiers fail with `RPL010`; duplicate or non-exact report layer sets fail closed. Verification must not silently collapse duplicate identifiers through map construction.
 
 ### Replay report v1 — historical wire format
 
@@ -154,6 +158,8 @@ Digest is SHA-256 of JCS(layer input).
 
 `hosted-generation` is `not-replayable` unless a program marks the layer replayable and supplies the corresponding artifact material. Hosted-model non-replayability does not void independent deterministic-layer artifact outcomes.
 
+The verifier independently checks the reported outcome, attested digest, recomputed digest, and reason against the result it derives. Free-form report text cannot ride on a successful C5 result while disagreeing with verified evidence.
+
 If approximate reproducibility is introduced later, it MUST use a separately versioned, type-aware comparator over underlying outputs with explicit algorithm, parameters, units/semantics, and claim boundary. It MUST NOT use distance between cryptographic digest strings.
 
 Actual implementation re-execution is a distinct future protocol surface and would require a versioned execution environment, implementation invocation, input/output capture, comparator semantics, and evidence of what was actually executed.
@@ -162,9 +168,11 @@ Actual implementation re-execution is a distinct future protocol surface and wou
 
 Historical `schema/evidence-bundle.schema.json` has `bundleVersion: "1"` and remains byte-for-byte compatible with the released v1 wire format; its optional replay report is replay-report v1. New evidence carrying replay-report v2 uses `schema/evidence-bundle-v2.schema.json` with `bundleVersion: "2"`.
 
+Evidence-bundle v2 also makes the current disclosure-state contract explicit: `committed` and `withheld` are unopened and cannot carry manifest/salt; `revealed` and `selective-audit` require material sufficient for the verifier to open the commitment.
+
 `verify-graph` selects the bundle schema from `bundleVersion`, verifies the selected anchor, applies reveal policy, verifies run DSSE if present, checks the version-compatible replay report if present, links the v0.1 record, and enforces C6. Unsupported bundle versions fail closed.
 
-This parent-container versioning prevents corrected replay semantics from being silently inserted into the historical bundle-v1 contract.
+This parent-container versioning prevents corrected replay or disclosure semantics from being silently inserted into the historical bundle-v1 contract.
 
 ## 11. v0.1 linkage
 
