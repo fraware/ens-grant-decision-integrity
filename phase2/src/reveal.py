@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from claims import C1_ESTABLISHED, C1_ID, C3_ESTABLISHED, C3_ID, COMMITMENT_DOMAIN
+from claims import C1_ESTABLISHED, C1_ID, COMMITMENT_DOMAIN
 from commitment import open_commitment
 from envelope import assert_round_binding
 from support import Phase2Error, VerificationResult, validate_schema
@@ -47,8 +47,7 @@ def verify_reveal(
             )
         else:
             details["establishedNote"] = (
-                "Withheld disclosure reports only envelope-supported claims after anchor verification. "
-                "Manifest contents were not checked."
+                "Withheld disclosure leaves the commitment unopened. Manifest contents were not checked."
             )
         return VerificationResult(ok=True, established=established, details=details)
 
@@ -65,7 +64,6 @@ def verify_reveal(
     validate_schema(envelope, "commitment-envelope.schema.json")
     open_commitment(digest_hex=envelope["commitmentDigest"], manifest=manifest, salt=salt, domain=domain)
     assert_round_binding(envelope, manifest)
-    established.extend([C1_ID, C3_ID])
+    established.append(C1_ID)
     details[C1_ID] = C1_ESTABLISHED
-    details[C3_ID] = C3_ESTABLISHED
     return VerificationResult(ok=True, established=established, details=details)
