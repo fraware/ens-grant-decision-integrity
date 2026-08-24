@@ -35,16 +35,10 @@ def test_committed_state_is_unopened_and_does_not_establish_c1() -> None:
     private_pem, public_pem = generate_rekor_fixture_key()
     bundle = build_bundle(
         rekor_private_pem=private_pem,
-        reveal_status="revealed",
+        reveal_status="committed",
         include_run=False,
         include_replay=False,
     )
-    bundle["revealStatus"] = "committed"
-    bundle["manifest"] = None
-    bundle["saltHex"] = None
-    bundle["decisionRecord"]["evaluatorManifest"]["revealStatus"] = "committed"
-    bundle["decisionRecord"]["evaluatorManifest"]["revealUri"] = None
-
     result = verify_graph(bundle, fixture_private_key_pem=private_pem, trust_root_pem=public_pem)
     assert result.ok
     assert "C1" not in result.established
@@ -58,7 +52,7 @@ def test_committed_state_is_unopened_and_does_not_establish_c1() -> None:
 
 def test_committed_state_rejects_disclosed_manifest_material() -> None:
     private_pem, _ = generate_rekor_fixture_key()
-    bundle = build_bundle(
+    opened = build_bundle(
         rekor_private_pem=private_pem,
         reveal_status="revealed",
         include_run=False,
@@ -66,12 +60,34 @@ def test_committed_state_rejects_disclosed_manifest_material() -> None:
     )
     with pytest.raises(Phase2Error) as exc:
         verify_reveal(
-            envelope=bundle["envelope"],
+            envelope=opened["envelope"],
             reveal_status="committed",
-            manifest=bundle["manifest"],
-            salt=bytes.fromhex(bundle["saltHex"]),
+            manifest=opened["manifest"],
+            salt=bytes.fromhex(opened["saltHex"]),
         )
     assert exc.value.code == "REV002"
+
+
+def test_standalone_reveal_establishes_manifest_binding_only() -> None:
+    private_pem, public_pem = generate_rekor_fixture_key()
+    bundle = build_bundle(
+        rekor_private_pem=private_pem,
+        reveal_status="revealed",
+        include_run=False,
+        include_replay=False,
+    )
+    local = verify_reveal(
+        envelope=bundle["envelope"],
+        reveal_status="revealed",
+        manifest=bundle["manifest"],
+        salt=bytes.fromhex(bundle["saltHex"]),
+    )
+    assert local.established == ["C1"]
+
+    graph = verify_graph(bundle, fixture_private_key_pem=private_pem, trust_root_pem=public_pem)
+    assert "C1" in graph.established
+    assert "C2" in graph.established
+    assert "C3" in graph.established
 
 
 def test_bundle_v2_requires_private_material_for_selective_audit() -> None:
@@ -82,8 +98,6 @@ def test_bundle_v2_requires_private_material_for_selective_audit() -> None:
         include_run=False,
         include_replay=False,
     )
-    bundle["bundleVersion"] = "2"
-    bundle["replayReport"] = None
     validate_schema(bundle, "evidence-bundle-v2.schema.json")
 
     missing = copy.deepcopy(bundle)
