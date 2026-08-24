@@ -6,7 +6,7 @@ v0.1 grant-decision `schemaVersion` remains `"0.1"`. This tree does not change v
 
 ## What a pass establishes
 
-Only the claims listed in `CLAIM-MATRIX.md`. In short: a revealed manifest can reopen an anchored digest; a supported anchor profile can place that digest before a deadline under that profile's trust assumptions; a signer can attest a run; accepted replay evidence can record canonical artifact-recomputation outcomes including honest `not-replayable`. None of that proves actual implementation re-execution, correctness, fairness, legitimacy, or funding authority.
+Only the claims listed in `CLAIM-MATRIX.md`. In short: a revealed manifest can reopen the commitment digest in a supplied envelope and prove its round fields match that envelope; a separately verified supported anchor profile can place the envelope before a deadline under that profile's trust assumptions; a signer can attest a run; accepted replay evidence can record canonical artifact-recomputation outcomes including honest `not-replayable`. None of that proves actual implementation re-execution, correctness, fairness, legitimacy, or funding authority.
 
 AI systems cannot approve, reject, suspend, or release funding.
 
@@ -48,13 +48,19 @@ Fixture verification is rigorous within its stated test trust boundary but is no
 
 Production `rekor-v1` pins the Sigstore Rekor v1 production public key in `src/anchors/rekor.py` and does not trust a live `/api/v1/log/publicKey` response as the root. Rekor v1 remains a historical compatibility profile; a successor profile must use a new identifier and its own claim/trust specification.
 
+## Disclosure states
+
+`committed` and `withheld` are unopened states. Current bundle-v2 verification does not accept manifest or salt in either state and does not establish C1. `revealed` and the current authorized `selective-audit` verification path require manifest and salt so the verifier can open the commitment and check the manifest round fields against the envelope.
+
+C1 is a manifest-to-envelope opening claim; it is not an anchor claim. C2/C3 are established separately by successful anchor verification. `verify-graph` combines only the claims whose checks actually succeeded.
+
 ## Replay reports and evidence bundles
 
-The current `replay` command emits `reportVersion: "2"`. It recomputes canonical digests of supplied layer artifacts and reports `exact-match`, `diverged`, or `not-replayable`. Replay-report v2 requires exactly the defined five layers and complete attested/recomputed evidence fields; the verifier independently checks the reported recomputed digests.
+The current `replay` command emits `reportVersion: "2"`. It recomputes canonical digests of supplied layer artifacts and reports `exact-match`, `diverged`, or `not-replayable`. Replay-report v2 requires exactly the defined five layers and complete attested/recomputed evidence fields; the verifier independently checks the reported outcomes, attested digests, recomputed digests, and reason fields.
 
-The historical replay-report v1 schema is preserved unchanged. Its `bounded-match` field remains parseable for historical compatibility, but the verifier rejects bounded digest-distance evidence with `RPL008`. SHA-256 digest distance is not a meaningful approximation metric for the underlying computation. Safe historical v1 reports without bounded-match may still verify when their evidence fields are consistent with recomputation.
+The historical replay-report v1 schema is preserved unchanged. Its `bounded-match` field remains parseable for historical compatibility, but the verifier rejects bounded digest-distance evidence with `RPL008`. SHA-256 digest distance is not a meaningful approximation metric for the underlying computation. Safe historical v1 reports without bounded-match may still verify when their evidence fields are consistent with the v1 semantics.
 
-The parent bundle is versioned with the replay contract. Historical `evidence-bundle.schema.json` remains bundle v1 and carries replay-report v1. New replay-report v2 evidence is carried by `evidence-bundle-v2.schema.json` with `bundleVersion: "2"`. This prevents corrected child semantics from silently changing the released bundle-v1 wire contract.
+The parent bundle is versioned with the replay contract. Historical `evidence-bundle.schema.json` remains bundle v1 and carries replay-report v1. New replay-report v2 evidence is carried by `evidence-bundle-v2.schema.json` with `bundleVersion: "2"`. Current test builders generate bundle v2; the checked-in retrospective example remains the historical bundle-v1 compatibility artifact.
 
 Artifact recomputation is not implementation re-execution. No verifier output may imply otherwise.
 
@@ -71,6 +77,8 @@ python phase2/src/cli.py replay --attestation attestation.json --layer-inputs la
 python phase2/src/cli.py verify-graph --bundle bundle.json
 ```
 
+`verify-commitment` requires `--manifest` and `--salt` together when an opening is requested; supplying only one fails closed. Profile-specific fixture-time, TSA-certificate, and transaction-hash arguments also fail closed when supplied to an incompatible anchor profile.
+
 `anchor --profile rekor-v1` submits to the Rekor v1 endpoint. `rfc3161` is a reserved production profile and currently fails closed with `TS3178`; it must not be represented as production timestamp support. `rfc3161-recorded-fixture` requires independently supplied `--trust-root`, and fixture issuance also requires `--fixture-key` and `--tsa-cert`. Malformed fixture encodings/signatures/trust material fail as structured protocol errors. `ethereum-calldata-fixture` is an offline test profile. Live Ethereum anchoring (`ethereum`) is not implemented.
 
 Signing keys in tests and in the public example are test keys. A real program must supply its own signing identity and independently configured verifier trust.
@@ -79,7 +87,7 @@ Signing keys in tests and in the public example are test keys. A real program mu
 
 `examples/retrospective-public.bundle.json` is a fictional, non-evaluative mapping of a Marketplace-like process using only public ENS forum URIs. It does not identify, score, recommend, or reject a real applicant. The hosted-generation layer is `not-replayable`. Deterministic layers are exact artifact matches. The embedded v0.1 record remains pending and preserves warning `CHAL003`.
 
-The public example is a historical bundle-v1/replay-v1 compatibility fixture. Tests also construct an in-memory bundle-v2/replay-v2 form and require `verify-graph` to accept it under the same fixture evidence. The example's anchor is a `rekor-v1-recorded-fixture` receipt. It does not claim inclusion in production Rekor on a date before the published Marketplace deadline.
+The public example is a historical bundle-v1/replay-v1 compatibility fixture. Tests also validate current bundle-v2/replay-v2 evidence. The example's anchor is a `rekor-v1-recorded-fixture` receipt. It does not claim inclusion in production Rekor on a date before the published Marketplace deadline.
 
 ## Administrative burden
 
