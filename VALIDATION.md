@@ -111,7 +111,7 @@ A Phase II pass does not establish actual implementation re-execution, correctne
 
 ```bash
 python scripts/conformance.py examples/tier-a-simplified-grant.example.json
-python scripts/test_schema_02.py
+python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
 python projection/src/cli.py --confidential examples/tier-a-simplified-grant.example.json --spec projection/examples/tier-a-projection-spec.json --out /tmp/tier-a-public.json
 ```
@@ -143,7 +143,7 @@ python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 python scripts/test_regressions.py
 python -m pytest phase2/tests
-python scripts/test_schema_02.py
+python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
 ```
 
