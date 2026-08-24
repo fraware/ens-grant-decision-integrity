@@ -65,7 +65,7 @@ Then write `vectors/rekor-live-hashedrekord.json` with `envelopeBytesUtf8` (UTF-
 
 It does **not** establish that any entry appears in production Sigstore Rekor, universal time, or institutional approval.
 
-`rfc3161-recorded-fixture` likewise exists only for trust-binding and protocol tests under a test TSA root. Production `rfc3161` currently fails closed; it must not be substituted for the fixture or described as available production C2 evidence.
+`rfc3161-recorded-fixture` likewise exists only for trust-binding and protocol tests under a test TSA root. Production `rfc3161` currently fails closed; it must not be substituted for the fixture or described as available production C2 evidence. Malformed fixture encodings, invalid configured trust material, and signature mismatch should terminate as structured verifier failures rather than uncaught parser/cryptography exceptions.
 
 ## Proportionality notes
 
