@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence-bundle-v2.schema.json",
+  "title": "ENS GDI Phase II Evidence Bundle v2",
+  "description": "Version-2 graph of envelope, receipt, optional reveal, optional run attestation, replay-report v2, and a v0.1 decision record. Phase II objects MUST NOT populate decision.authorityKind.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bundleVersion", "envelope", "receipt", "revealStatus", "decisionRecord"],
+  "properties": {
+    "bundleVersion": { "const": "2" },
+    "envelope": { "$ref": "commitment-envelope.schema.json" },
+    "receipt": { "$ref": "anchor-receipt.schema.json" },
+    "revealStatus": {
+      "type": "string",
+      "enum": ["committed", "revealed", "selective-audit", "withheld"]
+    },
+    "manifest": {
+      "oneOf": [
+        { "$ref": "evaluator-manifest.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "saltHex": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "selectiveAuditResult": { "type": ["object", "null"] },
+    "runAttestation": { "type": ["object", "null"] },
+    "runPublicKeyPem": { "type": ["string", "null"] },
+    "replayReport": {
+      "oneOf": [
+        { "$ref": "replay-report-v2.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "layerInputs": { "type": ["object", "null"] },
+    "decisionRecord": { "type": "object" },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "revealStatus": { "const": "revealed" } },
+        "required": ["revealStatus"]
+      },
+      "then": {
+        "required": ["manifest", "saltHex"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "revealStatus": { "const": "withheld" } },
+        "required": ["revealStatus"]
+      },
+      "then": {
+        "properties": {
+          "manifest": { "type": "null" },
+          "saltHex": { "type": "null" }
+        }
+      }
+    }
+  ]
+}
