@@ -97,6 +97,37 @@ def test_duplicate_layer_ids_fail_closed() -> None:
     assert exc.value.code == "RPL004"
 
 
+def test_missing_attested_layer_fails_as_protocol_error() -> None:
+    inputs = layer_inputs()
+    attested = attested_digests(inputs)
+    attested.pop("aggregation")
+    predicate = sample_predicate("ab" * 32, inputs)
+    with pytest.raises(Phase2Error) as exc:
+        replay(
+            attested_layer_digests=attested,
+            layer_inputs=inputs,
+            hosted_replayable=False,
+            manifest_commitment_digest=predicate["manifestCommitmentDigest"],
+        )
+    assert exc.value.code == "RPL010"
+    assert exc.value.claim == "C5"
+
+
+def test_unexpected_attested_layer_fails_as_protocol_error() -> None:
+    inputs = layer_inputs()
+    attested = attested_digests(inputs)
+    attested["unexpected-layer"] = "00" * 32
+    predicate = sample_predicate("ab" * 32, inputs)
+    with pytest.raises(Phase2Error) as exc:
+        replay(
+            attested_layer_digests=attested,
+            layer_inputs=inputs,
+            hosted_replayable=False,
+            manifest_commitment_digest=predicate["manifestCommitmentDigest"],
+        )
+    assert exc.value.code == "RPL010"
+
+
 def test_material_change_remains_diverged_without_approximate_hash_semantics() -> None:
     inputs = layer_inputs()
     attested = attested_digests(inputs)
