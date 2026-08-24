@@ -20,7 +20,7 @@ def tsa_material() -> tuple[str, str, str]:
 
 
 def test_rfc3161_fixture_anchor_and_verify(tsa_material: tuple[str, str, str]) -> None:
-    private_pem, public_pem, cert_pem = tsa_material
+    private_pem, _public_pem, cert_pem = tsa_material
     manifest = sample_manifest(programId="rfc3161-fixture-test")
     envelope, _salt = commit_manifest(manifest)
     env_bytes = envelope_bytes(envelope)
