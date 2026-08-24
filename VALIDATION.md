@@ -99,7 +99,7 @@ Expected Phase II results:
 - replay generation emits `reportVersion: "2"` with only `exact-match`, `diverged`, and `not-replayable` artifact-recomputation outcomes;
 - the historical replay-report v1 schema remains unchanged and parseable, but v1 `bounded-match` / non-null bounds are rejected by the current verifier with `RPL008`;
 - duplicate replay layer ids are rejected rather than being collapsed by map construction;
-- T13 demonstrates that RFC 3161 fixture verification uses independently supplied verifier trust and that production `rfc3161` fails closed rather than establishing unsupported C2 evidence;
+- T13 demonstrates that RFC 3161 fixture verification uses independently supplied verifier trust; receipt-selected trust substitution, malformed base64 fixture material, invalid configured trust material, and signature mismatch fail as structured protocol errors; production `rfc3161` fails closed rather than establishing unsupported C2 evidence;
 - T14 exercises the Ethereum calldata fixture under its explicit fixture trust boundary;
 - the public retrospective example has no confidential applicant data, hosted generation `not-replayable`, deterministic layers exact artifact matches, and preserves `CHAL003` on its embedded pending v0.1 record;
 - `verify-graph` succeeds on `phase2/examples/retrospective-public.bundle.json` under the fixture trust root;
