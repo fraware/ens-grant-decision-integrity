@@ -107,7 +107,7 @@ The profile identifier `rfc3161` is reserved for standards-conformant production
 
 It MUST NOT establish C2 until verification covers the CMS/RFC 3161 obligations named in `CLAIM-MATRIX.md`, including signer selection, signed attributes, message imprint, TSA certificate identification, timestamping authorization/EKU and applicable policy, certificate-path validation against independently configured verifier trust, and request/response binding. Receipt-carried certificate material MUST NOT act as its own trust root.
 
-`rfc3161-recorded-fixture` is an offline test profile. It verifies the repository's simplified signed-`TSTInfo` fixture under an independently supplied test TSA trust root. It is not evidence of third-party TSA service or production RFC 3161 conformance.
+`rfc3161-recorded-fixture` is an offline test profile. It verifies the repository's simplified signed-`TSTInfo` fixture under an independently supplied test TSA trust root. Fixture issuance requires explicit private-key and certificate material; verification requires explicit trust-root material. Malformed base64/token material, invalid trust material, and signature mismatch fail as structured protocol errors. The fixture is not evidence of third-party TSA service or production RFC 3161 conformance.
 
 ### 7.4 ethereum
 
