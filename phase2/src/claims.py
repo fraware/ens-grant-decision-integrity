@@ -15,8 +15,8 @@ C5_ID = "C5"
 C6_ID = "C6"
 
 C1_ESTABLISHED = (
-    "Revealed manifest and salt reopen the anchored digest, and the revealed manifest's "
-    "programId, roundId, and applicationDeadline match the anchored envelope."
+    "Revealed manifest and salt reopen the commitment digest in the supplied envelope, "
+    "and the manifest's programId, roundId, and applicationDeadline match that envelope."
 )
 C2_ESTABLISHED = (
     "Selected anchor profile places the envelope before the application deadline."
@@ -37,7 +37,7 @@ C6_ESTABLISHED = (
     "No Phase II object populated decision.authorityKind."
 )
 
-C1_DOES_NOT = "execution, operator honesty, or evaluator correctness"
+C1_DOES_NOT = "anchor validity, temporal precedence, execution, operator honesty, or evaluator correctness"
 C2_DOES_NOT = "universal time; the named profile's trust root and monitoring assumptions apply"
 C3_DOES_NOT = (
     "that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check"
