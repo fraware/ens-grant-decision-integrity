@@ -7,9 +7,10 @@ implementation was re-executed.
 Replay report v1 is retained as a historical wire format. Its ``bounded-match``
 mechanism is not accepted by the verifier because cryptographic digest distance
 has no semantic relationship to distance between underlying computations.
-Replay report v2 removes that mechanism and requires all evidence fields to
-agree with verifier recomputation. Approximate reproducibility, if added,
-requires a separately versioned layer-specific comparator over typed outputs.
+Replay report v2 removes that mechanism. Both accepted versions require their
+reported evidence fields to agree with verifier recomputation, using each
+version's defined reason text. Approximate reproducibility, if added, requires a
+separately versioned layer-specific comparator over typed outputs.
 """
 
 from __future__ import annotations
@@ -33,6 +34,12 @@ REPORT_SCHEMAS = {
     "1": "replay-report.schema.json",
     "2": "replay-report-v2.schema.json",
 }
+V1_DIVERGENCE_REASON = "recomputed digest does not match attested digest"
+V2_DIVERGENCE_REASON = "recomputed canonical digest does not match attested digest"
+HOSTED_NOT_REPLAYABLE_REASON = (
+    "Hosted generation is not replayable: model identity and decoding "
+    "behavior are not under this protocol's control."
+)
 
 
 def layer_digest(layer_input: Any) -> str:
@@ -63,12 +70,7 @@ def replay(
     bounds: dict[str, str] | None = None,
     manifest_commitment_digest: str,
 ) -> dict[str, Any]:
-    """Recompute canonical layer digests and report exact identity or divergence.
-
-    ``bounds`` remains in the call signature only to fail closed for callers of
-    the historical v1 API. A bounded comparison over SHA-256 digest characters is
-    methodologically invalid and is not emitted by replay report v2.
-    """
+    """Recompute canonical layer digests and emit replay report v2."""
     if bounds:
         raise Phase2Error(
             "bounded replay over cryptographic digest distance is unsupported; use a versioned typed comparator over underlying outputs",
@@ -88,10 +90,7 @@ def replay(
                     "attestedDigest": attested,
                     "recomputedDigest": None,
                     "bound": None,
-                    "reason": (
-                        "Hosted generation is not replayable: model identity and decoding "
-                        "behavior are not under this protocol's control."
-                    ),
+                    "reason": HOSTED_NOT_REPLAYABLE_REASON,
                 }
             )
             continue
@@ -103,7 +102,7 @@ def replay(
             reason = None
         else:
             outcome = "diverged"
-            reason = "recomputed canonical digest does not match attested digest"
+            reason = V2_DIVERGENCE_REASON
         layers.append(
             {
                 "layerId": layer_id,
@@ -121,6 +120,14 @@ def replay(
     }
     validate_schema(report, REPORT_SCHEMAS[CURRENT_REPORT_VERSION])
     return report
+
+
+def _expected_reason(report_version: str, expected_item: dict[str, Any]) -> str | None:
+    if expected_item["outcome"] != "diverged":
+        return expected_item.get("reason")
+    if report_version == "1":
+        return V1_DIVERGENCE_REASON
+    return V2_DIVERGENCE_REASON
 
 
 def verify_replay_report(
@@ -180,20 +187,15 @@ def verify_replay_report(
             )
         if item.get("attestedDigest") != attested_layer_digests[layer_id]:
             raise Phase2Error(f"replay attested digest for {layer_id} does not match run predicate", code="RPL007", claim="C5")
-
-        # Historical v1 accepted outcome/attested-digest verification without
-        # treating recomputedDigest or reason as authoritative evidence fields.
-        # Preserve that safe legacy behavior while making v2 fully self-consistent.
-        if report_version == "2":
-            if item.get("recomputedDigest") != expected_item.get("recomputedDigest"):
-                raise Phase2Error(
-                    f"replay recomputed digest for {layer_id} is inconsistent with supplied artifact material",
-                    code="RPL011",
-                    claim="C5",
-                )
-            if item.get("reason") != expected_item.get("reason"):
-                raise Phase2Error(
-                    f"replay reason for {layer_id} is inconsistent with the verified outcome",
-                    code="RPL012",
-                    claim="C5",
-                )
+        if item.get("recomputedDigest") != expected_item.get("recomputedDigest"):
+            raise Phase2Error(
+                f"replay recomputed digest for {layer_id} is inconsistent with supplied artifact material",
+                code="RPL011",
+                claim="C5",
+            )
+        if item.get("reason") != _expected_reason(str(report_version), expected_item):
+            raise Phase2Error(
+                f"replay reason for {layer_id} is inconsistent with the verified outcome",
+                code="RPL012",
+                claim="C5",
+            )
