@@ -8,6 +8,12 @@ Projection v1 is intentionally conservative: every top-level source field must
 be either published by the allowlist or explicitly withheld by a redaction rule.
 Silently dropping source fields is rejected because omission without disposition
 would defeat reconstructable disclosure accounting.
+
+The v1 public schema uses ``integrity`` for generated projection-integrity
+metadata. To avoid silently overwriting meaningful source integrity metadata, v1
+accepts only confidential records whose source ``integrity`` value is null. A
+future projection version must give source integrity and projection integrity
+separate, explicit disposition.
 """
 
 from __future__ import annotations
@@ -76,6 +82,12 @@ def project_record(confidential: dict[str, Any], spec: dict[str, Any]) -> Projec
 
     redactions = sorted(spec.get("redactions") or [], key=lambda item: item["path"])
     source = copy.deepcopy(confidential)
+    if source.get("integrity") is not None:
+        raise ProjectionError(
+            "projection v1 reserves public integrity for projection metadata and cannot overwrite non-null source integrity",
+            code="PROJ013",
+        )
+
     withheld_meta: dict[str, dict[str, Any]] = {}
     redacted_top_level: set[str] = set()
 
