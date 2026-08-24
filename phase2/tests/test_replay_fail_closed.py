@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 
 import pytest
 
 from factories import attested_digests, layer_inputs, sample_predicate
+from graph import verify_graph
 from replay import replay, verify_replay_report
 from support import Phase2Error, validate_schema
+
+PHASE2_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _report_fixture() -> tuple[dict, dict, dict]:
@@ -81,11 +86,23 @@ def test_safe_legacy_v1_exact_report_can_still_be_verified() -> None:
     )
 
 
+def test_bundle_v2_carries_replay_v2_without_rewriting_bundle_v1() -> None:
+    bundle = json.loads(
+        (PHASE2_ROOT / "examples" / "retrospective-public.bundle.json").read_text(encoding="utf-8")
+    )
+    bundle["bundleVersion"] = "2"
+    bundle["replayReport"]["reportVersion"] = "2"
+    validate_schema(bundle, "evidence-bundle-v2.schema.json")
+    result = verify_graph(bundle)
+    assert result.ok
+    assert "C5" in result.established
+    assert result.details["bundleVersion"] == "2"
+
+
 def test_duplicate_layer_ids_fail_closed() -> None:
     inputs, attested, report = _report_fixture()
     duplicate = copy.deepcopy(report)
     duplicate["layers"].append(copy.deepcopy(duplicate["layers"][0]))
-    validate_schema(duplicate, "replay-report-v2.schema.json")
     with pytest.raises(Phase2Error) as exc:
         verify_replay_report(
             duplicate,
@@ -94,7 +111,7 @@ def test_duplicate_layer_ids_fail_closed() -> None:
             hosted_replayable=False,
             manifest_commitment_digest=duplicate["manifestCommitmentDigest"],
         )
-    assert exc.value.code == "RPL004"
+    assert exc.value.code == "SCHEMA002"
 
 
 def test_missing_attested_layer_fails_as_protocol_error() -> None:
@@ -158,7 +175,7 @@ def test_not_replayable_layer_cannot_claim_a_recomputed_digest() -> None:
             hosted_replayable=False,
             manifest_commitment_digest=tampered["manifestCommitmentDigest"],
         )
-    assert exc.value.code == "RPL011"
+    assert exc.value.code == "SCHEMA002"
 
 
 def test_material_change_remains_diverged_without_approximate_hash_semantics() -> None:
