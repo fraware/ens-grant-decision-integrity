@@ -1,6 +1,6 @@
 # Phase II deferred work
 
-Items intentionally not shipped in v0.3 because half-built cryptography would overclaim privacy or fairness guarantees.
+Items intentionally not shipped in repository v0.3 because half-built cryptography would overclaim privacy or fairness guarantees.
 
 ## Merkleized / cryptographic selective disclosure
 

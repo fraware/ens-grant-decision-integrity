@@ -20,6 +20,7 @@
     {"round":5,"mechanism":"S-process","decidedAt":"2026-08-04T20:11:44Z","decisionUri":"at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.decision/3msbt3sspbn2u","runId":"spg-01o70m0q-f34yu212cglb","budgetUsd":1000,"outsideOptionKeptUsd":76,"allocationUsd":24,"proofkeeperBallot":{"uri":"at://did:plc:qc42fmqqlsmdq7jiypiiigww/org.simocracy.ballot/3msbsojvsln2o","mvf":[[0,250],[10,120],[25,0]]},"recordNote":"Forty ballots included the proposal; ballot reasoning referenced $195 in prior cumulative funding."}
   ],
   "caveats": [
+    "confirmedCumulativeAllocationUsd records declared Simocracy allocations only; those allocations were never received or paid.",
     "No separate eligibility attestation was exposed in the inspected lookup/indexed records; slate/allocation presence is the confirmed evidence used here.",
     "S-process ballot records exposed a single MVF payload rather than separate initial and final curves.",
     "No additional in-window August 5 decision was found in the inspected records; August 7 decisions were outside the requested window."

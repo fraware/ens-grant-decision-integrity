@@ -1,6 +1,10 @@
 name: Implementation feedback
 description: Report friction from using the Charter or decision schema in a real review process
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Report friction from an actual review or accountability workflow. Do not include applicant-confidential material.
   - type: input
     id: workflow
     attributes:

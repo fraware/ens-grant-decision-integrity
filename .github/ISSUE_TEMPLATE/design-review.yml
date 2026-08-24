@@ -5,11 +5,13 @@ body:
     attributes:
       value: |
         Please identify a concrete failure mode, unnecessary requirement, missing invariant, or implementation cost.
+
+        The Charter is a draft governance proposal, not adopted ENS policy. Do not include applicant-confidential material.
   - type: input
     id: surface
     attributes:
       label: Decision surface
-      description: Which Charter section, schema field, or example does this concern?
+      description: Which Charter section, schema field, conformance rule, Phase II claim, projection path, or example does this concern?
       placeholder: e.g. CHARTER §5.3 or evaluation.materialFindings
     validations:
       required: true
