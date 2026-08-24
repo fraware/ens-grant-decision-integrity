@@ -59,7 +59,10 @@ def validate_source_artifact(value: dict[str, Any]) -> None:
         schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SourceArtifactError(f"cannot load source-artifact schema: {exc}", code="SRC006") from exc
-    jsonschema.Draft202012Validator.check_schema(schema)
+    try:
+        jsonschema.Draft202012Validator.check_schema(schema)
+    except jsonschema.SchemaError as exc:
+        raise SourceArtifactError(f"source-artifact schema is invalid: {exc.message}", code="SRC006") from exc
     validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
     errors = sorted(validator.iter_errors(value), key=lambda item: list(item.absolute_path))
     if errors:
@@ -176,6 +179,13 @@ def _load_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def _write_json(path: Path, value: dict[str, Any]) -> None:
+    try:
+        path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+    except OSError as exc:
+        raise SourceArtifactError(f"cannot write source-artifact output: {exc}", code="SRC007") from exc
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build or verify preserved source-artifact metadata")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -222,7 +232,7 @@ def main(argv: list[str] | None = None) -> int:
                 capture_notes=args.capture_notes,
                 observations=args.observations,
             )
-            Path(args.out).write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+            _write_json(Path(args.out), value)
             print(json.dumps({"ok": True, "artifact": value}, indent=2))
             return 0
 
