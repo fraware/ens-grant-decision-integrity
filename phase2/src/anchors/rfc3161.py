@@ -45,16 +45,22 @@ OID_SHA256 = "2.16.840.1.101.3.4.2.1"
 
 
 def _load_private_key(pem: str | bytes) -> PrivateKeyTypes:
-    return serialization.load_pem_private_key(
-        pem.encode("utf-8") if isinstance(pem, str) else pem,
-        password=None,
-    )
+    try:
+        return serialization.load_pem_private_key(
+            pem.encode("utf-8") if isinstance(pem, str) else pem,
+            password=None,
+        )
+    except (TypeError, ValueError) as exc:
+        raise Phase2Error("invalid RFC 3161 fixture private key PEM", code="TS3183") from exc
 
 
 def _load_public_key(pem: str | bytes) -> PublicKeyTypes:
-    return serialization.load_pem_public_key(
-        pem.encode("utf-8") if isinstance(pem, str) else pem,
-    )
+    try:
+        return serialization.load_pem_public_key(
+            pem.encode("utf-8") if isinstance(pem, str) else pem,
+        )
+    except (TypeError, ValueError) as exc:
+        raise Phase2Error("invalid RFC 3161 trust public key PEM", code="TS3182", claim="C2") from exc
 
 
 def _sign_digest(private_key: PrivateKeyTypes, digest: bytes) -> bytes:
@@ -135,7 +141,10 @@ def _trust_public_key(trust_pem: str | bytes) -> PublicKeyTypes:
     if b"BEGIN CERTIFICATE" in raw:
         from cryptography import x509 as cx509
 
-        return cx509.load_pem_x509_certificate(raw).public_key()
+        try:
+            return cx509.load_pem_x509_certificate(raw).public_key()
+        except ValueError as exc:
+            raise Phase2Error("invalid RFC 3161 trust certificate PEM", code="TS3182", claim="C2") from exc
     return _load_public_key(raw)
 
 
