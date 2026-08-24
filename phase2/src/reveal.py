@@ -34,6 +34,8 @@ def verify_reveal(
 ) -> VerificationResult:
     if reveal_status not in V01_REVEAL_MAP:
         raise Phase2Error(f"unknown reveal status {reveal_status}", code="REV001")
+    if domain != COMMITMENT_DOMAIN:
+        raise Phase2Error("unsupported commitment domain for evaluator-manifest reveal", code="REV004", claim="C1")
 
     established: list[str] = []
     details: dict[str, Any] = {"revealStatus": reveal_status}
