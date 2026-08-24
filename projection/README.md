@@ -54,7 +54,7 @@ From `projection/src/project.py`:
 
 ## Spec domain and limits
 
-Projection specs use domain string `ens-gdi/public-projection/v1` and `specVersion` `"1"`. The projection digest is SHA-256 over RFC 8785 JCS bytes of a projection envelope that binds domain, spec version, record id, public record, and withheld digests.
+Projection specs use domain string `ens-gdi/public-projection/v1` and `specVersion` `"1"`. The projection digest is SHA-256 over RFC 8785 JCS bytes of a projection envelope that binds domain, spec version, record id, public record before generated integrity metadata is attached, and withheld digests.
 
 Reference limits for v1:
 
@@ -65,7 +65,7 @@ Reference limits for v1:
 - redaction categories are `privacy`, `security`, `commercial`, `legal`, `contractual`, `other`;
 - allowlisted fields must exist on the confidential record;
 - projection does not mutate the confidential input;
-- v1 uses the public record's `integrity` field for generated projection-integrity metadata. A non-null source `integrity` value therefore raises `PROJ013` rather than being silently overwritten. A future projection version should separate source-integrity disposition from generated projection integrity explicitly.
+- v1 reserves the public record's `integrity` namespace for generated projection-integrity metadata. A confidential source record must therefore have `integrity: null` (or no meaningful integrity object); a non-null source `integrity` value raises `PROJ013` rather than being silently overwritten. A future projection version should separate source-integrity disposition from generated projection integrity explicitly.
 
 Error codes: `PROJ001` (path not found), `PROJ003` (unknown category), `PROJ004` (unsupported spec version), `PROJ005` (domain mismatch), `PROJ006` (empty allowlist), `PROJ007` (missing allowlisted field), `PROJ008` (nested redaction path), `PROJ009` (duplicate allowlist field), `PROJ010` (duplicate redaction path), `PROJ011` (silent top-level omission), `PROJ012` (publish/withhold overlap), `PROJ013` (non-null source integrity would be overwritten).
 
