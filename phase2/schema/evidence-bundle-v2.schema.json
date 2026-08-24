@@ -43,11 +43,40 @@
   "allOf": [
     {
       "if": {
+        "properties": { "revealStatus": { "const": "committed" } },
+        "required": ["revealStatus"]
+      },
+      "then": {
+        "properties": {
+          "manifest": { "type": "null" },
+          "saltHex": { "type": "null" }
+        }
+      }
+    },
+    {
+      "if": {
         "properties": { "revealStatus": { "const": "revealed" } },
         "required": ["revealStatus"]
       },
       "then": {
-        "required": ["manifest", "saltHex"]
+        "required": ["manifest", "saltHex"],
+        "properties": {
+          "manifest": { "$ref": "evaluator-manifest.schema.json" },
+          "saltHex": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "revealStatus": { "const": "selective-audit" } },
+        "required": ["revealStatus"]
+      },
+      "then": {
+        "required": ["manifest", "saltHex"],
+        "properties": {
+          "manifest": { "$ref": "evaluator-manifest.schema.json" },
+          "saltHex": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
       }
     },
     {
