@@ -39,6 +39,8 @@ Replay reports are independently versioned within the Phase II evidence-bundle s
 
 A safe historical v1 report that contains only exact/diverged/not-replayable outcomes may still be verified. The v1 schema is not silently repurposed.
 
+The defined replay layer set must be complete and exact. Duplicate report layers and missing or unexpected attested layer identifiers fail closed as structured C5 errors.
+
 Neither replay-report version proves that the implementation identified in a run attestation was actually re-executed. A future re-execution protocol would require its own versioned execution environment, implementation invocation, output capture, comparator semantics, and claim boundary.
 
 ## Protocol controls (P1–P10)
@@ -56,7 +58,7 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | P7 | A corrupted inclusion proof or substituted digest still verifies. | Offline SET, inclusion, and digest match; T7. |
 | P8 | Withheld state is reported as manifest-content verification. | Reveal-status gate; T8. |
 | P9 | A run attestation with the wrong commitment or output is accepted. | Predicate binding; T9. |
-| P10 | Artifact recomputation is taken as implementation re-execution, fairness, or Phase II objects become decision authority. | Versioned replay outcomes including honest `not-replayable`; invalid digest-distance bounds fail closed; T10–T12. Authority stays on the v0.1 `decision` object. |
+| P10 | Artifact recomputation is taken as implementation re-execution, fairness, or Phase II objects become decision authority. | Versioned replay outcomes including honest `not-replayable`; invalid digest-distance bounds and malformed layer sets fail closed; T10–T12 plus replay regressions. Authority stays on the v0.1 `decision` object. |
 
 ## Adversarial tests
 
@@ -77,7 +79,7 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | T13 | RFC 3161 fixture verification is bound to independently supplied verifier trust; receipt-selected trust substitution, malformed fixture material, and production-profile overclaim fail closed with structured verifier errors. |
 | T14 | Ethereum calldata fixture verification binds the recorded calldata digest under the fixture trust boundary; it does not claim mainnet inclusion. |
 
-Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate replay layers, and projection disclosure completeness.
+Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate/missing/unexpected replay layers, and projection disclosure completeness.
 
 ## Hard non-claims
 
