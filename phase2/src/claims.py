@@ -15,13 +15,15 @@ C5_ID = "C5"
 C6_ID = "C6"
 
 C1_ESTABLISHED = (
-    "Revealed manifest and salt reopen the anchored digest."
+    "Revealed manifest and salt reopen the anchored digest, and the revealed manifest's "
+    "programId, roundId, and applicationDeadline match the anchored envelope."
 )
 C2_ESTABLISHED = (
     "Selected anchor profile places the envelope before the application deadline."
 )
 C3_ESTABLISHED = (
-    "programId, roundId, applicationDeadline, and domain string bind the commitment."
+    "The verified anchor binds the public envelope's programId, roundId, applicationDeadline, "
+    "commitment algorithm, and commitment digest as one anchored object."
 )
 C4_ESTABLISHED = (
     "Signer asserts this run used the bound commitment, input snapshots, "
@@ -38,8 +40,7 @@ C6_ESTABLISHED = (
 C1_DOES_NOT = "execution, operator honesty, or evaluator correctness"
 C2_DOES_NOT = "universal time; the named profile's trust root and monitoring assumptions apply"
 C3_DOES_NOT = (
-    "prevention of cross-program reuse if programId, roundId, deadline, and "
-    "domain are copied deliberately"
+    "that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check"
 )
 C4_DOES_NOT = "that the signer actually used that configuration or that the output is sound"
 C5_DOES_NOT = (
