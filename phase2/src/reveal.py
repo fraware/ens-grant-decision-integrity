@@ -32,6 +32,9 @@ def verify_reveal(
     salt: bytes | None = None,
     domain: str = COMMITMENT_DOMAIN,
 ) -> VerificationResult:
+    if reveal_status not in V01_REVEAL_MAP:
+        raise Phase2Error(f"unknown reveal status {reveal_status}", code="REV001")
+
     established: list[str] = []
     details: dict[str, Any] = {"revealStatus": reveal_status}
 
