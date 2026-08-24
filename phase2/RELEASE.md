@@ -15,7 +15,7 @@ Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is
 
 1. v0.1 validation contract passes unchanged on the candidate commit.
 2. `python -m pytest phase2/tests` passes, including canonicalization, commitment, anchor, authority-separation, replay-version/layer-set, RFC 3161 fail-closed/trust-root/malformed-input, and Ethereum-fixture tests. Any optional network-dependent case must be reported as skipped, not passed.
-3. If schema 0.2 is in scope: `python scripts/test_schema_02.py` and `python -m pytest projection/tests` pass.
+3. If schema 0.2 is in scope: `python -m pytest scripts/test_schema_02.py` and `python -m pytest projection/tests` pass.
 4. `phase2/examples/retrospective-public.bundle.json` verifies with `verify-graph` and preserves `CHAL003` on its embedded pending v0.1 record.
 5. No Phase II object populates `decision.authorityKind`.
 6. Replay-report v1 schema bytes/semantics remain unchanged from the released historical format; v1 `bounded-match` is parseable but rejected as evidence by the current verifier, while new replay generation emits v2. Duplicate or incomplete attested layer sets fail as structured C5 protocol errors.
