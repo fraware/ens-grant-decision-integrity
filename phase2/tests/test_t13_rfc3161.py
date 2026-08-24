@@ -116,6 +116,27 @@ def test_malformed_fixture_base64_fails_as_protocol_error(tsa_material: tuple[st
     assert exc.value.code == "TS3180"
 
 
+def test_invalid_configured_trust_root_fails_as_protocol_error(tsa_material: tuple[str, str, str]) -> None:
+    private_pem, _, cert_pem = tsa_material
+    manifest = sample_manifest(programId="rfc3161-invalid-trust-root")
+    envelope, _salt = commit_manifest(manifest)
+    env_bytes = envelope_bytes(envelope)
+    issuer = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        fixture_private_key_pem=private_pem,
+        fixture_certificate_pem=cert_pem,
+        trust_root_pem=cert_pem,
+    )
+    receipt = issuer.anchor(env_bytes)
+    verifier = Rfc3161Adapter(
+        profile_id="rfc3161-recorded-fixture",
+        trust_root_pem="-----BEGIN PUBLIC KEY-----\ninvalid\n-----END PUBLIC KEY-----\n",
+    )
+    with pytest.raises(Phase2Error) as exc:
+        verifier.verify(env_bytes, receipt)
+    assert exc.value.code == "TS3182"
+
+
 def test_production_rfc3161_fails_closed(tsa_material: tuple[str, str, str]) -> None:
     _private_pem, _, cert_pem = tsa_material
     manifest = sample_manifest(programId="rfc3161-production-disabled")
