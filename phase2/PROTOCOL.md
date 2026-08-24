@@ -132,6 +132,8 @@ Signing keys in this repository are test keys generated in the harness. A real p
 
 The reference implementation performs **canonical artifact recomputation**: it canonicalizes supplied layer objects and compares their SHA-256 digests with attested layer digests. It does not invoke or re-execute the implementation named in the run attestation. Therefore an artifact match MUST NOT be reported as proof of implementation re-execution.
 
+The defined layer set is exactly `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`, and `hosted-generation`. Missing or unexpected attested layer identifiers fail with `RPL010`; duplicate report layer identifiers or a non-exact report layer set fail with `RPL004`. Verification must not silently collapse duplicate identifiers through map construction.
+
 ### Replay report v1 — historical wire format
 
 Historical `schema/replay-report.schema.json` has `reportVersion: "1"` and includes `bounded-match`. The schema is retained unchanged for compatibility. The current verifier refuses any v1 `bounded-match` or non-null `bound` with `RPL008`. Cryptographic hash distance is not a meaningful approximation metric for the underlying computation.
@@ -148,7 +150,7 @@ Current `schema/replay-report-v2.schema.json` has `reportVersion: "2"` and outco
 | `diverged` | Canonical digest of the supplied layer artifact does not equal the attested digest. |
 | `not-replayable` | The layer is not available for this artifact-recomputation check; a reason is required. |
 
-Deterministic layers in this implementation: `preprocessing`, `retrieval-snapshot`, `scoring`, `aggregation`. Digest is SHA-256 of JCS(layer input).
+Digest is SHA-256 of JCS(layer input).
 
 `hosted-generation` is `not-replayable` unless a program marks the layer replayable and supplies the corresponding artifact material. Hosted-model non-replayability does not void independent deterministic-layer artifact outcomes.
 
