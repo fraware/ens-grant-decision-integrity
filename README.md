@@ -92,7 +92,7 @@ Optional schema `0.2` extensions do not mutate v0.1 behavior:
 
 ```bash
 python scripts/conformance.py examples/tier-a-simplified-grant.example.json
-python scripts/test_schema_02.py
+python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
 python projection/src/cli.py --confidential examples/tier-a-simplified-grant.example.json --spec projection/examples/tier-a-projection-spec.json --out /tmp/tier-a-public.json
 ```
