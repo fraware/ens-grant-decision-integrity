@@ -93,16 +93,21 @@ python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-pub
 
 Expected Phase II results:
 
-- the canonicalization, commitment, round-binding, anchor, disclosure, run-attestation, replay, authority-separation, RFC 3161 fixture/fail-closed, and Ethereum-fixture adversarial tests pass;
+- the canonicalization, commitment, round-envelope binding, anchor, disclosure, run-attestation, replay, authority-separation, CLI fail-closed, RFC 3161 fixture/fail-closed, and Ethereum-fixture adversarial tests pass;
 - production JCS bytes match a second independent RFC 8785 implementation and RFC 8785 sample encoding;
 - T6/T7 pass on `rekor-v1-recorded-fixture` receipts when live Rekor is unavailable;
+- C1 is established only by opening manifest+salt and checking the manifest round fields against the supplied envelope; standalone reveal does not establish anchor validity or temporal precedence;
+- `committed` and `withheld` remain unopened, carry no manifest/salt in current bundle-v2 verification, and do not establish C1; anchor verification may separately establish C2/C3;
 - replay generation emits `reportVersion: "2"` with only `exact-match`, `diverged`, and `not-replayable` artifact-recomputation outcomes;
+- replay-report v2 uses exactly the defined five layers and requires outcome, attested digest, recomputed digest, and reason fields to agree with verifier recomputation;
 - the historical replay-report v1 schema remains unchanged and parseable, but v1 `bounded-match` / non-null bounds are rejected by the current verifier with `RPL008`;
 - duplicate replay layer ids and missing/unexpected attested layer ids are rejected rather than being collapsed or surfacing raw mapping errors;
+- historical evidence-bundle v1 remains the frozen parent for replay-report v1, while newly generated current test bundles use evidence-bundle v2 with replay-report v2;
+- ambiguous CLI reveal inputs (`--manifest` without `--salt`, or vice versa) and incompatible profile-specific arguments fail closed before being silently ignored;
 - T13 demonstrates that RFC 3161 fixture verification uses independently supplied verifier trust; receipt-selected trust substitution, malformed base64 fixture material, invalid configured trust material, and signature mismatch fail as structured protocol errors; production `rfc3161` fails closed rather than establishing unsupported C2 evidence;
 - T14 exercises the Ethereum calldata fixture under its explicit fixture trust boundary;
 - the public retrospective example has no confidential applicant data, hosted generation `not-replayable`, deterministic layers exact artifact matches, and preserves `CHAL003` on its embedded pending v0.1 record;
-- `verify-graph` succeeds on `phase2/examples/retrospective-public.bundle.json` under the fixture trust root;
+- `verify-graph` succeeds on `phase2/examples/retrospective-public.bundle.json` as historical bundle-v1/replay-v1 compatibility evidence under the fixture trust root;
 - no Phase II object populates `decision.authorityKind`.
 
 A Phase II pass does not establish actual implementation re-execution, correctness, fairness, legitimacy, or funding authority.
