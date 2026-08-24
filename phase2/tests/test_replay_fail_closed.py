@@ -179,15 +179,26 @@ def test_not_replayable_layer_cannot_claim_a_recomputed_digest() -> None:
 
 
 def test_tampered_reason_fails_even_when_verified_outcome_is_unchanged() -> None:
-    inputs, attested, report = _report_fixture()
+    inputs = layer_inputs()
+    attested = attested_digests(inputs)
+    predicate = sample_predicate("ab" * 32, inputs)
+    perturbed = copy.deepcopy(inputs)
+    perturbed["scoring"]["materialChange"] = True
+    report = replay(
+        attested_layer_digests=attested,
+        layer_inputs=perturbed,
+        hosted_replayable=False,
+        manifest_commitment_digest=predicate["manifestCommitmentDigest"],
+    )
     tampered = copy.deepcopy(report)
     scoring = next(item for item in tampered["layers"] if item["layerId"] == "scoring")
-    scoring["reason"] = "unverified explanatory text"
+    assert scoring["outcome"] == "diverged"
+    scoring["reason"] = "different schema-valid explanation"
     with pytest.raises(Phase2Error) as exc:
         verify_replay_report(
             tampered,
             attested_layer_digests=attested,
-            layer_inputs=inputs,
+            layer_inputs=perturbed,
             hosted_replayable=False,
             manifest_commitment_digest=tampered["manifestCommitmentDigest"],
         )
