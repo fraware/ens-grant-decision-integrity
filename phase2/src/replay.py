@@ -1,4 +1,15 @@
-"""Layer-specific replay. Agreement is not correctness or fairness."""
+"""Layer-specific replay and artifact verification.
+
+Exact digest equality establishes byte/object identity under the declared JCS
+serialization. Agreement is not correctness or fairness.
+
+The historical ``bounded-match`` surface is intentionally fail-closed here.
+Cryptographic digest distance has no semantic relationship to distance between
+underlying computations because SHA-256 is avalanche-sensitive. Approximate
+reproducibility requires a versioned, layer-specific comparator over the
+underlying typed outputs; that is a separate protocol surface and MUST NOT be
+implemented by comparing hash strings.
+"""
 
 from __future__ import annotations
 
@@ -15,7 +26,7 @@ DETERMINISTIC_LAYERS = (
 )
 HOSTED_LAYER = "hosted-generation"
 ALL_LAYERS = DETERMINISTIC_LAYERS + (HOSTED_LAYER,)
-OUTCOMES = ("exact-match", "bounded-match", "diverged", "not-replayable")
+OUTCOMES = ("exact-match", "diverged", "not-replayable")
 
 
 def layer_digest(layer_input: Any) -> str:
@@ -30,7 +41,19 @@ def replay(
     bounds: dict[str, str] | None = None,
     manifest_commitment_digest: str,
 ) -> dict[str, Any]:
-    bounds = bounds or {}
+    """Recompute canonical layer digests and report exact identity or divergence.
+
+    ``bounds`` remains in the call signature only to fail closed for callers of
+    the historical API. A bounded comparison over SHA-256 digest characters is
+    methodologically invalid and is no longer accepted.
+    """
+    if bounds:
+        raise Phase2Error(
+            "bounded replay over cryptographic digest distance is unsupported; use a versioned typed comparator over underlying outputs",
+            code="RPL008",
+            claim="C5",
+        )
+
     layers: list[dict[str, Any]] = []
     for layer_id in ALL_LAYERS:
         attested = attested_layer_digests[layer_id]
@@ -55,19 +78,16 @@ def replay(
         if recomputed == attested:
             outcome = "exact-match"
             reason = None
-        elif layer_id in bounds:
-            outcome = "bounded-match" if _within_bound(attested, recomputed, bounds[layer_id]) else "diverged"
-            reason = None if outcome == "bounded-match" else "recomputed digest outside declared bound"
         else:
             outcome = "diverged"
-            reason = "recomputed digest does not match attested digest"
+            reason = "recomputed canonical digest does not match attested digest"
         layers.append(
             {
                 "layerId": layer_id,
                 "outcome": outcome,
                 "attestedDigest": attested,
                 "recomputedDigest": recomputed,
-                "bound": bounds.get(layer_id),
+                "bound": None,
                 "reason": reason,
             }
         )
@@ -78,18 +98,6 @@ def replay(
     }
     validate_schema(report, "replay-report.schema.json")
     return report
-
-
-def _within_bound(attested: str, recomputed: str, bound: str) -> bool:
-    """Hamming distance over hex encoded digests compared to an integer bound string."""
-    if len(attested) != len(recomputed):
-        return False
-    distance = sum(a != b for a, b in zip(attested, recomputed))
-    try:
-        limit = int(bound)
-    except ValueError as exc:
-        raise Phase2Error(f"invalid replay bound {bound}", code="RPL002") from exc
-    return distance <= limit
 
 
 def verify_replay_report(
@@ -106,15 +114,16 @@ def verify_replay_report(
     by_id = {item["layerId"]: item for item in report["layers"]}
     if set(by_id) != set(ALL_LAYERS):
         raise Phase2Error("replay report must include every defined layer", code="RPL004", claim="C5")
+    if any(item.get("outcome") == "bounded-match" or item.get("bound") not in {None, ""} for item in report["layers"]):
+        raise Phase2Error(
+            "bounded replay over cryptographic digest distance is not accepted",
+            code="RPL008",
+            claim="C5",
+        )
     expected = replay(
         attested_layer_digests=attested_layer_digests,
         layer_inputs=layer_inputs or {},
         hosted_replayable=hosted_replayable,
-        bounds={
-            item["layerId"]: item["bound"]
-            for item in report["layers"]
-            if item.get("outcome") == "bounded-match" and item.get("bound")
-        },
         manifest_commitment_digest=manifest_commitment_digest,
     )
     expected_by_id = {item["layerId"]: item for item in expected["layers"]}
