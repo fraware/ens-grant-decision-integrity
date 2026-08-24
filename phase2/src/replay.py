@@ -185,3 +185,9 @@ def verify_replay_report(
                 code="RPL011",
                 claim="C5",
             )
+        if item.get("reason") != expected_item.get("reason"):
+            raise Phase2Error(
+                f"replay reason for {layer_id} is inconsistent with the verified outcome",
+                code="RPL012",
+                claim="C5",
+            )
