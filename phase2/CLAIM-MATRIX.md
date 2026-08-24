@@ -8,7 +8,7 @@ v0.1 records without a Phase II evidence bundle still do not prove that a commit
 
 | Claim | Verifier establishes | Must not be claimed |
 |---|---|---|
-| C1 Manifest binding | Revealed manifest and salt reopen the anchored digest, and the revealed manifest's `programId`, `roundId`, and `applicationDeadline` match the anchored envelope. | execution, operator honesty, or evaluator correctness |
+| C1 Manifest binding | Revealed manifest and salt reopen the commitment digest in the supplied envelope, and the manifest's `programId`, `roundId`, and `applicationDeadline` match that envelope. | anchor validity, temporal precedence, execution, operator honesty, or evaluator correctness |
 | C2 Temporal precedence | Selected anchor profile places the envelope before the application deadline. | universal time; the named profile's trust root and monitoring assumptions apply |
 | C3 Round-envelope binding | The verified anchor binds the public envelope's `programId`, `roundId`, `applicationDeadline`, commitment algorithm, and commitment digest as one anchored object. | that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check |
 | C4 Run attribution | Signer asserts this run used the bound commitment, input snapshots, environment, and output digest. | that the signer actually used that configuration or that the output is sound |
@@ -21,14 +21,16 @@ v0.1 records without a Phase II evidence bundle still do not prove that a commit
 |---|---|---|
 | `commit` | Local digest construction only. No C1–C6 until later checks succeed. | Existence, time, execution, authority |
 | `anchor` | Submission to the selected profile. C2 is not established until `verify-commitment` succeeds. | Universal time; other profiles |
-| `verify-commitment` | C2 and C3 for the verified anchored envelope. C1 only after a successful reveal/opening. | Hidden manifest contents or hidden-manifest round-field equality when unopened; execution |
-| `reveal` | C1 and C3 when salt and manifest reopen the digest and match envelope round fields. | Execution; that disclosure policy was followed outside this object |
+| `verify-commitment` | C2 and C3 for the verified anchored envelope. C1 only when manifest and salt are also supplied and successfully opened. | Hidden manifest contents or hidden-manifest round-field equality when unopened; execution |
+| `reveal` | C1 when salt and manifest reopen the envelope commitment and match its round fields. | Anchor validity or time; execution; that disclosure policy was followed outside this object |
 | `attest-run` | Local DSSE wrapping of an assertion. C4 is not established until `verify-run` succeeds. | Honesty; actual use of the committed configuration |
 | `verify-run` | C4 as a signature over the in-toto statement and custom predicate. | Correctness of outputs; funding authority |
 | `replay` | Local artifact-recomputation outcomes. C5 is not established until `verify-graph` accepts the report. | Re-execution of the recorded implementation; fairness or hosted-model identity over time |
 | `verify-graph` | Conjunction of present, successful checks: C1 if opened, C2, C3, C4 if attestation present, C5 if accepted replay evidence is present, always C6. | Any claim whose object is absent or failed |
 
 `verify-commitment` on a committed or withheld bundle reports C2 and C3 only. C3 at that stage is an anchored-envelope association claim; it does not establish that hidden manifest round fields match the envelope. C1 is absent until a reveal or authorized audit actually opens the commitment and checks those fields.
+
+The standalone `reveal` operation does not verify an anchor and therefore does not establish C2 or C3. When the same opening succeeds inside `verify-graph`, C1 is combined with separately verified C2/C3 evidence.
 
 ## Replay report versions
 
@@ -39,7 +41,7 @@ Replay reports are independently versioned within the Phase II evidence-bundle s
 
 A safe historical v1 report that contains only exact/diverged/not-replayable outcomes may still be verified. The v1 schema is not silently repurposed.
 
-The defined replay layer set must be complete and exact. Duplicate report layers and missing or unexpected attested layer identifiers fail closed as structured C5 errors. Reported recomputed digests and explanatory reason fields must agree with verifier recomputation; unverified report text is not accepted as part of a successful replay result.
+The defined replay layer set must be complete and exact. Duplicate report layers and missing or unexpected attested layer identifiers fail closed as structured C5 errors. Reported recomputed digests and explanatory reason fields must agree with verifier recomputation under the applicable report-version semantics; unverified report text is not accepted as part of a successful replay result.
 
 Neither replay-report version proves that the implementation identified in a run attestation was actually re-executed. A future re-execution protocol would require its own versioned execution environment, implementation invocation, output capture, comparator semantics, and claim boundary.
 
@@ -79,7 +81,7 @@ These rows are Phase II controls. They do not rewrite v0.1 threat rows T1–T11 
 | T13 | RFC 3161 fixture verification is bound to independently supplied verifier trust; receipt-selected trust substitution, malformed fixture material, and production-profile overclaim fail closed with structured verifier errors. |
 | T14 | Ethereum calldata fixture verification binds the recorded calldata digest under the fixture trust boundary; it does not claim mainnet inclusion. |
 
-Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate/missing/unexpected replay layers, inconsistent recomputed/reason fields, evidence-bundle version separation, and projection disclosure completeness.
+Additional regression tests cover replay-version compatibility, rejection of v1 `bounded-match`, duplicate/missing/unexpected replay layers, inconsistent recomputed/reason fields, evidence-bundle version separation, fail-closed CLI arguments, and projection disclosure completeness.
 
 ## Hard non-claims
 
