@@ -21,6 +21,7 @@ jobs:
       - run: python scripts/test_conformance.py
       - run: python scripts/test_regressions.py
       - run: python scripts/test_source_artifact.py
+      - run: python scripts/test_policy_pins.py
 
   phase2:
     runs-on: ubuntu-latest
