@@ -14,14 +14,16 @@ Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is
 ## Pre-tag checklist
 
 1. v0.1 validation contract passes unchanged on the candidate commit.
-2. `python -m pytest phase2/tests` passes, including canonicalization, commitment, anchor, authority-separation, replay-version/layer-set/digest consistency, bundle-version compatibility, RFC 3161 fail-closed/trust-root/malformed-input, and Ethereum-fixture tests. Any optional network-dependent case must be reported as skipped, not passed.
+2. `python -m pytest phase2/tests` passes, including canonicalization, commitment, anchor, authority-separation, disclosure-state, CLI fail-closed, replay-version/layer-set/evidence consistency, bundle-version compatibility, RFC 3161 fail-closed/trust-root/malformed-input, and Ethereum-fixture tests. Any optional network-dependent case must be reported as skipped, not passed.
 3. If schema 0.2 is in scope: `python -m pytest scripts/test_schema_02.py` and `python -m pytest projection/tests` pass.
-4. `phase2/examples/retrospective-public.bundle.json` verifies as the historical bundle-v1/replay-v1 compatibility example and preserves `CHAL003` on its embedded pending v0.1 record; tests also verify a bundle-v2/replay-v2 transformation under the same fixture evidence.
+4. `phase2/examples/retrospective-public.bundle.json` verifies as the historical bundle-v1/replay-v1 compatibility example and preserves `CHAL003` on its embedded pending v0.1 record; current test builders generate bundle-v2/replay-v2 evidence.
 5. No Phase II object populates `decision.authorityKind`.
 6. Replay-report v1 and evidence-bundle v1 schema bytes/semantics remain unchanged from their released historical formats. v1 `bounded-match` is parseable but rejected as evidence by the current verifier. New replay generation emits v2; new bundles carrying replay v2 use bundle v2. Duplicate, incomplete, or inconsistent replay evidence fails closed.
-7. Production `rfc3161` issuance and verification remain fail-closed unless a separately reviewed standards-conformant implementation and adversarial/interoperability tests have landed. Fixture results must not be described as third-party TSA evidence. Invalid receipt encodings, signature mismatch, and invalid configured trust material must fail as structured verifier errors rather than uncaught parser/cryptography exceptions.
-8. Release notes state Rekor trust boundaries: fixture receipts do not claim public Sigstore inclusion unless a live receipt is recorded and documented.
-9. Projection tests demonstrate that top-level source fields cannot disappear silently, publish/withhold overlap fails, and non-null source integrity is not silently overwritten.
+7. Evidence-bundle v2 enforces current disclosure semantics: `committed` and `withheld` are unopened and do not carry manifest/salt; `revealed` and `selective-audit` provide material sufficient for opening. No unopened state establishes C1 or hidden-manifest round equality.
+8. Production `rfc3161` issuance and verification remain fail-closed unless a separately reviewed standards-conformant implementation and adversarial/interoperability tests have landed. Fixture results must not be described as third-party TSA evidence. Invalid receipt encodings, signature mismatch, and invalid configured trust material must fail as structured verifier errors rather than uncaught parser/cryptography exceptions.
+9. Release notes state Rekor trust boundaries: fixture receipts do not claim public Sigstore inclusion unless a live receipt is recorded and documented.
+10. Projection tests demonstrate that top-level source fields cannot disappear silently, publish/withhold overlap fails, and non-null source integrity is not silently overwritten.
+11. Required hosted checks are green on the exact candidate commit. A successful run on an earlier head is not evidence for a later head.
 
 ## Tag and notes
 
