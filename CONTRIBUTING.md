@@ -35,13 +35,13 @@ python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 python scripts/test_regressions.py
 python -m pytest phase2/tests
-python scripts/test_schema_02.py
+python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
 ```
 
 Expected Marketplace outcome: no conformance errors; warning set exactly `{CHAL003}`.
 
-A contribution that intentionally changes a conformance rule should update the corresponding adversarial or regression test and explain the new guarantee or trade-off. See `VALIDATION.md` and `CONFORMANCE.md`.
+A contribution that intentionally changes a conformance rule should update the corresponding adversarial or regression test and explain the new guarantee or trade-off. A result from an earlier branch head is not validation evidence for a later head; release-facing claims must identify the exact commit that was tested. See `VALIDATION.md` and `CONFORMANCE.md`.
 
 ## Sensitive reports
 
