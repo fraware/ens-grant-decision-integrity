@@ -1,0 +1,81 @@
+{
+  "checkpointVersion": "1",
+  "checkpointDate": "2026-08-25",
+  "purpose": "Dated pre-allocation repository and evidence-state checkpoint before the planned 2026-08-28 funding event. This file records only states already evidenced at this checkpoint and does not predict the Friday outcome.",
+  "repository": {
+    "repository": "fraware/ens-grant-decision-integrity",
+    "baselineCommit": "98f1723c11f21b1dc19335db19c1c0bc14715091",
+    "latestTaggedRelease": "v0.3.2",
+    "releaseBoundary": "The tagged release remains v0.3.2. baselineCommit contains unreleased development changes and must not be described as behavior of v0.3.2.",
+    "baselineValidation": {
+      "workflow": "validate",
+      "runId": 32833180477,
+      "runNumber": 442,
+      "event": "push",
+      "headSha": "98f1723c11f21b1dc19335db19c1c0bc14715091",
+      "status": "completed",
+      "conclusion": "success",
+      "completedAt": "2026-08-25T09:40:29Z",
+      "requiredJobs": {
+        "conformance": "success",
+        "phase2": "success",
+        "schema-02": "success"
+      }
+    }
+  },
+  "empiricalCorpus": {
+    "studyPlanVersion": "1",
+    "status": "in-progress",
+    "readyForFinalReview": false,
+    "observedCaseCount": 3,
+    "targetMinimumCases": 8,
+    "targetMaximumCases": 12,
+    "requiredStrataCoveredCount": 7,
+    "requiredStrataTotalCount": 8,
+    "requiredStrataUnresolved": [
+      "hard-eligibility"
+    ],
+    "conditionalStrataCovered": [
+      "public-private-separation"
+    ],
+    "conditionalStrataUncovered": [
+      "ai-assisted-when-evidenced"
+    ],
+    "doubleAnnotatedCaseCount": 0,
+    "doubleAnnotationObservedFraction": 0.0,
+    "doubleAnnotationMinimumFraction": 0.25,
+    "machineObservedBlockers": [
+      "case-count: 3/8 minimum",
+      "required-strata-unresolved: hard-eligibility (coverage or evidence-availability disposition required)",
+      "double-annotation: 0/3 cases (0.000000) below minimum fraction 0.250000"
+    ],
+    "source": "scripts/study_status.py output in validation run 442 on baselineCommit"
+  },
+  "simocracyEvidence": {
+    "statusSnapshot": "provenance/simocracy-status-2026-08-24.json",
+    "observedOn": "2026-08-24",
+    "aggregateAllocationUsd": 219,
+    "ratifiedRoundCount": 3,
+    "provisionalRoundCount": 2,
+    "financialEvidence": {
+      "paymentAuthorization": null,
+      "transfer": null,
+      "receipt": null,
+      "settlement": null
+    },
+    "freshnessBoundary": "This checkpoint carries forward the separately dated 2026-08-24 funding-status snapshot. It does not claim that the Simocracy surface was independently re-observed on 2026-08-25."
+  },
+  "fridayCaptureRule": {
+    "plannedCheckpointDate": "2026-08-28",
+    "procedure": "provenance/ALLOCATION-CAPTURE.md",
+    "rule": "After an authoritative Friday artifact exists, add a new dated snapshot. Preserve the authoritative platform decision vocabulary and record payment authorization, transfer, receipt, or settlement only when separately evidenced. Do not rewrite this checkpoint or the 2026-08-24 snapshot to imply continuity or a stronger financial state."
+  },
+  "nonClaims": [
+    "This checkpoint does not predict or represent the outcome of the planned 2026-08-28 funding event.",
+    "A successful repository validation run does not establish substantive correctness, fairness, institutional legitimacy, or external adoption.",
+    "The empirical corpus is not complete and is not represented as statistically representative of ENS decisions.",
+    "The unresolved hard-eligibility stratum does not establish that supporting evidence does not exist; it means no evidence-backed checked-in case covers that stratum at this checkpoint.",
+    "The recorded $219 allocation state is not represented as payment, transfer, receipt, or settlement.",
+    "Null financial-evidence fields mean the referenced dated snapshot contains no such evidence; they do not prove the event did not occur elsewhere."
+  ]
+}

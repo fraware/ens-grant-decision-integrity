@@ -37,8 +37,10 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `scripts/source_artifact.py` | Build/verify SHA-256 metadata over exact preserved source bytes |
 | `scripts/verify_policy_pins.py` | Verify schema 0.2 policy pins against byte-verified source artifacts |
 | `SOURCE-ARTIFACTS.md` | Source-capture assurance chain, CLI, and non-claims |
-| `corpus/` | Predeclared retrospective study plan, case schema/template, and empirical protocol |
+| `corpus/` | Predeclared retrospective study plan, case schema/template, empirical cases, and protocol |
 | `scripts/corpus_metrics.py` | Validate corpus cases and compute descriptive reconstructability/agreement metrics |
+| `scripts/study_status.py` | Revalidate empirical cases and report progress against predeclared case-count, stratum, and double-annotation gates |
+| `corpus/STUDY-STATUS.md` | Semantics and claim boundaries for machine-readable study-progress reporting |
 | `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, replay evidence, and versioned evidence bundles |
 | `projection/` | Deterministic confidential-to-public record projection |
 | `examples/` | Fictional worked examples (non-evaluative) |
@@ -123,16 +125,20 @@ The source verifier re-hashes the supplied raw bytes and checks byte length and 
 
 `corpus/` defines the empirical test before real cases are counted. `study-plan.json` predeclares the heterogeneous sampling strata, primary metrics, double-annotation rule, anti-circularity rule, merit boundary, and privacy boundary. `schema/case.schema.json` defines the machine-readable case contract. `case-template.json` is explicitly marked `template: true` and is not empirical evidence.
 
+The unreleased development state currently contains three checked-in public-only empirical reconstructions: the SPP3 Namespace award, the SPP3 EthID withdrawal, and the SPP2 Agora budget-constrained no-award case. The machine study-status report classifies the corpus as `in-progress`, not complete: 3 cases versus the predeclared 8–12 target, 7 of 8 required strata represented, `hard-eligibility` unresolved, and 0 of 3 cases double annotated against a minimum fraction of 0.25. This status is descriptive study-progress evidence only.
+
 ```bash
-python -m pytest scripts/test_corpus.py
+python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py scripts/test_study_status.py
 python scripts/corpus_metrics.py corpus/case-template.json
+python scripts/validate_corpus_cases.py
+python scripts/study_status.py
 ```
 
 For a real case, the corpus CLI requires a traceable source record, re-hashes the exact initial record file identified by the case, and—when review changes the record—re-hashes the reconciled record file as well. Paths are case-relative and cannot escape the case directory. Redistributable source entries must carry source-artifact metadata and preserved bytes; the CLI re-runs source-artifact verification and requires the case artifact ID and source URI to match the verified metadata. Reference-only and authorized-audit-only entries remain explicitly outside the public byte-verification claim.
 
 The metrics are descriptive: required-field reconstructability, direct-source and unknown rates, interpretive share, annotation time, finding dispositions, and—when exactly two independent annotations cover the same material field set—raw classification agreement and Cohen's kappa. Neither high validator success nor high annotator agreement establishes substantive correctness, fairness, source truth, or institutional legitimacy.
 
-The corpus must preserve exact initial record bytes/hash and initial findings. If review changes a record, reconciled bytes/hash, the change rationale, reconciliation state, and reconciliation notes are retained. `unknown` is an admissible result; undocumented facts must not be inferred merely to make a case validate. See `corpus/README.md`.
+The corpus must preserve exact initial record bytes/hash and initial findings. If review changes a record, reconciled bytes/hash, the change rationale, reconciliation state, and reconciliation notes are retained. `unknown` is an admissible result; undocumented facts must not be inferred merely to make a case validate. See `corpus/README.md` and `corpus/STUDY-STATUS.md`.
 
 ## What validators prove and do not prove
 
@@ -165,7 +171,7 @@ This project governs the integrity of the decision record. It does not determine
 | Phase II versions | manifest/envelope/anchor/run predicate v1; replay report v1 historical and v2 current; evidence bundle v1 historical and v2 current |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
-| Retrospective corpus | Protocol/schema/metrics infrastructure only; no template is counted as an empirical case |
+| Retrospective corpus | In progress: 3 empirical cases; predeclared target 8–12; 7/8 required strata represented; `hard-eligibility` unresolved; 0/3 double annotated |
 | Simocracy decision-status snapshot | $219 across five relevant rounds; 3 ratified and 2 provisional as observed 2026-08-24 |
 | Financial evidence | no payment, transfer, receipt, or settlement evidence recorded in the dated 2026-08-24 snapshot |
 | Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
