@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp3-2026-ethid-withdrawal-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 3 (SPP3)",
+    "roundId": "SPP3-2026",
+    "authority": "ENS DAO following an SPP3 committee cohort recommendation",
+    "programUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "ethid-spp3-2026",
+    "applicantName": "EthID",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP3-2026",
+    "version": "public-authorization-plus-published-rubric",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+    "sources": [
+      "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "eligibility": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "evaluationCriteria": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "conflictRules": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "decisionProcedure": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086"
+    },
+    "changeDuringReview": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "PUBLIC-HARD-SCREEN-AGGREGATE",
+        "description": "The public cohort record states that one application failed the eligibility gate and the remaining 25 were scored; EthID was among the initially selected providers. This record therefore represents only the aggregate fact that EthID passed the published pre-score hard screen, without asserting gate-by-gate results or a check timestamp.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-COHORT"
+        ]
+      }
+    ],
+    "rationale": "Eligibility is derived from the published process: only qualifying applications were scored, and EthID was initially selected. The exact eligibility-check time was not identified in the reviewed public sources."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "spp3-committee",
+      "displayName": "SPP3 Committee (collective published selection)",
+      "kind": "committee",
+      "role": "collective evaluator and cohort recommender",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-AUTH",
+      "kind": "forum",
+      "description": "SPP3 program authorization and committee model, including authority separation, quorum, voting, conflict rules, evaluation floor, and provider obligations.",
+      "uri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-RUBRIC",
+      "kind": "forum",
+      "description": "Published SPP3 submission timeline, hard eligibility screen, and weighted evaluation rubric.",
+      "uri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-COHORT",
+      "kind": "forum",
+      "description": "Published SPP3 cohort recommendation and discussion recording EthID as initially selected, EthID's public decline, the $1.2 million removal from the recommended cohort, and the committee's decision to proceed with the remaining four providers.",
+      "uri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-MARKETPLACE-RFP",
+      "kind": "forum",
+      "description": "Subsequent Marketplace RFP proposal stating that the provider selected for the marketplace and revenue vertical declined its award and that the standalone cohort proposal ratifies the four remaining providers.",
+      "uri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-FINAL-VOTE",
+      "kind": "onchain",
+      "description": "Public proposal mirror for the final four-provider SPP3 cohort. Used only as a reconstruction source showing the executed cohort excludes EthID; not represented as an independent cryptographic proof.",
+      "uri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "C1",
+        "name": "Prior Delivery History",
+        "weight": 0.25,
+        "score": null,
+        "scoreScale": "1-5; EthID aggregate score not public"
+      },
+      {
+        "criterionId": "C2",
+        "name": "Scope Clarity",
+        "weight": 0.15,
+        "score": null,
+        "scoreScale": "1-5; EthID aggregate score not public"
+      },
+      {
+        "criterionId": "C3",
+        "name": "Milestone Structure",
+        "weight": 0.15,
+        "score": null,
+        "scoreScale": "1-5; EthID aggregate score not public"
+      },
+      {
+        "criterionId": "C4",
+        "name": "Adoption, Revenue, and Ecosystem Utility",
+        "weight": 0.4,
+        "score": null,
+        "scoreScale": "1-5; EthID aggregate score not public"
+      },
+      {
+        "criterionId": "D1",
+        "name": "Discretion: Team and Budget Fit",
+        "weight": 0.05,
+        "score": null,
+        "scoreScale": "1-5; EthID score not public"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-INITIAL-SELECTION",
+        "statement": "The published cohort record states that EthID was one of five initially selected providers before declining the offer.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-RECOMMENDED-ALLOCATION",
+        "statement": "The committee's July 7 update states that EthID's withdrawal removed $1,200,000 from the recommended cohort.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "high"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "1-5 weighted rubric; EthID aggregate score is not public in reviewed sources"
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "withdrawn",
+    "authority": "SPP3 committee recommendation followed by applicant withdrawal before final ENS DAO cohort ratification",
+    "authorityKind": "committee",
+    "decidedAt": null,
+    "awardedAmount": null,
+    "currency": "USD",
+    "rationale": "The committee initially selected EthID and the later committee update states that the withdrawal removed $1,200,000 from the recommended cohort. EthID publicly declined SPP3 funding before the final executable four-provider cohort. No final ENS DAO award to EthID is represented.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": "Governing policy requires 3 of 4 Member seats active and participating for cohort voting/ranking; no EthID-specific vote tally is published in the reviewed sources.",
+    "decisionRule": "Simple majority of participating Members; Chair votes only as tiebreaker.",
+    "voteRecordUri": null
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "The reviewed public governing and cohort artifacts did not identify a dedicated post-selection factual or procedural correction path for this withdrawn application. This is a public-evidence statement, not a claim that no private or internal process existed.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T07:40:12Z",
+    "updatedAt": "2026-08-25T07:40:12Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Public-only retrospective reconstruction; this is not a contemporaneous institutional decision record.",
+    "The literal status 'withdrawn' is intentionally outside the v0.1 closed decision.status vocabulary. Mapping the observed applicant withdrawal to approved, rejected, deferred, suspended, or pending would materially misstate the public record.",
+    "decision.authorityKind='committee' identifies the last documented institutional selection surface before the applicant withdrawal. It does not make the applicant's withdrawal an institutional committee act and does not imply a final ENS DAO award decision for EthID.",
+    "The $1,200,000 figure is represented as the amount removed from the recommended cohort after withdrawal, not as a final awardedAmount or a payment.",
+    "governingPolicy.effectiveAt and eligibility.checkedAt are intentionally null because exact source-supported timestamps were not established from the reviewed public sources.",
+    "The public cohort page says individual scoring records remain internal and that applicants may request their own aggregated rubric scores privately. No EthID score is inferred.",
+    "The final executable cohort included the four remaining providers and excluded EthID.",
+    "The public timeline artifacts are not silently reconciled: the May 14 timeline lists submissions closing June 9, while the later cohort process narrative says submissions closed June 4."
+  ]
+}

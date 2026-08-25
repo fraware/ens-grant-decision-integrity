@@ -1,0 +1,376 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp3-2026-ethid-withdrawal",
+  "title": "SPP3 EthID withdrawal — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "other",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected after the first approved-award case because the public record contains an applicant withdrawal after committee selection but before final DAO cohort ratification. This directly stress-tests whether the v0.1 decision model can represent a real terminal lifecycle state without misclassifying it as approval, rejection, deferral, suspension, or pending.",
+    "exclusionBoundary": "This case reconstructs EthID's SPP3 selection-and-withdrawal lifecycle from public sources. It does not reconstruct the private application body, private individual scoring records, applicant-specific aggregate rubric scores, internal deliberations, or any later work outside the SPP3 candidacy.",
+    "strata": [
+      "merit-decision",
+      "policy-change-or-ambiguity",
+      "public-private-separation",
+      "incomplete-public-record",
+      "other"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-AUTH",
+      "sourceUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-RUBRIC",
+      "sourceUri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-COHORT",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public forum source recording the initial selection, EthID's public decline, the committee response, and the later four-provider update. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-MARKETPLACE-RFP",
+      "sourceUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public forum source describing the declined marketplace/revenue award and stating that the standalone cohort ratifies the four remaining providers. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-FINAL-VOTE",
+      "sourceUri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public proposal mirror used to confirm that the executed final cohort consists of the four remaining providers. It is not represented as independent cryptographic execution proof."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:4ed7dfc475b66532893bb17eed009d8e41b94111fa6761888a7be3adb1a7c982",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. The non-v0.1 withdrawal status and two unsupported required timestamps are preserved as validator findings rather than normalized into false values."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "ethid-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 1.8,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH"]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH"],
+          "rationale": "The public sources name the cycle SPP3 but do not publish a formal round identifier; SPP3-2026 is a reconstruction identifier."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH"],
+          "rationale": "The authorization separates committee recommendation from final DAO ratification; the record maps that architecture into program.authority."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT"],
+          "rationale": "The public sources identify EthID by provider name, not a formal application identifier; ethid-spp3-2026 is a reconstruction identifier."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT"]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"],
+          "rationale": "ENS-SPP3-2026 is a reconstruction identifier binding the ratified authorization and published rubric."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"],
+          "rationale": "The public source set has no single machine-readable policy version; the record names the specific authorization-plus-rubric combination."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH"]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"],
+          "rationale": "The mapping assigns each GDI decision surface to the public artifact containing the relevant controlling text."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC", "SRC-COHORT"],
+          "rationale": "Public artifacts report differing submission-close dates, but the reconstruction does not classify that pre-review timeline discrepancy as an in-review policy change; the ambiguity is preserved separately."
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"],
+          "rationale": "Only qualifying applications were scored, and EthID was initially selected, so EthID necessarily passed the published hard screen."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"],
+          "rationale": "Public evidence supports an aggregate pass of the hard screen but not gate-by-gate EthID results or an exact check timestamp."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-COHORT"],
+          "rationale": "The reconstruction represents the published committee selection collectively because EthID-specific individual score records are not public."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC", "SRC-COHORT", "SRC-MARKETPLACE-RFP", "SRC-FINAL-VOTE"],
+          "rationale": "Public artifacts are mapped into the decision-record evidence taxonomy without asserting exact byte preservation."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-RUBRIC"]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT"]
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT", "SRC-MARKETPLACE-RFP"]
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-COHORT"],
+          "rationale": "The field identifies the committee recommendation as the last institutional selection surface while preserving that the subsequent withdrawal was an applicant act before DAO ratification."
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-COHORT"],
+          "rationale": "committee is the nearest existing v0.1 institutional authority category for the documented pre-withdrawal selection surface; it does not classify the applicant withdrawal itself as a committee act."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "EthID withdrew before final DAO cohort ratification, so the $1.2M removed from the recommendation is not represented as a final award."
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT", "SRC-MARKETPLACE-RFP", "SRC-FINAL-VOTE"],
+          "rationale": "The rationale composes the public initial selection, applicant withdrawal, and final exclusion without converting the recommended $1.2M into a final award."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No final EthID award or provider stream was ratified; provider delivery conditions are therefore not instantiated for this withdrawn application."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT"],
+          "rationale": "The reconstructed artifact contains only public information; this does not imply that internal scoring or applicant materials were public."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC", "SRC-COHORT", "SRC-MARKETPLACE-RFP", "SRC-FINAL-VOTE"],
+          "rationale": "This repository case is a public retrospective reconstruction assembled exclusively from public-source references."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record was created, not a historical process fact."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record was created, not a historical process fact."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact record-byte identity is supplied by the corpus snapshot hash."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-WITHDRAWN-STATUS",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.status",
+        "message": "'withdrawn' is not one of ['pending', 'ineligible', 'approved', 'rejected', 'deferred', 'suspended']",
+        "disposition": "model-defect",
+        "rationale": "The public record contains a terminal applicant withdrawal after committee selection and before final DAO ratification. v0.1 has no applicant-withdrawal lifecycle state. Substituting approved, rejected, deferred, suspended, or pending would materially misstate the observed process. This finding is evidence of a representational gap for this case, not a claim that every workflow requires a new institutional decision status.",
+        "sourceArtifactIds": ["SRC-COHORT", "SRC-MARKETPLACE-RFP", "SRC-FINAL-VOTE"]
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The reviewed public artifacts establish that EthID passed the eligibility screen and was evaluated, but do not establish the exact eligibility-check timestamp required by schema v0.1. The null is retained instead of inventing a timestamp.",
+        "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"]
+      },
+      {
+        "findingId": "INIT-SCHEMA-POLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The reviewed public sources establish the authorization and rubric but this reconstruction does not have an exact source-supported effective timestamp for the combined governing policy represented here. The null is retained instead of fabricating one.",
+        "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"]
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA decision.status: 'withdrawn' is not one of ['pending', 'ineligible', 'approved', 'rejected', 'deferred', 'suspended']",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "Should a future schema represent applicant disposition or lifecycle events separately from institutional decision.status, so a withdrawal does not have to be forced into the institutional decision vocabulary?",
+      "If a future model adds applicant withdrawal, what authority and timestamp semantics should apply when the applicant acts after committee selection but before final DAO ratification?",
+      "What exact timestamp should a retrospective public-only record use for governingPolicy.effectiveAt when the source set combines an authorization and a later published rubric without a single machine-readable policy-version activation event?",
+      "When exactly was EthID's eligibility screen completed? Public evidence establishes qualification and selection but not the required checkedAt instant.",
+      "What were EthID's aggregate rubric scores? The committee states applicants may request their own aggregated scores privately, but reviewed public sources do not publish EthID's scores.",
+      "Were any conflicts or substantive disagreements recorded for EthID in internal committee working documents? The public record does not establish them.",
+      "The May 14 timeline lists submissions closing June 9, while the later cohort narrative states submissions closed June 4. The case preserves the discrepancy rather than choosing one without further evidence.",
+      "Because structural schema findings short-circuit semantic conformance, absence of semantic findings in this case is not evidence that all v0.1 semantic obligations were satisfied."
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "The $1,200,000 figure is a recommended-cohort amount removed after withdrawal; it is not represented as a final award, payment, or receipt.",
+    "Classifying the withdrawal-status finding as a model defect is a case-specific representational conclusion, not a claim that the v0.1 institutional decision-status vocabulary should simply be expanded with an applicant lifecycle state.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures."
+  ]
+}
