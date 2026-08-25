@@ -24,12 +24,28 @@ Required fields are `artifactVersion`, `artifactId`, `sourceUri`, `capturedAt`, 
 
 For dynamic web material, preserve the exact response/export bytes actually relied on when redistribution and policy permit. If a browser export, API response, repository blob, or manually saved document is the reviewed artifact, identify that capture method explicitly; do not imply byte identity with another representation.
 
+## Capture storage model
+
+Captured content bytes are deduplicated by SHA-256 under `sha256/<prefix>/<digest>/source.bytes`. Capture provenance is stored separately under an artifact-ID-derived path in `captures/`. Therefore two distinct source/capture events may safely refer to the same immutable content bytes without overwriting each other's metadata or capture log.
+
+`artifactId` is unique within a capture store. Reusing an existing artifact ID fails closed (`CAP020`) rather than silently replacing provenance.
+
+The artifact ID itself is hashed before it participates in a filesystem path, so an untrusted ID does not become a path traversal surface.
+
+## Network capture boundary
+
+The built-in HTTP acquisition path is **SSRF-hardened**, not claimed to be universally SSRF-safe. It rejects unsupported schemes, localhost, private/link-local/reserved destinations, validates each redirect target, defaults to HTTPS, imposes response-size and redirect limits, and records redirect/cross-origin observations.
+
+The standard-library HTTP transport may resolve a hostname again when opening the connection. The current client therefore does **not** establish immunity to DNS rebinding between preflight validation and transport connection. That limitation is emitted in network-capture evidence. Operators requiring a stronger network boundary should capture through infrastructure that pins the vetted destination IP while preserving TLS hostname/SNI verification, then feed the resulting bytes to the offline source verifier.
+
+Network capture is acquisition evidence only. It does not authenticate institutional source ownership, prove publication time, or turn a redirect target into a semantically equivalent governing-policy URI.
+
 ## CLI
 
 Build metadata from already captured bytes:
 
 ```bash
-python scripts/source_artifact.py build \
+gdi source -- build \
   --artifact-id policy-001 \
   --source-uri https://example.org/policy \
   --file policy.html \
@@ -40,10 +56,22 @@ python scripts/source_artifact.py build \
   --out policy-001.artifact.json
 ```
 
-Verify metadata against the preserved bytes:
+Capture a local file into the provenance store:
 
 ```bash
-python scripts/source_artifact.py verify \
+gdi source -- capture \
+  --artifact-id policy-001 \
+  --source-uri https://example.org/policy \
+  --method manual-file \
+  --file policy.html \
+  --media-type text/html \
+  --out-dir evidence
+```
+
+Verify metadata against preserved bytes:
+
+```bash
+gdi verify-source \
   --metadata policy-001.artifact.json \
   --file policy.html
 ```
@@ -56,7 +84,7 @@ python scripts/verify_policy_pins.py \
   --artifact policy-001.artifact.json policy.html
 ```
 
-Run record conformance separately. A policy-pin byte match is not a substitute for `scripts/conformance.py`.
+Run record conformance separately or use a verification bundle that contains the relevant source artifacts. A policy-pin byte match is not a substitute for record semantic conformance.
 
 ## Claim boundary
 
@@ -69,6 +97,7 @@ It does **not** establish:
 - that the bytes existed at `capturedAt` or `policyPinning.pinnedAt` under an independent timestamp;
 - that the source governs the decision surface named by the record without the separate conformance check;
 - that a later live page still contains the captured bytes;
-- that an archive URI is immutable or independently trustworthy.
+- that an archive URI is immutable or independently trustworthy;
+- that network capture is protected against every DNS-rebinding or transport-layer attack.
 
 These limits are part of the interface, not optional caveats.
