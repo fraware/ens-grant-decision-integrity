@@ -21,7 +21,7 @@ The profile records enough information for a third party to reconstruct the proc
 - delivery conditions for funded awards;
 - minimum provenance when AI materially informs a recommendation.
 
-JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, deterministic confidential-to-public projection, and exact-byte source-artifact verification for policy-pin evidence.
+JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, deterministic confidential-to-public projection, exact-byte source-artifact verification for policy-pin evidence, and a predeclared retrospective-corpus protocol for empirical reconstructability testing.
 
 ## Repository layout
 
@@ -37,6 +37,8 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `scripts/source_artifact.py` | Build/verify SHA-256 metadata over exact preserved source bytes |
 | `scripts/verify_policy_pins.py` | Verify schema 0.2 policy pins against byte-verified source artifacts |
 | `SOURCE-ARTIFACTS.md` | Source-capture assurance chain, CLI, and non-claims |
+| `corpus/` | Predeclared retrospective study plan, case schema/template, and empirical protocol |
+| `scripts/corpus_metrics.py` | Validate corpus cases and compute descriptive reconstructability/agreement metrics |
 | `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, replay evidence, and versioned evidence bundles |
 | `projection/` | Deterministic confidential-to-public record projection |
 | `examples/` | Fictional worked examples (non-evaluative) |
@@ -65,7 +67,7 @@ python scripts/test_conformance.py
 python scripts/test_regressions.py
 ```
 
-The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including source-artifact, Phase II, schema 0.2, and projection suites.
+The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including source-artifact, corpus, Phase II, schema 0.2, and projection suites.
 
 ## Phase II (evaluator provenance)
 
@@ -117,11 +119,24 @@ python scripts/verify_policy_pins.py --record record.json --artifact policy.arti
 
 The source verifier re-hashes the supplied raw bytes and checks byte length and SHA-256. The policy-pin verifier then requires exact URI and hash equality against a byte-verified artifact. It does not retrieve the source, normalize it, authenticate source ownership, decide whether the source was institutionally adopted, or prove that the bytes existed at `capturedAt` or `policyPinning.pinnedAt`. Decision-surface semantics remain in the record and the conformance layer. See `SOURCE-ARTIFACTS.md`.
 
+## Retrospective empirical corpus
+
+`corpus/` defines the empirical test before real cases are counted. `study-plan.json` predeclares the heterogeneous sampling strata, primary metrics, double-annotation rule, anti-circularity rule, merit boundary, and privacy boundary. `schema/case.schema.json` defines the machine-readable case contract. `case-template.json` is explicitly marked `template: true` and is not empirical evidence.
+
+```bash
+python -m pytest scripts/test_corpus.py
+python scripts/corpus_metrics.py corpus/case-template.json
+```
+
+The metrics are descriptive: required-field reconstructability, direct-source and unknown rates, interpretive share, annotation time, finding dispositions, and—when exactly two independent annotations cover the same material field set—raw classification agreement and Cohen's kappa. Neither high validator success nor high annotator agreement establishes substantive correctness, fairness, source truth, or institutional legitimacy.
+
+The corpus must preserve initial record hashes and findings. If review changes a record, the reconciled hash and change rationale are retained. `unknown` is an admissible result; undocumented facts must not be inferred merely to make a case validate. See `corpus/README.md`.
+
 ## What validators prove and do not prove
 
-**Prove:** record structure and declared cross-field consistency under the selected profile; exact byte identity for a supplied source artifact when the source-artifact verifier succeeds; exact policy-pin URI/hash linkage to a byte-verified artifact when the policy-pin verifier succeeds; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec.
+**Prove:** record structure and declared cross-field consistency under the selected profile; exact byte identity for a supplied source artifact when the source-artifact verifier succeeds; exact policy-pin URI/hash linkage to a byte-verified artifact when the policy-pin verifier succeeds; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec; corpus-case structural/protocol consistency and the arithmetic of its descriptive metrics when the corpus validator succeeds.
 
-**Do not prove:** truth or completeness of cited evidence; source ownership or institutional adoption; quality of substantive judgment; legitimacy of the governing policy; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment, transfer, receipt, or settlement of Simocracy allocations.
+**Do not prove:** truth or completeness of cited evidence; source ownership or institutional adoption; quality of substantive judgment; legitimacy of the governing policy; representativeness of the retrospective corpus; correctness of an annotation merely because annotators agree; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment, transfer, receipt, or settlement of Simocracy allocations.
 
 ## AI provenance boundary
 
@@ -148,6 +163,7 @@ This project governs the integrity of the decision record. It does not determine
 | Phase II versions | manifest/envelope/anchor/run predicate v1; replay report v1 historical and v2 current; evidence bundle v1 historical and v2 current |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
+| Retrospective corpus | Protocol/schema/metrics infrastructure only; no template is counted as an empirical case |
 | Simocracy decision-status snapshot | $219 across five relevant rounds; 3 ratified and 2 provisional as observed 2026-08-24 |
 | Financial evidence | no payment, transfer, receipt, or settlement evidence recorded in the dated 2026-08-24 snapshot |
 | Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
