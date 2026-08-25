@@ -48,6 +48,10 @@ Fixture verification is rigorous within its stated test trust boundary but is no
 
 Production `rekor-v1` pins the Sigstore Rekor v1 production public key in `src/anchors/rekor.py` and does not trust a live `/api/v1/log/publicKey` response as the root. Rekor v1 remains a historical compatibility profile; a successor profile must use a new identifier and its own claim/trust specification.
 
+### Rekor v2 module
+
+`src/anchors/rekor_v2.py` and `vectors/rekor-v2/` provide the `rekor-v2` / `rekor-v2-recorded-fixture` surfaces. Recorded vectors do **not** establish production-profile C2. Technical log-submission signature material is a log-submission artifact only and never grants institutional authority. Live Sigstore TUF TrustedRoot / SigningConfig online issuance is intentionally fail-closed in this build until an official client integration is pinned.
+
 ## Disclosure states
 
 `committed` and `withheld` are unopened states. Current bundle-v2 verification does not accept manifest or salt in either state and does not establish C1. `revealed` and the current authorized `selective-audit` verification path require manifest and salt so the verifier can open the commitment and check the manifest round fields against the envelope.
@@ -79,7 +83,7 @@ python phase2/src/cli.py verify-graph --bundle bundle.json
 
 `verify-commitment` requires `--manifest` and `--salt` together when an opening is requested; supplying only one fails closed. Profile-specific fixture-time, TSA-certificate, and transaction-hash arguments also fail closed when supplied to an incompatible anchor profile.
 
-`anchor --profile rekor-v1` submits to the Rekor v1 endpoint. `rfc3161` is a reserved production profile and currently fails closed with `TS3178`; it must not be represented as production timestamp support. `rfc3161-recorded-fixture` requires independently supplied `--trust-root`, and fixture issuance also requires `--fixture-key` and `--tsa-cert`. Malformed fixture encodings/signatures/trust material fail as structured protocol errors. `ethereum-calldata-fixture` is an offline test profile. Live Ethereum anchoring (`ethereum`) is not implemented.
+`anchor --profile rekor-v1` submits to the Rekor v1 endpoint. `rfc3161` is a reserved production profile and currently fails closed with `TS3178`; it must not be represented as production timestamp support. `rfc3161-recorded-fixture` requires independently supplied `--trust-root`, and fixture issuance also requires `--fixture-key` and `--tsa-cert`. Malformed fixture encodings/signatures/trust material fail as structured protocol errors. `ethereum-calldata-fixture` is an offline test profile. Live Ethereum anchoring (`ethereum`) is not implemented. Rekor v2 live online issuance remains fail-closed as noted above; use recorded fixtures only within their stated test trust boundary.
 
 Signing keys in tests and in the public example are test keys. A real program must supply its own signing identity and independently configured verifier trust.
 
