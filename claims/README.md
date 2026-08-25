@@ -25,4 +25,4 @@ gdi claims --id PHASE2.C4A.AUTHORIZED_SIGNER
 
 ## Non-claims
 
-The registry enumerates bounded propositions. It does not establish that ENS or any program adopted this repository, that a decision was fair, or that funding was paid.
+The registry enumerates bounded propositions for package `ens-gdi` `0.4.0` / current verifier surfaces. It does not establish that ENS or any program adopted this repository, that a decision was fair, that funding was paid, or that a future `v1.0.0` gate matrix is complete.
