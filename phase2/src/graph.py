@@ -174,6 +174,7 @@ def _anchor_adapter_kwargs(
     *,
     fixture_private_key_pem: str | bytes | None,
     trust_root_pem: str | None,
+    trust_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build adapter arguments from verifier policy, never receipt-selected trust."""
     kwargs: dict[str, Any] = {}
@@ -190,6 +191,16 @@ def _anchor_adapter_kwargs(
                 "recorded-fixture graph verify requires the test-log public or private key",
                 code="GRP001",
             )
+    elif profile_id in {"rekor-v2", "rekor-v2-recorded-fixture"}:
+        if trust_policy is None:
+            raise Phase2Error(
+                "rekor-v2 graph verification requires an externally supplied trust policy",
+                code="GRP010",
+                claim="C2",
+            )
+        kwargs["trust_policy"] = trust_policy
+        if fixture_private_key_pem:
+            kwargs["fixture_private_key_pem"] = fixture_private_key_pem
     elif profile_id in {"rfc3161", "rfc3161-recorded-fixture"}:
         if not trust_root_pem:
             raise Phase2Error(
@@ -210,6 +221,7 @@ def verify_graph(
     *,
     fixture_private_key_pem: str | bytes | None = None,
     trust_root_pem: str | None = None,
+    trust_policy: dict[str, Any] | None = None,
 ) -> VerificationResult:
     bundle_version = bundle.get("bundleVersion")
     schema_name = BUNDLE_SCHEMAS.get(bundle_version)
@@ -231,6 +243,7 @@ def verify_graph(
             receipt["profileId"],
             fixture_private_key_pem=fixture_private_key_pem,
             trust_root_pem=trust_root_pem,
+            trust_policy=trust_policy,
         ),
     )
     claim = adapter.verify(env_bytes, receipt)

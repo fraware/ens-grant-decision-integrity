@@ -1,0 +1,40 @@
+{
+  "specVersion": "2",
+  "domain": "ens-gdi/public-projection/v2",
+  "profileId": "ens-public-standard-v1",
+  "sourceRecordSchema": "grant-decision-record/0.2",
+  "sourceUri": "https://github.com/fraware/ens-grant-decision-integrity",
+  "rules": [
+    { "path": "/schemaVersion", "action": "publish-subtree" },
+    { "path": "/recordId", "action": "publish-subtree" },
+    { "path": "/recordType", "action": "publish-subtree" },
+    { "path": "/program", "action": "publish-subtree" },
+    {
+      "path": "/application",
+      "action": "withhold-subtree",
+      "category": "privacy",
+      "explanation": "Applicant identity and requested terms remain confidential in Tier A simplified grants."
+    },
+    { "path": "/governingPolicy", "action": "publish-subtree" },
+    { "path": "/policyPinning", "action": "publish-subtree" },
+    { "path": "/authorityIdentity", "action": "publish-subtree" },
+    { "path": "/eligibility", "action": "publish-subtree" },
+    { "path": "/evaluators", "action": "publish-subtree" },
+    { "path": "/conflicts", "action": "publish-subtree" },
+    { "path": "/evidence", "action": "publish-subtree" },
+    { "path": "/evaluation", "action": "publish-subtree" },
+    { "path": "/evaluatorManifest", "action": "publish-subtree" },
+    { "path": "/decision", "action": "publish-subtree" },
+    { "path": "/challenge", "action": "publish-subtree" },
+    { "path": "/deliveryConditions", "action": "publish-subtree" },
+    { "path": "/disclosure", "action": "publish-subtree" },
+    { "path": "/timestamps", "action": "publish-subtree" },
+    { "path": "/integrity", "action": "publish-subtree" },
+    {
+      "path": "/notes",
+      "action": "drop-by-profile",
+      "profileRuleId": "ENS-PUBLIC-001",
+      "explanation": "Internal illustrative notes are excluded from this public profile"
+    }
+  ]
+}

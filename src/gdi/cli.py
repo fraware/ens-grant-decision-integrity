@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -20,6 +21,22 @@ from gdi.trust.policy import TrustPolicyError, load_trust_policy
 
 def _print_json(value: Any) -> None:
     print(json.dumps(value, indent=2, sort_keys=True))
+
+
+def _profiles_dir() -> Path:
+    """Resolve versioned operational profiles under ``profiles/``."""
+    env = os.environ.get("GDI_PROFILES_DIR")
+    if env:
+        return Path(env)
+    here = Path(__file__).resolve()
+    candidates = [
+        here.parents[2] / "profiles",
+        Path.cwd() / "profiles",
+    ]
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate
+    return candidates[0]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -45,6 +62,10 @@ def build_parser() -> argparse.ArgumentParser:
     bundle.add_argument("--trust-policy", type=Path)
     bundle.add_argument("--online", action="store_true")
     bundle.add_argument("--json", action="store_true")
+
+    profiles = sub.add_parser("profiles", help="list or show operational adoption profiles")
+    profiles.add_argument("profile_id", nargs="?", help="Optional profile ID to print")
+    profiles.add_argument("--format", choices=("text", "json"), default="text")
 
     return parser
 
@@ -87,11 +108,37 @@ def main(argv: list[str] | None = None) -> int:
                 sys.stdout.write(render_text(report))
             return code
 
+        if args.command == "profiles":
+            root = _profiles_dir()
+            if not root.is_dir():
+                raise FileNotFoundError(
+                    "profiles directory not found; set GDI_PROFILES_DIR or run from a source checkout"
+                )
+            if args.profile_id:
+                path = root / f"{args.profile_id}.json"
+                if not path.is_file():
+                    raise FileNotFoundError(f"unknown profile: {args.profile_id}")
+                text = path.read_text(encoding="utf-8")
+                sys.stdout.write(text if text.endswith("\n") else text + "\n")
+                return OK
+            ids = sorted(
+                p.stem for p in root.glob("*.json") if p.name != "profile.schema.json"
+            )
+            if args.format == "json":
+                _print_json({"profiles": ids})
+            else:
+                for profile_id in ids:
+                    print(profile_id)
+            return OK
+
         parser.error(f"unknown command {args.command}")
         return USAGE_ERROR
     except (BundleError, ClaimRegistryError, SourceArtifactError, TrustPolicyError) as exc:
         _print_json({"ok": False, "error": str(exc), "code": getattr(exc, "code", "ERROR")})
         return getattr(exc, "exit_code", 1)
+    except FileNotFoundError as exc:
+        _print_json({"ok": False, "error": str(exc), "code": "USAGE"})
+        return USAGE_ERROR
     except Exception as exc:  # noqa: BLE001
         _print_json({"ok": False, "error": str(exc), "code": "INTERNAL"})
         return INTERNAL_ERROR

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "projection-spec-v2.schema.json",
+  "title": "ENS GDI Public Projection Spec v2",
+  "description": "RFC 6901 path disposition rules for projection v2. Arrays are atomic; per-index pointers are rejected by the engine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["specVersion", "domain", "profileId", "rules"],
+  "properties": {
+    "specVersion": { "const": "2" },
+    "domain": { "const": "ens-gdi/public-projection/v2" },
+    "profileId": { "type": "string", "minLength": 1 },
+    "sourceRecordSchema": { "type": "string", "minLength": 1 },
+    "sourceUri": { "type": "string", "format": "uri" },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "action"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "RFC 6901 JSON Pointer. Empty string addresses the document root."
+          },
+          "action": {
+            "type": "string",
+            "enum": ["publish-subtree", "withhold-subtree", "drop-by-profile", "descend"]
+          },
+          "category": {
+            "type": "string",
+            "enum": ["privacy", "security", "commercial", "legal", "contractual", "other"]
+          },
+          "explanation": { "type": "string", "minLength": 1 },
+          "profileRuleId": { "type": "string", "minLength": 1 },
+          "whenAbsent": { "const": "ignore" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "action": { "const": "withhold-subtree" } }, "required": ["action"] },
+            "then": { "required": ["category"] }
+          },
+          {
+            "if": { "properties": { "action": { "const": "drop-by-profile" } }, "required": ["action"] },
+            "then": { "required": ["profileRuleId", "explanation"] }
+          }
+        ]
+      }
+    }
+  }
+}
