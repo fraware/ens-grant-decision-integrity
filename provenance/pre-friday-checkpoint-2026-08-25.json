@@ -4,24 +4,32 @@
   "purpose": "Dated pre-allocation repository and evidence-state checkpoint before the planned 2026-08-28 funding event. This file records only states already evidenced at this checkpoint and does not predict the Friday outcome.",
   "repository": {
     "repository": "fraware/ens-grant-decision-integrity",
-    "baselineCommit": "98f1723c11f21b1dc19335db19c1c0bc14715091",
+    "baselineCommit": "757d35e2de7e113787d66166d736b9c740adaa3c",
     "latestTaggedRelease": "v0.3.2",
     "releaseBoundary": "The tagged release remains v0.3.2. baselineCommit contains unreleased development changes and must not be described as behavior of v0.3.2.",
     "baselineValidation": {
       "workflow": "validate",
-      "runId": 32833180477,
-      "runNumber": 442,
+      "runId": 32837042283,
+      "runNumber": 445,
       "event": "push",
-      "headSha": "98f1723c11f21b1dc19335db19c1c0bc14715091",
+      "headSha": "757d35e2de7e113787d66166d736b9c740adaa3c",
       "status": "completed",
       "conclusion": "success",
-      "completedAt": "2026-08-25T09:40:29Z",
+      "completedAt": "2026-08-25T10:24:41Z",
       "requiredJobs": {
         "conformance": "success",
         "phase2": "success",
         "schema-02": "success"
       }
-    }
+    },
+    "openRelevantPullRequests": [
+      {
+        "number": 19,
+        "title": "Add source-bounded SPP3 hard-eligibility case",
+        "headRef": "research/hard-eligibility-disposition",
+        "note": "Empirical hard-eligibility case under review; not merged into this pre-event baseline."
+      }
+    ]
   },
   "empiricalCorpus": {
     "studyPlanVersion": "1",
@@ -44,15 +52,17 @@
     "doubleAnnotatedCaseCount": 0,
     "doubleAnnotationObservedFraction": 0.0,
     "doubleAnnotationMinimumFraction": 0.25,
+    "doubleAnnotationPlan": "corpus/double-annotation-plan-2026-08-25.json",
     "machineObservedBlockers": [
       "case-count: 3/8 minimum",
       "required-strata-unresolved: hard-eligibility (coverage or evidence-availability disposition required)",
       "double-annotation: 0/3 cases (0.000000) below minimum fraction 0.250000"
     ],
-    "source": "scripts/study_status.py output in validation run 442 on baselineCommit"
+    "source": "scripts/study_status.py against baselineCommit 757d35e; double-annotation plan frozen at that commit"
   },
   "simocracyEvidence": {
     "statusSnapshot": "provenance/simocracy-status-2026-08-24.json",
+    "fundingIndex": "provenance/simocracy-funding.json",
     "observedOn": "2026-08-24",
     "aggregateAllocationUsd": 219,
     "ratifiedRoundCount": 3,
@@ -63,11 +73,13 @@
       "receipt": null,
       "settlement": null
     },
-    "freshnessBoundary": "This checkpoint carries forward the separately dated 2026-08-24 funding-status snapshot. It does not claim that the Simocracy surface was independently re-observed on 2026-08-25."
+    "freshnessBoundary": "This checkpoint carries forward the separately dated 2026-08-24 funding-status snapshot and the funding index. It does not claim that the Simocracy surface was independently re-observed on 2026-08-25. Those files remain byte-frozen for this pre-event checkpoint."
   },
   "fridayCaptureRule": {
     "plannedCheckpointDate": "2026-08-28",
     "procedure": "provenance/ALLOCATION-CAPTURE.md",
+    "postEventStatus": "blocked-until-authoritative-artifact",
+    "postEventStatusNote": "As of 2026-08-25, no authoritative 2026-08-28 platform artifact exists. Do not invent a Friday status snapshot. After an authoritative public artifact exists, capture exact bytes when lawful, write a new dated snapshot (for example provenance/simocracy-status-2026-08-28.json), preserve the platform's exact decision vocabulary on Axis A, and populate Axis B financialEvidence fields only when separately evidenced.",
     "rule": "After an authoritative Friday artifact exists, add a new dated snapshot. Preserve the authoritative platform decision vocabulary and record payment authorization, transfer, receipt, or settlement only when separately evidenced. Do not rewrite this checkpoint or the 2026-08-24 snapshot to imply continuity or a stronger financial state."
   },
   "nonClaims": [
@@ -76,6 +88,7 @@
     "The empirical corpus is not complete and is not represented as statistically representative of ENS decisions.",
     "The unresolved hard-eligibility stratum does not establish that supporting evidence does not exist; it means no evidence-backed checked-in case covers that stratum at this checkpoint.",
     "The recorded $219 allocation state is not represented as payment, transfer, receipt, or settlement.",
-    "Null financial-evidence fields mean the referenced dated snapshot contains no such evidence; they do not prove the event did not occur elsewhere."
+    "Null financial-evidence fields mean the referenced dated snapshot contains no such evidence; they do not prove the event did not occur elsewhere.",
+    "Open pull requests listed here are not part of the frozen baseline commit and must not be treated as merged behavior."
   ]
 }
