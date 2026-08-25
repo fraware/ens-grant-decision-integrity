@@ -37,6 +37,8 @@ Every source entry carries an exact `sourceUri`. A `redistributable` source also
 
 A `public-only` case cannot contain an `authorized-audit-only` source. Protected applicant material must not be added to the public repository merely to improve completeness.
 
+Checked-in empirical cases live under `corpus/cases/<case-id>/`. CI runs `scripts/validate_corpus_cases.py`, discovers every `case.json` in that directory, re-verifies its exact record snapshot and validator-output binding, and fails if any checked-in case violates the corpus contract. A case may legitimately contain recorded validator errors; CI requires those errors to match the exact validator output rather than requiring the historical reconstruction itself to be green.
+
 ## Record snapshot identity
 
 `recordHash` is `sha256:<hex>` over the exact file bytes identified by the snapshot's relative `path`. It is not a JCS or semantic-content hash. The case CLI resolves the path inside the case directory, rejects absolute/path-escape references, re-hashes the file, and compares it with the declared digest.
@@ -76,6 +78,12 @@ python scripts/corpus_metrics.py corpus/path/to/case.json
 ```
 
 For real cases the CLI verifies declared record-snapshot bytes, the corresponding initial/final decision-record validator output, and any redistributable source artifacts before emitting metrics. It reports source counts, byte-verification status, validator-binding status, required-field reconstructability, direct-source and unknown rates, interpretive share, elapsed minutes, and finding dispositions. For exactly two independent annotations over the same material field set, it also reports raw classification agreement and Cohen's kappa.
+
+To validate all checked-in empirical cases in one pass, run:
+
+```bash
+python scripts/validate_corpus_cases.py
+```
 
 Kappa is descriptive agreement evidence, not proof that either annotation is substantively correct. It is undefined when expected agreement is 1. Small-case results must not be generalized as population estimates.
 
