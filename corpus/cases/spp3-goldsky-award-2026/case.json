@@ -1,0 +1,455 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp3-2026-goldsky-award",
+  "title": "SPP3 Goldsky indexing award — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "approved-award",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected from the post-start selection addendum because Goldsky adds a first-time SPP provider with a standalone indexing mandate and published milestone-structure scoring, distinct from the Namespace subname award already encoded.",
+    "exclusionBoundary": "Does not reconstruct other cohort members, private individual scores, KYC/Award Notice contents, or application bytes beyond the public cohort summary. Does not invent AI-evaluator involvement.",
+    "strata": [
+      "approved-award",
+      "merit-decision",
+      "delivery-or-milestone",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-AUTH",
+      "sourceUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-RUBRIC",
+      "sourceUri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-COHORT",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public cohort recommendation naming Goldsky, Option B scope confirmation, aggregate scores, and milestone-related award rationale."
+    },
+    {
+      "artifactId": "SRC-VOTE",
+      "sourceUri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public governance proposal mirror reporting the executed four-provider cohort that includes Goldsky. Not treated as independent cryptographic proof."
+    },
+    {
+      "artifactId": "SRC-APPLICATION-URI",
+      "sourceUri": "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafybeidblcll7pt7s4jzlte6khv7twiqnckdoalanj2aoemd27afefhyou",
+      "role": "evidence",
+      "availability": "reference-only",
+      "notes": "Application URI linked by the cohort recommendation. Treated as reference-only; no application-content fact is inferred beyond the public cohort summary."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:6e534bc477f0adb3df8379fe733c16d2b4f241569d878ba084c88bb0f9a82aad",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. Unsupported exact timestamps remain null."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "goldsky-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 6.5,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH"
+          ]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH"
+          ],
+          "rationale": "The public sources name the cycle SPP3; SPP3-2026 is a reconstruction identifier."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-VOTE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ],
+          "rationale": "The public cohort identifies Goldsky by provider name; goldsky-spp3-2026 is a reconstruction identifier."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT",
+            "SRC-APPLICATION-URI"
+          ]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH"
+          ]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "The authorization allowed timeline adjustments; this case does not classify the pre-review timeline ambiguity as an in-review policy change for Goldsky."
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-COHORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ],
+          "rationale": "The reviewed public cohort discloses a Namespace-only recusal and does not disclose a Goldsky-specific conflict; the empty conflicts array is therefore source-bounded."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT",
+            "SRC-VOTE",
+            "SRC-APPLICATION-URI"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-VOTE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT",
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-COHORT",
+            "SRC-VOTE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-COHORT"
+          ],
+          "rationale": "Public program terms and the cohort's Option B indexing mandate support a delivery/reporting condition; Award Notice milestone bytes remain outside the successfully retrieved public set."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-COHORT",
+            "SRC-APPLICATION-URI"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT",
+            "SRC-VOTE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact byte identity is provided by the corpus snapshot hash instead."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Public artifacts establish that Goldsky was scored after the eligibility screen but not the exact eligibility-check timestamp. The null is retained.",
+        "sourceArtifactIds": [
+          "SRC-RUBRIC",
+          "SRC-COHORT"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-GOVERNINGPOLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Authorization and rubric publication are established, but no single exact effective timestamp for the combined policy is source-supported. The null is retained.",
+        "sourceArtifactIds": [
+          "SRC-AUTH",
+          "SRC-RUBRIC"
+        ]
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "What exact timestamp should govern governingPolicy.effectiveAt for the authorization-plus-rubric combination?",
+      "When exactly was Goldsky's eligibility screen completed?",
+      "What Award Notice milestone dates and payment amounts apply to Goldsky Option B beyond the public cohort summary?",
+      "Were any Goldsky-specific scoring disagreements recorded internally?"
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures.",
+    "The public governance mirror is used as a reconstruction source and is not represented as an independent cryptographic proof of the on-chain outcome.",
+    "Option B scope confirmation is taken from the published cohort text and is not reconstructed from private interview transcripts."
+  ]
+}

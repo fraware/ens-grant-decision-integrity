@@ -1,0 +1,440 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp2-2025-ep65-vote-amendment",
+  "title": "SPP2 EP6.5 vote amendment — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "other",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected from the post-start selection addendum as an explicit published policy amendment changing SPP2 voting/allocation mechanics with a dated facilitation-plan change notice, without cloning an award outcome.",
+    "exclusionBoundary": "Represents the amendment decision/process change, not every subsequent SPP2 award. Does not treat the Agora no-award outcome as this case's unit of analysis.",
+    "strata": [
+      "policy-change-or-ambiguity",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-ORIGINAL-PLAN",
+      "sourceUri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public original SPP2 facilitation plan preceding the amendment."
+    },
+    {
+      "artifactId": "SRC-TEMPCHECK",
+      "sourceUri": "https://discuss.ens.domains/t/temp-check-social-service-provider-season-2-vote-amendment-proposal/20526",
+      "role": "evidence",
+      "availability": "reference-only",
+      "notes": "Public temp-check discussion for the SPP2 vote amendment proposals."
+    },
+    {
+      "artifactId": "SRC-EP65",
+      "sourceUri": "https://docs.ens.domains/dao/proposals/6.5/",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public ENS docs page for EP6.5 listing status Passed and the amended ranking/allocation rules."
+    },
+    {
+      "artifactId": "SRC-AMENDED-PLAN",
+      "sourceUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "MetaGov notice that Amendment 6.5 passed with the highest votes and will govern the SPP2 selection vote, with reopened edit window."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:e9b76623384a6a36fc441e1ab9c20ebfb13352fa7339155fb41784fbc10ebe2b",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction of the EP6.5 amendment decision."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "ep65-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 4.0,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ],
+          "rationale": "SPP2-2025 is a reconstruction identifier for the season whose voting rules were amended."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65"
+          ],
+          "rationale": "Reconstruction identifier for the EP6.5 proposal as the unit of analysis."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65"
+          ]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65"
+          ]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-EP65"
+          ]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ]
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ],
+          "rationale": "No EP6.5-specific conflict adjudication is disclosed in the reviewed sources."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-TEMPCHECK",
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65"
+          ]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "Amendment outcome is pass/fail, not a scalar applicant score."
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "Public sources establish that EP6.5 passed; the literal status 'amendment-passed' is an interpretive encoding outside v0.1 vocabulary to avoid falsely implying an applicant award."
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "EP6.5 is a procedural amendment, not an applicant funding award."
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No provider delivery conditions are instantiated by the amendment decision itself."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-TEMPCHECK",
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact byte identity is provided by the corpus snapshot hash instead."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-DECISION-STATUS",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.status",
+        "message": "'amendment-passed' is not one of ['pending', 'ineligible', 'approved', 'rejected', 'deferred', 'suspended']",
+        "disposition": "unresolved",
+        "rationale": "Literal status 'amendment-passed' is retained because mapping a procedural amendment into approved/rejected/deferred/suspended/pending would misstate the public record or invent an applicant award.",
+        "sourceArtifactIds": [
+          "SRC-EP65",
+          "SRC-AMENDED-PLAN"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      },
+      {
+        "findingId": "INIT-SCHEMA-GOVERNINGPOLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA decision.status: 'amendment-passed' is not one of ['pending', 'ineligible', 'approved', 'rejected', 'deferred', 'suspended']",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "What exact Snapshot end instant should bind decision.decidedAt for EP6.5?",
+      "Should a governance amendment use a dedicated recordType and status vocabulary rather than service-provider-decision?",
+      "What quorum/voting-power totals should be recorded from the Snapshot page?"
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures.",
+    "This case does not adjudicate whether EP6.5 was substantively superior to EP6.4.",
+    "Subsequent SPP2 award outcomes are out of scope for this unit of analysis.",
+    "The non-vocabulary status amendment-passed is a reconstructability encoding choice, not a claim that the DAO used that label."
+  ]
+}

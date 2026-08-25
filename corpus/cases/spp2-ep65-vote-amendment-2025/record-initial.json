@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp2-2025-ep65-vote-amendment-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 2 (SPP2)",
+    "roundId": "SPP2-2025",
+    "authority": "ENS DAO social governance vote amending SPP2 selection procedure",
+    "programUri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "ep-6-5-spp2-vote-amendment",
+    "applicantName": "EP 6.5 SPP2 Vote Amendment Proposal II",
+    "applicationUri": "https://docs.ens.domains/dao/proposals/6.5/",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP2-2025-pre-EP6.5",
+    "version": "EP6.3 program facilitation prior to EP6.5 amendment",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+    "sources": [
+      "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "https://docs.ens.domains/dao/proposals/6.5/"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "eligibility": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "evaluationCriteria": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "conflictRules": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "decisionProcedure": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340"
+    },
+    "changeDuringReview": true,
+    "changeSummary": "EP6.5 amended SPP2 voting from team-only ranking to rank-budget Copeland allocation with NONE BELOW, and MetaGov reopened a limited application edit window through 27 Apr 2025 23:59 UTC.",
+    "previousVersion": "SPP2 original facilitation under EP6.3",
+    "changeNoticeUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+    "priorEvaluationsRerun": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "GOVERNANCE-PROPOSAL-IN-SCOPE",
+        "description": "EP6.5 is a published DAO social proposal to amend SPP2 selection rules within the already-authorized Season 2 program; this reconstruction treats the proposal as within the public governance process rather than as an applicant hard-eligibility screen.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-EP65",
+          "E-AMENDED-PLAN"
+        ]
+      }
+    ],
+    "rationale": "The unit of analysis is a governance amendment, not an applicant eligibility gate. Exact checkedAt does not apply in the applicant-screen sense and remains null."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "ens-dao-electorate",
+      "displayName": "ENS DAO Snapshot electorate for EP6.5",
+      "kind": "other",
+      "role": "approve or reject the SPP2 vote amendment",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-ORIGINAL-PLAN",
+      "kind": "forum",
+      "description": "Original SPP2 facilitation plan preceding EP6.5.",
+      "uri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-TEMPCHECK",
+      "kind": "forum",
+      "description": "Temp-check discussion for SPP2 vote amendment proposals.",
+      "uri": "https://discuss.ens.domains/t/temp-check-social-service-provider-season-2-vote-amendment-proposal/20526",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-EP65",
+      "kind": "document",
+      "description": "EP6.5 proposal documentation with status Passed and amended ranking/allocation rules.",
+      "uri": "https://docs.ens.domains/dao/proposals/6.5/",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-AMENDED-PLAN",
+      "kind": "forum",
+      "description": "MetaGov facilitation update stating Amendment 6.5 passed with the highest votes and governs the upcoming selection vote.",
+      "uri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "AMENDMENT-PASS",
+        "name": "DAO social vote outcome for EP6.5 versus competing amendment EP6.4",
+        "score": null,
+        "scoreScale": "binary pass/fail under Snapshot social vote rules as published"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-PASSED",
+        "statement": "ENS docs list EP6.5 status as Passed, and MetaGov states Amendment 6.5 was the option with the highest votes and will govern the SPP2 selection vote.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-EP65",
+          "E-AMENDED-PLAN"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-RULE-CHANGE",
+        "statement": "EP6.5 replaces team-only ranking with rank-budget Copeland allocation, NONE BELOW cutoff, and $4.5M envelope rules, and MetaGov reopened a limited application edit window.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-EP65",
+          "E-AMENDED-PLAN"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "critical"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "No scalar score; outcome is a passed DAO social amendment."
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "amendment-passed",
+    "authority": "ENS DAO Snapshot social vote on EP6.5",
+    "authorityKind": "dao-vote",
+    "decidedAt": null,
+    "awardedAmount": null,
+    "currency": "USD",
+    "rationale": "EP6.5 passed and MetaGov published that it governs the SPP2 selection vote, amending ranking and allocation mechanics and reopening a limited application edit window. The literal status 'amendment-passed' is outside the v0.1 closed vocabulary because mapping a procedural amendment into approved would falsely require an applicant award amount and deliveryConditions.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": null,
+    "decisionRule": "Snapshot social proposal for EP6.5; MetaGov states it received the highest votes among the amendment options and governs the selection vote.",
+    "voteRecordUri": "https://docs.ens.domains/dao/proposals/6.5/"
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "Reviewed public amendment artifacts do not identify a dedicated post-passage correction process for EP6.5 itself beyond ordinary governance.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T18:30:00Z",
+    "updatedAt": "2026-08-25T18:30:00Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Unit of analysis is the EP6.5 amendment decision/process change, not any subsequent SPP2 award outcome.",
+    "awardedAmount is null because this case does not fund an applicant.",
+    "decision.decidedAt remains null at schema-v0.1 precision despite Passed status on public docs.",
+    "The literal status 'amendment-passed' is intentionally outside the v0.1 closed decision.status vocabulary.",
+    "Reference-only remote sources are not represented as exact byte-preserved captures."
+  ]
+}
