@@ -270,7 +270,7 @@
       "allOf": [
         {
           "if": {
-            "properties": {"classification": {"const": "direct-source"}},
+            "properties": {"classification": {"enum": ["direct-source", "derived", "interpretive"]}},
             "required": ["classification"]
           },
           "then": {
