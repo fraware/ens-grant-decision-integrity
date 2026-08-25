@@ -7,7 +7,7 @@ Repository version lineage relevant to this tree:
 - `0.2.0` — Phase II commitment, anchoring, run attestation, and replay;
 - `0.3.0` — schema 0.2 extensions, projection, and alternate anchor fixtures;
 - `0.3.1` / `0.3.2` — documentation and public-readiness corrections (no Phase II claim-matrix change);
-- post-`0.3.2` hardening — claim-narrowing corrections, replay report v2, evidence-bundle v2, RFC 3161 production fail-closed behavior, and projection completeness checks. These changes require a new repository release before being described as released behavior.
+- package `0.4.0` / post-`0.3.2` hardening on `main` — claim-narrowing corrections, replay report v2, evidence-bundle v2, RFC 3161 production fail-closed behavior, projection v1/v2 completeness checks, Rekor v2 module (live issuance fail-closed), unified `gdi` verifier. These changes require a new annotated repository tag before being described as tagged-release behavior. Package `0.4.0` is not `v1.0.0`.
 
 Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is separately specified. Evaluator manifest, commitment envelope, anchor receipt, and run predicate identifiers remain unchanged. Historical replay-report v1 and evidence-bundle v1 remain frozen; current replay generation emits replay-report v2, and new bundles carrying it use evidence-bundle v2.
 

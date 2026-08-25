@@ -134,6 +134,15 @@ Expected results:
 
 The predeclared `corpus/study-plan.json` defines a heterogeneous 8–12 case stress-test, not a statistically representative population estimate. Case selection must cover the declared strata before considering validator outcomes. AI-assisted cases are conditional on actual historical evidence of material AI use.
 
+Current machine study progress (descriptive only; regenerate with `scripts/study_status.py`):
+
+```bash
+python scripts/study_status.py
+python -m pytest scripts/test_study_status.py
+```
+
+Expected interpretation: `ok=true` means counted cases satisfied the machine corpus contract and the status computation succeeded. It does **not** mean the empirical study is complete. With nine checked-in cases, case-count and required-stratum coverage may be met while double annotation remains blocked and `readyForFinalReview` remains `false`.
+
 Corpus validation can establish consistency of the case contract, equality between declared and observed bytes for the specific record/source artifacts it actually verifies, and arithmetic of descriptive metrics. It does not establish that annotations are correct, reference-only sources match unpreserved historical bytes, sources are true or complete, the sample is representative, or the historical decision was substantively sound.
 
 ## Phase II contract (additive)
@@ -202,21 +211,25 @@ Future status changes should be represented by a new dated snapshot. Historical 
 Run all of the following on the exact candidate commit before tagging:
 
 ```bash
+python -m pip install -e ".[dev]"
 python -m pip install -r requirements-dev.txt
 python -m pip install -r phase2/requirements.txt
+gdi --version
 python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 python scripts/test_regressions.py
 python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
-python -m pytest scripts/test_corpus.py
+python -m pytest scripts/test_corpus.py scripts/test_study_status.py
 python scripts/corpus_metrics.py corpus/case-template.json
+python scripts/study_status.py
 python -m pytest phase2/tests
 python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
+gdi verify-bundle examples/verification-bundle --json
 ```
 
-CI mirrors this split across jobs `conformance`, `phase2`, and `schema-02` (see `.github/workflows/validate.yml`). The `conformance` job also runs the source-artifact, policy-pin, and corpus-contract tests. A release statement must identify the exact commit whose checks ran; success on an earlier head is not evidence for a later head.
+CI mirrors this split across jobs (see `.github/workflows/validate.yml`). A release statement must identify the exact commit whose checks ran; success on an earlier head is not evidence for a later head.
 
 ## Limits
 

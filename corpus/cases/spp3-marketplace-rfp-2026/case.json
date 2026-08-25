@@ -1,0 +1,440 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp3-2026-marketplace-rfp-amendment",
+  "title": "SPP3 Marketplace RFP authorization (EP7.1) — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "other",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected from the post-start selection addendum as a one-time policy amendment authorizing a milestone-gated Marketplace RFP with publicly incomplete provider-award settlement, distinct from EthID withdrawal and standard cohort awards.",
+    "exclusionBoundary": "Does not invent a final marketplace awardee, award amount, or interview outcomes. Does not reopen EthID withdrawal as this case's primary unit of analysis.",
+    "strata": [
+      "policy-change-or-ambiguity",
+      "delivery-or-milestone",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-EP71",
+      "sourceUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public EP7.1 proposal authorizing a one-time Marketplace RFP from uncommitted SPP3 budget after EthID withdrawal."
+    },
+    {
+      "artifactId": "SRC-TIMELINE",
+      "sourceUri": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public post opening the RFP after DAO approval, with rubric, eligibility gate, and timeline. States applications are now closed; does not settle a final awardee in the reviewed reconstruction."
+    },
+    {
+      "artifactId": "SRC-COHORT",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "role": "evidence",
+      "availability": "reference-only",
+      "notes": "Public cohort context for EthID withdrawal and uncommitted budget that precipitated the RFP."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:8e3886cf30fcd412369ffc7cf4a02c9e2030f5976fbe1464ee545bdf9897d4a6",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. Final marketplace awardee remains unsettled by design."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "marketplace-rfp-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 5.0,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71"
+          ]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "SPP3-2026-MARKETPLACE-RFP is a reconstruction identifier for the one-time RFP process."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71"
+          ],
+          "rationale": "Reconstruction identifier for the EP7.1 authorization unit of analysis."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71"
+          ]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71"
+          ]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71"
+          ]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ]
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "EP7.1 restates standard SPP3 recusal rules for the RFP; no named marketplace-applicant recusal is settled in this reconstruction."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE",
+            "SRC-COHORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-TIMELINE",
+            "SRC-EP71"
+          ],
+          "rationale": "Public sources establish DAO approval of EP7.1; 'authorization-passed' is an interpretive non-vocabulary status to avoid inventing a settled provider award amount."
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "Milestone-gated award design is authorized publicly; instantiation for a named awardee remains pending/incomplete in this reconstruction."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-EP71",
+            "SRC-TIMELINE",
+            "SRC-COHORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact byte identity is provided by the corpus snapshot hash instead."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-DECISION-STATUS",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.status",
+        "message": "'authorization-passed' is not one of ['pending', 'ineligible', 'approved', 'rejected', 'deferred', 'suspended']",
+        "disposition": "unresolved",
+        "rationale": "Literal status 'authorization-passed' is retained because mapping EP7.1 authorization into approved would invent a positive awardedAmount and overstate provider-award settlement.",
+        "sourceArtifactIds": [
+          "SRC-EP71",
+          "SRC-TIMELINE"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      },
+      {
+        "findingId": "INIT-SCHEMA-GOVERNINGPOLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA decision.status: 'authorization-passed' is not one of ['pending', 'ineligible', 'approved', 'rejected', 'deferred', 'suspended']",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "Has a final marketplace awardee and winning score been published after this reconstruction's evidence cutoff?",
+      "What exact Snapshot end instant should bind decision.decidedAt for EP7.1?",
+      "Should authorization amendments and subsequent provider awards be split into separate corpus cases once an awardee is named?"
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures.",
+    "Approval of EP7.1 is not represented as settlement of a marketplace provider award.",
+    "This case does not reopen or re-adjudicate the separately encoded EthID withdrawal.",
+    "The non-vocabulary status authorization-passed is a reconstructability encoding choice, not a claim that the DAO used that label."
+  ]
+}

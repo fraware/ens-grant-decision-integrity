@@ -1,0 +1,224 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp3-2026-marketplace-rfp-amendment-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 3 (SPP3) Marketplace RFP",
+    "roundId": "SPP3-2026-MARKETPLACE-RFP",
+    "authority": "ENS DAO social amendment (EP7.1) authorizing the SPP3 committee to run a scoped Marketplace RFP",
+    "programUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "ep-7-1-spp3-marketplace-rfp",
+    "applicantName": "EP 7.1 SPP3 Marketplace RFP authorization",
+    "applicationUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP3-2026-EP7.1",
+    "version": "one-time Marketplace RFP amendment plus published submission timeline/rubric",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+    "sources": [
+      "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "eligibility": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+      "evaluationCriteria": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+      "conflictRules": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "decisionProcedure": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263"
+    },
+    "changeDuringReview": true,
+    "changeSummary": "One-time amendment to SPP3 authorization extending the committee mandate to run an open Marketplace RFP from uncommitted budget after EthID declined, with marketplace-specific rubric and milestone-gated award design.",
+    "previousVersion": "SPP3 program authorization without Marketplace RFP mandate",
+    "changeNoticeUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+    "priorEvaluationsRerun": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "GOVERNANCE-RFP-AUTHORIZATION-IN-SCOPE",
+        "description": "EP7.1 is a published social proposal to amend SPP3 to authorize a scoped Marketplace RFP using already-authorized uncommitted funds; treated as within the public governance process.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-EP71",
+          "E-TIMELINE"
+        ]
+      }
+    ],
+    "rationale": "Unit of analysis is the RFP authorization amendment. Applicant hard-screen results for marketplace proposers are not reconstructed as settled awards."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "ens-dao-electorate",
+      "displayName": "ENS DAO Snapshot electorate for EP7.1",
+      "kind": "other",
+      "role": "approve or reject the Marketplace RFP amendment",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    },
+    {
+      "evaluatorId": "spp3-committee",
+      "displayName": "SPP3 Committee",
+      "kind": "committee",
+      "role": "run the authorized RFP under published rubric and quorum rules after EP7.1 passage",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-EP71",
+      "kind": "forum",
+      "description": "EP7.1 social proposal authorizing Marketplace RFP, budget ceiling, and milestone-gated award design.",
+      "uri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-TIMELINE",
+      "kind": "forum",
+      "description": "Marketplace RFP submission timeline and artifacts post stating DAO approval, publishing rubric/eligibility, and recording that applications are closed without settling a final awardee in this reconstruction.",
+      "uri": "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-COHORT",
+      "kind": "forum",
+      "description": "SPP3 cohort recommendation context for EthID withdrawal and uncommitted budget.",
+      "uri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "EP71-PASS",
+        "name": "DAO social vote outcome authorizing the Marketplace RFP",
+        "score": null,
+        "scoreScale": "pass/fail social vote; timeline post states the DAO approved EP7.1"
+      },
+      {
+        "criterionId": "M1-M5",
+        "name": "Marketplace RFP rubric M1–M5 for subsequent provider selection",
+        "score": null,
+        "scoreScale": "1-5 weighted rubric published for applicant scoring; no final winning score settled in this reconstruction"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-AUTHORIZED",
+        "statement": "The Marketplace RFP timeline post states the DAO approved EP7.1 by Snapshot vote and opens the RFP under that authority.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-TIMELINE",
+          "E-EP71"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-INCOMPLETE-AWARD",
+        "statement": "Public timeline artifacts describe submission close, committee evaluation windows, and an award-announcement target, but this reconstruction does not treat a final marketplace awardee, award amount, or interview outcome as settled.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-TIMELINE"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-MILESTONE-DESIGN",
+        "statement": "EP7.1 and the timeline post authorize a milestone-gated award structure (build milestones through go-live and traction gates), with stream pause if go-live is missed without committee approval.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-EP71",
+          "E-TIMELINE"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate",
+          "spp3-committee"
+        ],
+        "materiality": "high"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "No final marketplace applicant score is settled in the reviewed public record for this reconstruction."
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "authorization-passed",
+    "authority": "ENS DAO Snapshot social vote on EP7.1, with subsequent RFP administration by the SPP3 committee",
+    "authorityKind": "dao-vote",
+    "decidedAt": null,
+    "awardedAmount": null,
+    "currency": "USD",
+    "rationale": "The public timeline post states the DAO approved EP7.1 authorizing the Marketplace RFP. The literal status 'authorization-passed' is outside the v0.1 closed vocabulary because mapping authorization-without-settled-awardee into approved would invent a positive awardedAmount and overstate provider-award settlement.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": null,
+    "decisionRule": "Snapshot social proposal for EP7.1; committee then runs RFP under published rubric with quorum of three of four Member seats.",
+    "voteRecordUri": "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263"
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "Reviewed public EP7.1 artifacts do not identify a dedicated post-authorization correction path beyond ordinary governance.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [
+    {
+      "conditionId": "MARKETPLACE-RFP-MILESTONE-GATED-AWARD-DESIGN",
+      "description": "Authorized design: one award of up to $500,000, roughly half streamed through go-live build milestones and half released against on-chain-verifiable traction gates; go-live miss pauses the stream without committee-approved revision.",
+      "targetDate": null,
+      "reviewWindow": "Award term co-terminating with SPP3 cohort (~11 months) once an awardee is selected and KYC/executable complete",
+      "verificationMethod": "Milestone acceptance criteria and on-chain traction gates as published; exact per-award thresholds set at signing.",
+      "verifier": "SPP3 committee and accountability body / ENS Foundation per published RFP terms",
+      "dependencies": [
+        "Final awardee selection and public winning score (not settled in this reconstruction)",
+        "Service agreement, KYC, and executable funding vote"
+      ],
+      "paymentAmount": null,
+      "currency": "USD",
+      "status": "pending",
+      "evidenceIds": [
+        "E-EP71",
+        "E-TIMELINE"
+      ],
+      "consequence": "Amounts not released by term end return to the DAO treasury; if no proposal clears the bar, nothing is funded."
+    }
+  ],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T18:30:00Z",
+    "updatedAt": "2026-08-25T18:30:00Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Unit of analysis is EP7.1 RFP authorization plus incomplete public provider-selection process, not a named marketplace awardee.",
+    "No final awardee, award amount, or interview outcome is invented.",
+    "The literal status 'authorization-passed' is intentionally outside the v0.1 closed decision.status vocabulary.",
+    "decision.decidedAt for EP7.1 remains null at schema-v0.1 precision.",
+    "EthID withdrawal is background context and is already encoded as a separate case.",
+    "Reference-only remote sources are not represented as exact byte-preserved captures."
+  ]
+}

@@ -31,13 +31,16 @@ Source-provenance changes must distinguish content identity from source truth, o
 Run the validation contract that covers the surfaces you touch. For changes that could affect any of the shipped profiles, run the full local suite:
 
 ```bash
+python -m pip install -e ".[dev]"
 python -m pip install -r requirements-dev.txt
 python -m pip install -r phase2/requirements.txt
+gdi --version
 python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 python scripts/test_regressions.py
 python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
+python -m pytest scripts/test_corpus.py scripts/test_study_status.py
 python -m pytest phase2/tests
 python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
@@ -47,6 +50,7 @@ Expected Marketplace outcome: no conformance errors; warning set exactly `{CHAL0
 
 A contribution that intentionally changes a conformance rule should update the corresponding adversarial or regression test and explain the new guarantee or trade-off. A source-artifact change should include tampering or mismatch tests that fail closed. A result from an earlier branch head is not validation evidence for a later head; release-facing claims must identify the exact commit that was tested. See `VALIDATION.md`, `CONFORMANCE.md`, and `SOURCE-ARTIFACTS.md`.
 
+Corpus contributions must preserve anti-circularity: do not invent missing public facts to make a case green, and do not fabricate independent second annotations.
 ## Sensitive reports
 
 Do not open a public issue for validator bypasses, redaction leaks, credential exposure, or release-integrity ambiguity. Use `SECURITY.md`.

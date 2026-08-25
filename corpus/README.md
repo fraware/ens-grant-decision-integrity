@@ -96,3 +96,15 @@ A case that cannot be completed from available artifacts remains informative. Do
 ## Merit and legitimacy boundary
 
 The corpus evaluates reconstructability, claim discipline, and operational burden. It does not rescore historical applicants, certify the quality of substantive judgment, prove source truth, or determine institutional legitimacy.
+
+## Current corpus status (machine)
+
+As of the current `main` tree, `scripts/study_status.py` reports nine counted public-only empirical cases under `corpus/cases/`. Case-count and declared required-stratum coverage gates are met. Double annotation is **not** met (`0/9`; need ≥3 at current size). Status is `in-progress`; `readyForFinalReview` is `false`.
+
+Second-annotation handoffs for the three baseline cases live under `corpus/second-annotation-handoffs/` (see `DOUBLE-ANNOTATION.md`, `HANDOFF-STATUS.md`, `ANNOTATOR-CHECKLIST.md`). Do not fabricate independent annotations.
+
+Descriptive draft notes for the incomplete study: `FINAL-STUDY-REPORT.md` (not final-review ready).
+
+```bash
+python scripts/study_status.py
+```

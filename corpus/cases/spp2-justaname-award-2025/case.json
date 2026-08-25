@@ -1,0 +1,481 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp2-2025-justaname-award",
+  "title": "SPP2 JustaName award — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "approved-award",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected from the post-start selection addendum as a prior-season award under delegate ranked-choice (EP6.5/EP6.10) with public EP6.13 funded-stream confirmation, structurally distinct from SPP3 committee recommendation awards.",
+    "exclusionBoundary": "Does not rescore JustaName, reconstruct every delegate ballot, or treat unofficial stream-tracking repositories as cryptographic proof. Exact Copeland tallies are not independently recomputed.",
+    "strata": [
+      "approved-award",
+      "merit-decision",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-ORIGINAL-PLAN",
+      "sourceUri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-EP65",
+      "sourceUri": "https://docs.ens.domains/dao/proposals/6.5/",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public ENS governance documentation for the passed EP6.5 amendment. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-AMENDED-PLAN",
+      "sourceUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public MetaGov amended facilitation plan stating EP6.5 governs the selection vote."
+    },
+    {
+      "artifactId": "SRC-APPLICATION",
+      "sourceUri": "https://discuss.ens.domains/t/spp2-justaname-application/20430",
+      "role": "evidence",
+      "availability": "reference-only",
+      "notes": "Public JustaName SPP2 application thread, including MetaGov eligibility confirmation. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-VOTE",
+      "sourceUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public EP6.10 selection proposal describing the ranked-choice vote and listing JustaName among applicants."
+    },
+    {
+      "artifactId": "SRC-IMPLEMENTATION",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public EP6.13 executable implementation listing Justaname at $300,000 for a one-year stream among funded SPP2 providers."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:dda63976109fafdeecaab4a8936646368b71d6838140116b42afb81d262470fb",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. Unsupported exact timestamps remain null; funding is bound to EP6.13."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "justaname-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 5.2,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN"
+          ],
+          "rationale": "The public program is named SPP2; SPP2-2025 is a reconstruction identifier."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION"
+          ],
+          "rationale": "justaname-spp2-2025 is a reconstruction identifier bound to the public application thread."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION",
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION"
+          ]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-EP65"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AMENDED-PLAN"
+          ]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN",
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-EP65"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN"
+          ]
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION",
+            "SRC-AMENDED-PLAN"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-VOTE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-VOTE"
+          ],
+          "rationale": "No JustaName-specific recusal is disclosed in the reviewed public sources; the empty array is retained."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN",
+            "SRC-APPLICATION",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-EP65",
+            "SRC-VOTE"
+          ]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "SPP2 used ranked-choice allocation without a published scalar JustaName merit score in the reviewed sources."
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-VOTE"
+          ],
+          "rationale": "EP6.13 establishes the funded stream; provider-specific milestone schedules beyond program-level reporting are not fully reconstructed from the reviewed public set."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-APPLICATION",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-ORIGINAL-PLAN",
+            "SRC-EP65",
+            "SRC-AMENDED-PLAN",
+            "SRC-APPLICATION",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact byte identity is provided by the corpus snapshot hash instead."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-DECISION-DECIDEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.decidedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Public surfaces identify EP6.10 vote-end display times, but this reconstruction does not upgrade a rendered clock time into a schema-v0.1 exact timestamp. The null is retained.",
+        "sourceArtifactIds": [
+          "SRC-VOTE",
+          "SRC-IMPLEMENTATION"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Eligibility confirmation is public; exact checkedAt instant is not established.",
+        "sourceArtifactIds": [
+          "SRC-APPLICATION",
+          "SRC-AMENDED-PLAN"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-GOVERNINGPOLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "EP6.5 passage and amended facilitation are established without one exact combined effective timestamp.",
+        "sourceArtifactIds": [
+          "SRC-ORIGINAL-PLAN",
+          "SRC-EP65",
+          "SRC-AMENDED-PLAN"
+        ]
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA decision.decidedAt: None is not of type 'string'",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "What exact schema-v0.1 instant should bind decision.decidedAt for EP6.10 versus EP6.13?",
+      "What was JustaName's exact Copeland rank and pairwise tally on the authoritative result surface?",
+      "What quorum figure should be recorded for the DAO-wide SPP2 selection vote? (committee-quorum stratum not claimed without a source-bounded quorum figure.)",
+      "What provider-specific delivery milestones were negotiated beyond the public stream amount?"
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures.",
+    "Listing in EP6.13 establishes the funded allocation represented here and does not recompute the full election from raw ballots.",
+    "Absence of a recorded quorum percentage is a public-evidence limit, not proof that the vote lacked quorum."
+  ]
+}

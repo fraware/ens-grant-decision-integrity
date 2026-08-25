@@ -2,11 +2,15 @@
 
 A versioned draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
-The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding rounds assigned a cumulative **$219** to that proposal. A dated public-status snapshot for 2026-08-24 records the first three relevant rounds as `ratified` and the August 3 and August 4 rounds as `provisional`. The repository does not treat those decision states as payment, transfer, receipt, or settlement evidence. v0.1 implements the first $200 work item described in the originating proposal: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 added optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
+The project originated in the Simocracy proposal **"No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed."** Five ENS Governance funding rounds assigned a cumulative **$219** to that proposal. A dated public-status snapshot for 2026-08-24 records the first three relevant rounds as `ratified` and the August 3 and August 4 rounds as `provisional`. The repository does not treat those decision states as payment, transfer, receipt, or settlement evidence. Allocation is not payment.
 
-**Releases:** [v0.3.2](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.2) (latest) · [v0.3.1](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.1) · [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
+**Package / development line:** `ens-gdi` **0.4.0** (`gdi` CLI). This is an engineering checkpoint on `main`, not a claim that `v1.0.0` gates are closed, and not ENS endorsement.
 
-The latest tagged release remains v0.3.2. Development after that tag is unreleased until a new reviewed tag is created; do not attribute unreleased hardening behavior to v0.3.2.
+**Latest annotated Git tag:** [v0.3.2](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.2). Earlier tags: [v0.3.1](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.1) · [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0).
+
+Do not attribute unreleased `0.4.0` tree behavior to tag `v0.3.2`. Do not describe this checkpoint as `v1.0.0`.
+
+Release lineage in short: v0.1 Charter and schema; v0.2 Phase II evaluator-manifest commitment and anchoring; v0.3 schema 0.2 extensions, projection, and alternate anchor fixtures; post-v0.3.2 / package 0.4.0 hardening includes unified `gdi` verifier, claim registry, profiles/adapters, corpus expansion, projection v2, and Rekor v2 module surfaces (see `RELEASE-INTEGRITY.md` and `docs/V1_0_0_GATE_CHECKLIST.md`).
 
 ## What this repository provides
 
@@ -21,7 +25,7 @@ The profile records enough information for a third party to reconstruct the proc
 - delivery conditions for funded awards;
 - minimum provenance when AI materially informs a recommendation.
 
-JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, deterministic confidential-to-public projection, exact-byte source-artifact verification for policy-pin evidence, and a predeclared retrospective-corpus protocol for empirical reconstructability testing.
+JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, deterministic confidential-to-public projection (v1 and v2), exact-byte source-artifact verification for policy-pin evidence, a unified `gdi` verifier and claim registry, ENS-oriented profiles/adapters, and a predeclared retrospective-corpus protocol for empirical reconstructability testing.
 
 ## Repository layout
 
@@ -37,31 +41,42 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `scripts/source_artifact.py` | Build/verify SHA-256 metadata over exact preserved source bytes |
 | `scripts/verify_policy_pins.py` | Verify schema 0.2 policy pins against byte-verified source artifacts |
 | `SOURCE-ARTIFACTS.md` | Source-capture assurance chain, CLI, and non-claims |
+| `src/gdi/` | Packaged unified verifier (`gdi` entry point) |
+| `claims/` | Machine-readable claim registry |
+| `profiles/` | ENS-oriented profile definitions |
+| `adapters/` | Operator-facing mapping adapters (do not score merit) |
+| `templates/` | Operator worksheets |
 | `corpus/` | Predeclared retrospective study plan, case schema/template, empirical cases, and protocol |
 | `scripts/corpus_metrics.py` | Validate corpus cases and compute descriptive reconstructability/agreement metrics |
-| `scripts/study_status.py` | Revalidate empirical cases and report progress against predeclared case-count, stratum, and double-annotation gates |
+| `scripts/study_status.py` | Revalidate empirical cases and report progress against predeclared gates |
 | `corpus/STUDY-STATUS.md` | Semantics and claim boundaries for machine-readable study-progress reporting |
-| `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, replay evidence, and versioned evidence bundles |
-| `projection/` | Deterministic confidential-to-public record projection |
-| `examples/` | Fictional worked examples (non-evaluative) |
+| `phase2/` | Evaluator-manifest commitment, anchoring (incl. Rekor v1/v2 modules), run attestation, replay, evidence bundles |
+| `projection/` | Deterministic confidential-to-public record projection (v1 and v2) |
+| `examples/` | Fictional worked examples and a verification-bundle smoke fixture |
 | `methodology/GRANT-DECISION-INTEGRITY.md` | Draft twelve-step review methodology |
+| `docs/ADOPTER-GUIDE.md` | Short operator-facing adoption guide |
+| `docs/V1_0_0_GATE_CHECKLIST.md` | Engineering gate tracker for a future `v1.0.0` — **not** a release claim |
 | `ADOPTION.md` | Adoption pathway for ENS grant programs |
 | `VALIDATION.md` | Validation contract and expected outcomes |
 | `DESIGN-NOTES.md` | Design rationale, threat model, and scope boundaries |
 | `RELEASE-INTEGRITY.md` | Release-identity and archive-integrity procedure |
+| `ASSURANCE-CASE.md` | Bounded assurance map to the claim registry |
+| `DEFERRED.md` | Explicit non-goals and deferred work at the v1.0.0 boundary |
 | `REVIEW.md` | Adversarial review guide |
 | `CONTRIBUTING.md` | Contribution preferences and pre-change validation |
 | `SECURITY.md` | Sensitive-disclosure reporting |
-| `CITATION.cff` | Citation metadata for the latest tagged release |
+| `CITATION.cff` | Citation metadata aligned with package version `0.4.0` |
 | `provenance/simocracy-funding.json` | Recorded historical allocation amounts and source identifiers |
 | `provenance/simocracy-status-2026-08-24.json` | Dated platform decision-status snapshot; financial evidence kept separate |
 | `provenance/ALLOCATION-CAPTURE.md` | Friday/post-event provenance procedure without status conflation |
 
 ## Quickstart
 
-Install pinned dependencies and run the complete v0.1 validation contract:
+Install the package (editable) and run the unified CLI, or use the script-based validation contract:
 
 ```bash
+python -m pip install -e ".[dev]"
+gdi --version
 python -m pip install -r requirements-dev.txt
 python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
@@ -69,7 +84,16 @@ python scripts/test_conformance.py
 python scripts/test_regressions.py
 ```
 
-The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including source-artifact, corpus, Phase II, schema 0.2, and projection suites.
+Useful `gdi` surfaces (see `--help` for full options):
+
+```bash
+gdi verify-record examples/spp3-marketplace-rfp.example.json
+gdi verify-bundle examples/verification-bundle --json
+gdi claims --id C2
+gdi profiles
+```
+
+The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including source-artifact, corpus, Phase II, schema 0.2, projection, and bundle suites.
 
 ## Phase II (evaluator provenance)
 
@@ -83,11 +107,9 @@ python -m pytest phase2/tests
 python phase2/src/cli.py verify-graph --bundle phase2/examples/retrospective-public.bundle.json
 ```
 
-Rekor tests and the public example use `rekor-v1-recorded-fixture` receipts verified under a shipped test-log key. That profile does **not** establish inclusion in the public Sigstore Rekor log. Rekor v1 remains a historical compatibility profile. See `phase2/ADMIN-BURDEN.md` and `phase2/CLAIM-MATRIX.md`.
+Public examples and many tests use recorded-fixture receipts under shipped test-log keys. Fixture profiles do **not** establish inclusion in a production public log. Rekor v1 remains a historical compatibility profile. A Rekor v2 module exists (`phase2/src/anchors/rekor_v2.py`); live Sigstore TUF TrustedRoot / SigningConfig online issuance remains fail-closed until an official client integration is pinned. Production `rfc3161` fails closed until standards-conformant CMS/RFC 3161 verification is implemented. See `phase2/ADMIN-BURDEN.md`, `phase2/CLAIM-MATRIX.md`, and `phase2/DEFERRED.md`.
 
-Current replay generation emits replay-report v2 (`exact-match`, `diverged`, `not-replayable`) from canonical artifact recomputation. Replay-report v2 requires the exact defined layer set and complete digest evidence, and graph verification checks the reported recomputed digests. Historical replay-report v1 remains schema-frozen for compatibility, but its `bounded-match` digest-distance mechanism is rejected by the current verifier because cryptographic hash distance is not a meaningful approximation measure for the underlying computation.
-
-Historical evidence-bundle v1 also remains schema-frozen and carries replay-report v1. New evidence carrying replay-report v2 uses evidence-bundle v2. This avoids silently changing the released parent-container contract.
+Current replay generation emits replay-report v2 (`exact-match`, `diverged`, `not-replayable`) from canonical artifact recomputation. Historical replay-report v1 remains schema-frozen for compatibility; its `bounded-match` digest-distance mechanism is rejected by the current verifier. New evidence carrying replay-report v2 uses evidence-bundle v2.
 
 ## Schema 0.2 extensions and projection
 
@@ -95,9 +117,11 @@ Optional schema `0.2` extensions do not mutate v0.1 behavior:
 
 - `schema/grant-decision-record-0.2.schema.json` — optional `policyPinning` and `authorityIdentity`
 - `schema/grant-decision-public-projection-0.2.schema.json` — relaxed requirements for projected public records
-- `projection/` — deterministic confidential-to-public record projection with withheld commitments; projection v1 uses top-level redaction paths, fails closed on silent top-level omission or ambiguous publish/withhold disposition, and refuses to overwrite non-null source integrity metadata
-- `phase2/src/anchors/rfc3161.py` — reserved production RFC 3161 profile plus recorded test fixture; production `rfc3161` currently fails closed until standards-conformant CMS/RFC 3161 verification is implemented
-- `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`); live mainnet anchoring is not implemented
+- `projection/` — deterministic confidential-to-public record projection with withheld commitments
+  - **v1:** top-level redaction paths; fails closed on silent top-level omission or ambiguous publish/withhold disposition; refuses to overwrite non-null source integrity metadata
+  - **v2:** RFC 6901 path disposition rules; arrays treated atomically; explicit dispositions required
+- `phase2/src/anchors/rfc3161.py` — reserved production RFC 3161 profile plus recorded test fixture; production `rfc3161` fails closed
+- `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile; live mainnet anchoring is not implemented
 - `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
 
 ```bash
@@ -125,7 +149,15 @@ The source verifier re-hashes the supplied raw bytes and checks byte length and 
 
 `corpus/` defines the empirical test before real cases are counted. `study-plan.json` predeclares the heterogeneous sampling strata, primary metrics, double-annotation rule, anti-circularity rule, merit boundary, and privacy boundary. `schema/case.schema.json` defines the machine-readable case contract. `case-template.json` is explicitly marked `template: true` and is not empirical evidence.
 
-The unreleased development state currently contains three checked-in public-only empirical reconstructions: the SPP3 Namespace award, the SPP3 EthID withdrawal, and the SPP2 Agora budget-constrained no-award case. The machine study-status report classifies the corpus as `in-progress`, not complete: 3 cases versus the predeclared 8–12 target, 7 of 8 required strata represented, `hard-eligibility` unresolved, and 0 of 3 cases double annotated against a minimum fraction of 0.25. This status is descriptive study-progress evidence only.
+The development tree currently contains **nine** checked-in public-only empirical reconstructions (SPP2 and SPP3). Machine `study_status` reports:
+
+- `status`: `in-progress`
+- case count: **9** (predeclared target 8–12) — minimum and maximum gates met
+- required strata declared coverage: **met** (`requiredUnresolved` empty)
+- double annotation: **0/9** (need ≥3 at current corpus size; minimum fraction 0.25) — **blocked**
+- `readyForFinalReview`: **false**
+
+This status is descriptive study-progress evidence only. Second-annotation handoffs are prepared under `corpus/second-annotation-handoffs/`; human independent annotations have not been returned. Do not fabricate second annotations.
 
 ```bash
 python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py scripts/test_study_status.py
@@ -142,9 +174,11 @@ The corpus must preserve exact initial record bytes/hash and initial findings. I
 
 ## What validators prove and do not prove
 
-**Prove:** record structure and declared cross-field consistency under the selected profile; exact byte identity for a supplied source artifact when the source-artifact verifier succeeds; exact policy-pin URI/hash linkage to a byte-verified artifact when the policy-pin verifier succeeds; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec; corpus-case structural/protocol consistency, exact-byte agreement for declared record snapshots and redistributable sources when those checks apply, and the arithmetic of its descriptive metrics when the corpus validator succeeds.
+**Prove:** record structure and declared cross-field consistency under the selected profile; exact byte identity for a supplied source artifact when the source-artifact verifier succeeds; exact policy-pin URI/hash linkage to a byte-verified artifact when the policy-pin verifier succeeds; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec; corpus-case structural/protocol consistency, exact-byte agreement for declared record snapshots and redistributable sources when those checks apply, and the arithmetic of its descriptive metrics when the corpus validator succeeds; claim-registry–bounded results from `gdi verify-bundle` for checks that actually ran.
 
-**Do not prove:** truth or completeness of cited evidence; source ownership or institutional adoption; byte verification of reference-only or authorized-audit-only corpus sources; quality of substantive judgment; legitimacy of the governing policy; representativeness of the retrospective corpus; correctness of an annotation merely because annotators agree; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment, transfer, receipt, or settlement of Simocracy allocations.
+**Do not prove:** truth or completeness of cited evidence; source ownership or institutional adoption; byte verification of reference-only or authorized-audit-only corpus sources; quality of substantive judgment; legitimacy of the governing policy; representativeness of the retrospective corpus; correctness of an annotation merely because annotators agree; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment, transfer, receipt, or settlement of Simocracy allocations; ENS DAO / Foundation / SPP committee endorsement.
+
+`ok=true` with `not-run` or `not-applicable` checks must not be marketed as full-profile production assurance.
 
 ## AI provenance boundary
 
@@ -164,19 +198,22 @@ This project governs the integrity of the decision record. It does not determine
 
 | Item | Value |
 |---|---|
-| Latest tagged repository release | `0.3.2` |
-| Development state | unreleased changes may exist after the latest tag; exact commit SHA is authoritative |
+| Package version (`ens-gdi` / `gdi`) | `0.4.0` (engineering checkpoint; unreleased as an annotated tag unless/until tagged) |
+| Latest annotated repository tag | `v0.3.2` |
 | Default grant-decision `schemaVersion` | `"0.1"` |
 | Optional extensions | schema `"0.2"` (additive) |
 | Phase II versions | manifest/envelope/anchor/run predicate v1; replay report v1 historical and v2 current; evidence bundle v1 historical and v2 current |
+| Projection | v1 (top-level) and v2 (RFC 6901 path dispositions) |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
-| Retrospective corpus | In progress: 3 empirical cases; predeclared target 8–12; 7/8 required strata represented; `hard-eligibility` unresolved; 0/3 double annotated |
+| Retrospective corpus | In progress: 9 empirical cases; required strata coverage met; 0/9 double annotated; `readyForFinalReview=false` |
 | Simocracy decision-status snapshot | $219 across five relevant rounds; 3 ratified and 2 provisional as observed 2026-08-24 |
 | Financial evidence | no payment, transfer, receipt, or settlement evidence recorded in the dated 2026-08-24 snapshot |
-| Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
+| Friday / post-event capture | blocked until an authoritative artifact exists; template/checklist only — no invented outcomes |
+| Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or any SPP committee |
+| `v1.0.0` | Not claimed; see `docs/V1_0_0_GATE_CHECKLIST.md` for remaining blockers |
 
-For adoption guidance, see `ADOPTION.md`. For security-sensitive reports, see `SECURITY.md`.
+For adoption guidance, see `docs/ADOPTER-GUIDE.md` and `ADOPTION.md`. For security-sensitive reports, see `SECURITY.md`.
 
 ## Sources
 

@@ -12,7 +12,9 @@ The reviewed Git commit SHA is the content-addressed anchor for a release. A Git
 | `v0.3.1` | Public-readiness documentation and fixture URI corrections | No validator or schema behavior changes |
 | `v0.3.2` | Documentation accuracy: version labels, allocation/payment caveat, stale scope/procedure text | No validator or schema behavior changes |
 
-Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is separately specified. Schema `"0.2"` is an optional additive profile. Phase II evaluator manifest, commitment envelope, anchor receipt, and run predicate retain version `"1"`; replay reports and evidence bundles are independently versioned, with historical v1 formats and current v2 formats in unreleased post-v0.3.2 hardening.
+**Package line `0.4.0` (current `pyproject.toml` / `gdi`):** engineering checkpoint on `main` after `v0.3.2`. Includes unified verifier packaging, claim registry, profiles/adapters, corpus expansion, projection v2, and Rekor v2 module surfaces among other hardening. **Not** an annotated Git tag unless/until one is created. **Not** `v1.0.0`. Do not describe `0.4.0` tree behavior as part of tag `v0.3.2`.
+
+Grant-decision `schemaVersion` stays `"0.1"` unless a versioned schema change is separately specified. Schema `"0.2"` is an optional additive profile. Phase II evaluator manifest, commitment envelope, anchor receipt, and run predicate retain version `"1"`; replay reports and evidence bundles are independently versioned (historical v1; current v2). Projection has v1 and v2 engines.
 
 Release URLs:
 

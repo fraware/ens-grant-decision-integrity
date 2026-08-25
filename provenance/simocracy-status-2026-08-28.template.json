@@ -1,0 +1,39 @@
+{
+  "snapshotVersion": "1",
+  "template": true,
+  "templatePurpose": "Capture checklist skeleton for a post-2026-08-28 dated Simocracy funding snapshot. Do not commit a filled production file until an authoritative public artifact exists. Do not copy this template into simocracy-status-2026-08-28.json with invented values.",
+  "proposal": {
+    "title": null,
+    "uri": null
+  },
+  "observedOn": null,
+  "sourceUri": null,
+  "sourceArtifactHash": null,
+  "aggregateAllocationUsd": null,
+  "axisA_decisionStatus": {
+    "description": "Axis A — platform decision/procedural vocabulary exactly as represented by the authoritative artifact (for example provisional or ratified). Do not translate into a stronger project-defined state.",
+    "rounds": []
+  },
+  "axisB_financialEvidence": {
+    "description": "Axis B — payment authorization, transfer, receipt, and settlement only when separately evidenced. Leave null/absent until evidence exists. Allocation or ratification alone is not payment.",
+    "paymentAuthorization": null,
+    "transfer": null,
+    "receipt": null,
+    "settlement": null
+  },
+  "repositoryBaseline": {
+    "preEventCommit": null,
+    "note": "Record the exact Git commit SHA that preceded the Friday artifact capture. Prefer the pre-Friday checkpoint SHA current at freeze time, not a guessed historical SHA."
+  },
+  "captureMetadata": {
+    "capturedAt": null,
+    "capturer": null,
+    "authoritativeArtifactExists": false,
+    "notes": "Fill only after the public artifact exists. Preserve exact bytes when lawful."
+  },
+  "nonClaims": [
+    "A template is not evidence.",
+    "Null financial-evidence fields mean no such evidence is recorded yet; they do not prove an event did not occur elsewhere.",
+    "Platform decision status is not payment, transfer, receipt, or settlement."
+  ]
+}
