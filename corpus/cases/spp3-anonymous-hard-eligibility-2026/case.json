@@ -1,0 +1,482 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp3-2026-anonymous-hard-eligibility-disqualification",
+  "title": "SPP3 anonymous hard-eligibility disqualification — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "eligibility-failure",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected to exercise the predeclared hard-eligibility stratum after official public sources were found that establish a real SPP3 eligibility-gate disqualification. The case is included despite public-source incompleteness because the study plan treats unknown as admissible and explicitly tests whether the record model exposes rather than hides evidence gaps.",
+    "exclusionBoundary": "This case represents only the one anonymously reported SPP3 hard-screen disqualification and the aggregate published reason. It does not identify the applicant, infer an application URI or requested amount, assign outcomes to unpublished eligibility gates, infer individual committee participation, convert the cohort-post publication time into the historical eligibility-decision time, or reassess whether the committee's substantive eligibility judgment was correct.",
+    "strata": [
+      "hard-eligibility",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-AUTH",
+      "sourceUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public ENS governance source reviewed during reconstruction. It establishes the SPP3 service-to-ENS eligibility rule and program authorization. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-RUBRIC",
+      "sourceUri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public SPP3 process source reviewed during reconstruction. It publishes the pre-score hard eligibility screen and states that applications failing it are not reviewed further. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-COHORT",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public cohort recommendation reviewed during reconstruction. It reports 26 applications, one eligibility-gate disqualification, 25 scored applications, and the aggregate reason for the disqualification. It does not publicly identify the disqualified applicant. No exact byte-preserved capture is claimed."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:57fda92519f688b69628092dc295f82725c5ffb4f4b4195e0718907e9fe34ca0",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. Applicant identity and three exact historical instants remain intentionally null because the reviewed official sources do not establish them; these are preserved as structural validator findings rather than filled with labels or publication timestamps."
+    },
+    "reconciled": {
+      "recordHash": "sha256:8942eb1990dedf6d1f941a74310c7ef5056df4c5d6bb95d9c97d0ac3bf8c168d",
+      "path": "record-reconciled.json",
+      "notes": "Exact UTF-8 bytes after disclosure serialization corrections only: removed unsupported publicRecordUri and protectedRecordLocator; set redactions to []; set timestamps.updatedAt to the reconciliation time. The four source-null fields are unchanged."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "anonymous-hard-screen-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 3.3,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH"
+          ]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH"
+          ],
+          "rationale": "The public sources call the cycle SPP3; SPP3-2026 is a local reconstruction identifier, not a source-issued round ID."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-COHORT"
+          ],
+          "rationale": "The sources establish a named committee applying the hard screen under a DAO-ratified program; the record maps that arrangement into program.authority."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ],
+          "rationale": "The cohort report discloses one anonymous eligibility-disqualified application but no formal application ID; the record uses a local reconstruction identifier solely to address the case."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ],
+          "rationale": "ENS-SPP3-2026 is a reconstruction identifier for the ratified authorization plus published pre-submission process artifacts."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ],
+          "rationale": "The source set has no single machine-readable version identifier; the record names the exact authorization-plus-rubric combination used in the reconstruction."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH"
+          ]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ],
+          "rationale": "The GDI surface taxonomy is mapped to the official public artifacts containing the corresponding rules; the source documents do not themselves use that taxonomy."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "The reviewed sources establish the eligibility rule before submissions and do not identify a change to that rule during review; the record does not convert unrelated timeline adjustments into an eligibility-policy change."
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "The failed service-to-ENS gate is directly supported. Outcomes for the other published gates are retained as pending because the aggregate cohort disclosure does not state them."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "The public record attributes the hard-screen process to the SPP3 committee collectively; individual participation in this anonymous applicant's eligibility review is not reconstructed."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "The official public references are mapped into the decision-record evidence taxonomy without claiming preserved source bytes or undisclosed application evidence."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "The public process states that an application failing the hard eligibility screen is not reviewed further, and the cohort report says the remaining 25 applications were scored."
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-COHORT"
+          ]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-COHORT"
+          ],
+          "rationale": "The eligibility gate is applied by the named SPP3 committee before later DAO cohort ratification, so this case maps the hard-screen authority to the v0.1 committee category."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "The application was disqualified before scoring and no award is represented."
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-COHORT",
+            "SRC-AUTH",
+            "SRC-RUBRIC"
+          ]
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "A hard-screen-disqualified application did not enter the funded provider cohort, so provider delivery conditions are not instantiated for this case."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-COHORT"
+          ],
+          "rationale": "The checked-in reconstruction uses only public aggregate sources; this does not imply the underlying application, direct notice, or committee working materials were public."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-AUTH",
+            "SRC-RUBRIC",
+            "SRC-COHORT"
+          ],
+          "rationale": "This repository case is assembled exclusively from public-source references and intentionally excludes any guessed applicant identity."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata, not a historical SPP3 process fact."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata, not a historical SPP3 process fact."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact reconstruction bytes are bound by the corpus snapshot hash."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-APPLICANT-NAME",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "application.applicantName",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The official cohort source reports exactly one eligibility-disqualified application but deliberately publishes decline rationale in aggregate and does not identify this applicant. The null preserves that public-source limitation instead of manufacturing a name or treating a repository label as the historical applicant name.",
+        "sourceArtifactIds": [
+          "SRC-COHORT"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-DECIDEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.decidedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The cohort recommendation was published on July 3, but its publication timestamp is not evidence of the exact earlier instant at which the committee made the applicant-specific hard-screen decision. The null is retained.",
+        "sourceArtifactIds": [
+          "SRC-COHORT"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-DISCLOSURE-ADDITIONAL",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "disclosure",
+        "message": "Additional properties are not allowed ('protectedRecordLocator', 'publicRecordUri' were unexpected)",
+        "disposition": "annotation-defect",
+        "rationale": "These properties are not permitted by schema v0.1. They were reconstruction serialization defects, not evidence of a historical process gap. Corrected in record-reconciled.json by removing both properties.",
+        "sourceArtifactIds": []
+      },
+      {
+        "findingId": "INIT-SCHEMA-DISCLOSURE-REDACTIONS",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "disclosure.redactions.0",
+        "message": "'The public cohort recommendation does not disclose the identity or application URI of the eligibility-disqualified applicant.' is not of type 'object'",
+        "disposition": "annotation-defect",
+        "rationale": "v0.1 requires structured redaction objects. The initial reconstruction placed a free-text note in redactions[0]. Missing public applicant identity is already represented by the null applicantName field; inventing a redaction event is not justified. Corrected in record-reconciled.json by setting redactions to [].",
+        "sourceArtifactIds": [
+          "SRC-COHORT"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The official sources establish that the hard screen preceded scoring and that one application failed it, but they do not publish the exact applicant-specific eligibility-check instant.",
+        "sourceArtifactIds": [
+          "SRC-RUBRIC",
+          "SRC-COHORT"
+        ]
+      },
+      {
+        "findingId": "INIT-SCHEMA-POLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The authorization and pre-submission artifacts establish the governing eligibility rule, but the reviewed source set does not supply one exact machine-usable effective instant for the combined authorization-plus-rubric policy representation.",
+        "sourceArtifactIds": [
+          "SRC-AUTH",
+          "SRC-RUBRIC"
+        ]
+      }
+    ],
+    "recordChangedAfterReview": true,
+    "finalErrors": [
+      "ERROR SCHEMA application.applicantName: None is not of type 'string'",
+      "ERROR SCHEMA decision.decidedAt: None is not of type 'string'",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": [],
+    "changeRationale": "Reconciliation corrected two reconstruction serialization defects in disclosure (unsupported publicRecordUri/protectedRecordLocator properties, and a string redactions[0] where v0.1 requires a structured redaction object). Those defects are annotation/reconstruction format errors, not historical process gaps. The four source-null fields (application.applicantName, governingPolicy.effectiveAt, eligibility.checkedAt, decision.decidedAt) remain unresolved because the reviewed public sources do not establish them; they were not filled with placeholders."
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": true,
+    "reconciliationNotes": [
+      "disclosure.publicRecordUri removed: unsupported by schema v0.1; was a reconstruction serialization defect, not a historical fact.",
+      "disclosure.protectedRecordLocator removed: unsupported by schema v0.1; was a reconstruction serialization defect, not a historical fact.",
+      "disclosure.redactions changed from a one-element string array to []: v0.1 requires structured redaction objects, and the reviewed sources do not establish a deliberate institutional redaction event for applicant identity.",
+      "timestamps.updatedAt set to 2026-08-25T15:46:00Z as reconstruction metadata for this reconciliation; timestamps.createdAt preserved.",
+      "application.applicantName, governingPolicy.effectiveAt, eligibility.checkedAt, and decision.decidedAt remain null; no placeholders were invented."
+    ],
+    "residualQuestions": [
+      "Should a future record profile permit an explicitly unknown or protected applicant identity when an authoritative aggregate decision event is public but the applicant is not named?",
+      "Does an anonymous aggregate hard-screen disclosure belong as a first-class decision-record case, or should it be represented through a separate aggregate/process-observation object until applicant identity can be bound?",
+      "Can an authorized audit or later public artifact establish the applicant identity, application URI, exact eligibility-check instant, or exact decision instant without weakening the public/private boundary?",
+      "The public cohort report states one disqualification reason but not the other gate outcomes. Those gates remain pending; further evidence could refine them without changing the source-supported failed gate.",
+      "Because the current record is structurally invalid on four unresolved fields, semantic conformance is short-circuited; absence of semantic findings is not evidence that evaluator-participation, authority, challenge, or other semantic rules passed."
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "This corpus case does not identify or attempt to identify the eligibility-disqualified applicant.",
+    "The committee's published eligibility judgment is recorded as a historical source claim and is not independently endorsed or re-adjudicated by this case.",
+    "Missing public applicant identity, timestamps, or gate outcomes do not prove the historical process lacked those facts or records internally.",
+    "Reference-only source URIs are not represented as exact byte-preserved captures.",
+    "A validator result or reconstructability metric does not establish source truth, applicant merit, fairness, or institutional legitimacy.",
+    "The July 3 cohort-post timestamp is not represented as the applicant-specific eligibility decision time."
+  ]
+}

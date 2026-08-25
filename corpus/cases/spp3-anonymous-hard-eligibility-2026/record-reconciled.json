@@ -1,0 +1,232 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp3-2026-anonymous-hard-eligibility-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 3 (SPP3)",
+    "roundId": "SPP3-2026",
+    "authority": "Named SPP3 committee under ENS DAO program authorization",
+    "programUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "spp3-2026-publicly-unidentified-hard-screen-case",
+    "applicantName": null,
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP3-2026",
+    "version": "public-authorization-plus-published-rubric",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+    "sources": [
+      "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "eligibility": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "evaluationCriteria": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "conflictRules": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "decisionProcedure": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086"
+    },
+    "changeDuringReview": false
+  },
+  "eligibility": {
+    "status": "ineligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "SPP3-E1-AMOUNT",
+        "description": "Requested amount must be greater than $200,000.",
+        "result": "pending",
+        "evidenceIds": [
+          "E-RUBRIC"
+        ]
+      },
+      {
+        "ruleId": "SPP3-E2-PRIMARY-SERVICE",
+        "description": "Primary deliverable must be a service to ENS; projects whose primary value accrues outside ENS are not eligible.",
+        "result": "fail",
+        "evidenceIds": [
+          "E-AUTH",
+          "E-RUBRIC",
+          "E-COHORT"
+        ]
+      },
+      {
+        "ruleId": "SPP3-E3-CATEGORY",
+        "description": "Work must map to one of the four published SPP3 objective categories.",
+        "result": "pending",
+        "evidenceIds": [
+          "E-RUBRIC"
+        ]
+      },
+      {
+        "ruleId": "SPP3-E4-CATEGORY4-JUSTIFICATION",
+        "description": "A Category 4 application must justify the residual category and provide a concrete theory of value with measurable outcomes.",
+        "result": "pending",
+        "evidenceIds": [
+          "E-RUBRIC"
+        ]
+      },
+      {
+        "ruleId": "SPP3-E5-NO-ACTIVE-CONFLICT",
+        "description": "No active conflict of interest.",
+        "result": "pending",
+        "evidenceIds": [
+          "E-RUBRIC"
+        ]
+      }
+    ],
+    "rationale": "The public cohort recommendation states that one application was disqualified at the eligibility gate because its primary value accrues outside the ENS ecosystem. The reviewed public sources do not identify the applicant, the exact eligibility-check time, or the other gate outcomes."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "spp3-committee",
+      "displayName": "SPP3 Committee (collective hard-screen authority)",
+      "kind": "committee",
+      "role": "eligibility screener and cohort recommender",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-AUTH",
+      "kind": "forum",
+      "description": "Ratified SPP3 program authorization stating that the primary deliverable must be a service to ENS and that projects whose primary value accrues outside ENS are not eligible.",
+      "uri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-RUBRIC",
+      "kind": "forum",
+      "description": "Published SPP3 pre-score hard eligibility screen and application/evaluation rules.",
+      "uri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-COHORT",
+      "kind": "forum",
+      "description": "Published SPP3 cohort recommendation reporting 26 applications, one eligibility-gate disqualification, 25 scored applications, and the aggregate reason for the disqualification.",
+      "uri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "C1",
+        "name": "Prior Delivery History",
+        "weight": 0.25,
+        "score": null,
+        "scoreScale": "1-5; not reached because the application failed the pre-score hard eligibility screen"
+      },
+      {
+        "criterionId": "C2",
+        "name": "Scope Clarity",
+        "weight": 0.15,
+        "score": null,
+        "scoreScale": "1-5; not reached because the application failed the pre-score hard eligibility screen"
+      },
+      {
+        "criterionId": "C3",
+        "name": "Milestone Structure",
+        "weight": 0.15,
+        "score": null,
+        "scoreScale": "1-5; not reached because the application failed the pre-score hard eligibility screen"
+      },
+      {
+        "criterionId": "C4",
+        "name": "Adoption, Revenue, and Ecosystem Utility",
+        "weight": 0.4,
+        "score": null,
+        "scoreScale": "1-5; not reached because the application failed the pre-score hard eligibility screen"
+      },
+      {
+        "criterionId": "D1",
+        "name": "Discretion: Team and Budget Fit",
+        "weight": 0.05,
+        "score": null,
+        "scoreScale": "1-5; not reached because the application failed the pre-score hard eligibility screen"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-HARD-SCREEN",
+        "statement": "The public cohort recommendation reports that one SPP3 application was disqualified at the eligibility gate and that the remaining 25 applications were scored.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-OUTSIDE-ENS",
+        "statement": "The public cohort recommendation states that the disqualified application's primary value accrues outside the ENS ecosystem, which the ratified program excludes.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-AUTH",
+          "E-RUBRIC",
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "critical"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "not scored; the published process states that applications failing the hard eligibility screen are not reviewed further"
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "ineligible",
+    "authority": "SPP3 Committee",
+    "authorityKind": "committee",
+    "decidedAt": null,
+    "awardedAmount": null,
+    "currency": "USD",
+    "rationale": "The committee's public cohort recommendation reports one eligibility-gate disqualification because the application's primary value accrues outside the ENS ecosystem. The public report is aggregate and does not identify the applicant or exact decision instant.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": null,
+    "decisionRule": "Applications failing the published hard eligibility screen are not reviewed further.",
+    "voteRecordUri": null
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "The reviewed public program and cohort sources do not identify a public case-specific factual or procedural correction route for the anonymously reported eligibility disqualification. This does not establish that no private or internal route existed.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T10:27:47Z",
+    "updatedAt": "2026-08-25T15:46:00Z"
+  },
+  "integrity": null,
+  "notes": [
+    "This is a public-only retrospective reconstruction of an anonymously reported hard-eligibility decision event, not a claim that the repository knows which applicant was disqualified.",
+    "application.applicationId is a local reconstruction identifier. application.applicantName is intentionally null because the reviewed public sources do not identify the applicant; schema v0.1 requires a string, so the validator is expected to preserve this as a structural finding.",
+    "eligibility.checkedAt and decision.decidedAt are intentionally null. The July 3 cohort-post timestamp is the publication time of the aggregate disclosure and is not elevated into either historical decision timestamp.",
+    "governingPolicy.effectiveAt is intentionally null because the reviewed sources establish the authorization and published eligibility rules but do not supply one exact machine-usable effective instant for the combined policy representation.",
+    "The public cohort post states the disqualification reason but does not establish the other hard-gate results. Those gates remain pending instead of being inferred as pass or fail.",
+    "Because the record is intentionally structurally invalid on unresolved required fields, semantic conformance is short-circuited. Absence of semantic findings is not evidence that the remaining semantics passed."
+  ]
+}

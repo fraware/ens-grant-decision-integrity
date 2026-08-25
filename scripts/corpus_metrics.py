@@ -227,6 +227,16 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> int:
             code="CORP024",
         )
 
+    for source in case["sourceArtifacts"]:
+        if source["availability"] in {"reference-only", "authorized-audit-only"} and (
+            "metadataPath" in source or "bytesPath" in source
+        ):
+            raise CorpusCaseError(
+                f"source {source['artifactId']} with availability={source['availability']!r} "
+                "cannot claim byte-verified metadataPath/bytesPath; only redistributable sources are byte-verified",
+                code="CORP028",
+            )
+
     verified_redistributable = 0
     initial_record_path: Path | None = None
     final_record_path: Path | None = None
