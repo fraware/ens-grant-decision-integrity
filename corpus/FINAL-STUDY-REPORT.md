@@ -2,6 +2,8 @@
 
 Status: **incomplete draft**. Machine gates for `ready-for-final-review` are **not** met. Case-count and declared required-stratum coverage are currently satisfied; double annotation remains blocked. Do not treat this document as a completed empirical report.
 
+Computed below with `scripts/study_status.py` and `gdi.corpus.metrics.compute_metrics` against repository `main` `8728f9848673b19e349870b7e89fff1d97d8eef0` (local engineering refresh). Regenerating metrics after annotation changes is required before any final-review claim.
+
 ## 1. Objective and preregistration reference
 
 **Known.** The retrospective corpus tests whether the Grant Decision Integrity ontology and tooling improve reconstructability of real historical decision processes without disproportionate administrative burden, per `corpus/study-plan.json` (studyPlanVersion `1`).
@@ -36,23 +38,15 @@ Sampling strategy (preregistered): heterogeneous stress-test covering required s
 2. `ens-spp3-2026-ethid-withdrawal`
 3. `ens-spp2-2025-agora-budget-rejection`
 4. `ens-spp3-2026-anonymous-hard-eligibility-disqualification`
-5. `ens-spp3-2026-goldsky-award` (new)
-6. `ens-spp2-2025-justaname-award` (new)
-7. `ens-spp2-2025-ep65-vote-amendment` (new)
-8. `ens-spp2-2025-unruggable-q4-delivery` (new)
-9. `ens-spp3-2026-marketplace-rfp-amendment` (new)
+5. `ens-spp3-2026-goldsky-award`
+6. `ens-spp2-2025-justaname-award`
+7. `ens-spp2-2025-ep65-vote-amendment`
+8. `ens-spp2-2025-unruggable-q4-delivery`
+9. `ens-spp3-2026-marketplace-rfp-amendment`
 
 **Selection addendum:** see `corpus/selection-log-2026-08-25.json`. Five preferred candidates encoded; Fluidkey remains selected-not-yet-encoded and held in reserve under the 12-case ceiling.
 
-**Strata gaps / dispositions:**
-
-| Stratum | Disposition |
-| --- | --- |
-| All required strata in study-plan | Represented by at least one counted case (machine `requiredUnresolved` empty) |
-| `recusal-or-conflict` | Only Namespace discloses a distinct public recusal; no second recusal case invented |
-| `committee-quorum` | Represented by Namespace; JustaName intended it at selection but did not claim it without a bound quorum figure |
-| `ai-assisted-when-evidenced` | **Not evidenced** in selected historical decisions; not invented |
-| `public-private-separation` | Covered by Namespace/EthID; Fluidkey optional for further stress |
+**Machine study-status (honest):** `ok=true`, `readyForFinalReview=false`, `status=in-progress`, sole machine blocker `double-annotation: 0/9` (need ≥3 at current corpus size). Required strata declared coverage: met (`requiredUnresolved` empty). Conditional `ai-assisted-when-evidenced`: uncovered / not invented.
 
 ## 4. Case table
 
@@ -72,13 +66,31 @@ Sampling strategy (preregistered): heterogeneous stress-test covering required s
 
 ## 5. Preregistered primary metrics
 
-**Incomplete.** Metrics must be computed from the final counted corpus using definitions in `study-plan.json` without redefining denominators. Per-case metrics are available via `scripts/corpus_metrics.py` / `scripts/validate_corpus_cases.py`. Aggregate medians/ranges/per-stratum breakdowns are **post-hoc secondary analysis** if added later.
+**Partial — primary annotations only.** Definitions from `study-plan.json` `primaryMetrics`. Values below are per-case machine outputs from primary annotations. Aggregate medians/ranges across cases are **not** claimed as preregistered primary analysis here (would be post-hoc secondary if added). Double-annotation agreement metrics are **blocked** (section 6).
+
+| caseId | reconstructability | direct-source | unknown | interpretive share of reconstructable | elapsed min | source artifacts | initial findings | finding dispositions |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ens-spp2-2025-agora-budget-rejection | 0.827586 | 0.241379 | 0.172414 | 0.583333 | 3.5 | 6 | 3 | unresolved:3 |
+| ens-spp2-2025-ep65-vote-amendment | 0.833333 | 0.300000 | 0.166667 | 0.520000 | 4.0 | 4 | 3 | unresolved:3 |
+| ens-spp2-2025-justaname-award | 0.843750 | 0.343750 | 0.156250 | 0.481481 | 5.2 | 6 | 3 | unresolved:3 |
+| ens-spp2-2025-unruggable-q4-delivery | 0.818182 | 0.363636 | 0.181818 | 0.444444 | 4.5 | 4 | 3 | unresolved:3 |
+| ens-spp3-2026-anonymous-hard-eligibility-disqualification | 0.758621 | 0.310345 | 0.241379 | 0.545455 | 3.3 | 3 | 6 | annotation-defect:2; unresolved:4 |
+| ens-spp3-2026-ethid-withdrawal | 0.766667 | 0.233333 | 0.233333 | 0.608696 | 1.8 | 5 | 3 | model-defect:1; unresolved:2 |
+| ens-spp3-2026-goldsky-award | 0.878788 | 0.363636 | 0.121212 | 0.482759 | 6.5 | 5 | 2 | unresolved:2 |
+| ens-spp3-2026-marketplace-rfp-amendment | 0.812500 | 0.281250 | 0.187500 | 0.538462 | 5.0 | 3 | 3 | unresolved:3 |
+| ens-spp3-2026-namespace-award | 0.878788 | 0.363636 | 0.121212 | 0.482759 | 8.4 | 5 | 2 | unresolved:2 |
+
+**Primary-metric honesty notes:**
+
+- Rates are over applicable required fields in the primary annotation, not over all schema fields.
+- These metrics do **not** establish source truth, merit, fairness, or institutional legitimacy.
+- `agreement` / Cohen kappa: **not computable** until genuine independent second annotations exist.
 
 ## 6. Second-annotation agreement results
 
 **Blocked / incomplete.**
 
-Handoffs prepared under `corpus/second-annotation-handoffs/` (see `HANDOFF-STATUS.md`). Human completed annotations have not been returned. `review.doubleAnnotation` remains `false` on counted cases. Agreement and kappa are **not** reported. Machine blocker: `0/9` cases below minimum fraction `0.25` (need at least 3 double-annotated cases at current corpus size).
+Handoffs prepared under `corpus/second-annotation-handoffs/` (see `HANDOFF-STATUS.md`, `ANNOTATOR-CHECKLIST.md`). Human completed annotations have not been returned. `review.doubleAnnotation` remains `false` on counted cases. Agreement and kappa are **not** reported. Machine blocker: `0/9` cases below minimum fraction `0.25` (need at least 3 double-annotated cases at current corpus size).
 
 ## 7. Recurring ontology/model defects
 
@@ -109,9 +121,9 @@ Confirmed process gaps require source-bounded wording after review dispositions.
 
 ## 10. Administrative-burden measurements
 
-**Incomplete.**
+**Partial (primary only).**
 
-Primary annotation elapsed minutes exist per case in `case.json` annotations. Aggregate burden (including second annotation time) awaits human second-annotation completion.
+Primary annotation elapsed minutes are in the section 5 table (range 1.8–8.4 minutes on these public reconstructions). Aggregate burden including second annotation time awaits human second-annotation completion.
 
 ## 11. Limitations and non-claims
 

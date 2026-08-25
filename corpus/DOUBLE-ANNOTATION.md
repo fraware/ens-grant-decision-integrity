@@ -17,6 +17,10 @@ Before the second annotation is frozen, do not provide the primary annotation cl
 
 The second annotator must use a distinct `annotatorId`, record elapsed time, cover the exact same material field set, and set `independent=true` only if the withheld primary reconstruction materials were not consulted before submission. Tooling can enforce identifier separation, field-set equality, source-reference validity, and the explicit independence attestation. It cannot prove the human process was actually independent.
 
+## Operator package (frozen handoffs)
+
+The three baseline handoffs are prepared under `corpus/second-annotation-handoffs/` with hashes recorded in `HANDOFF-STATUS.md`. Human annotator steps and verify/integrate commands are in `second-annotation-handoffs/ANNOTATOR-CHECKLIST.md`. Do not fabricate second annotations, copy primary classifications, or set `independent=true` unless the independence boundary was actually respected.
+
 ## Handoff tooling
 
 Prepare a handoff from a checked-in single-annotation case:
