@@ -18,8 +18,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
-ROOT = Path(__file__).resolve().parents[3]
-SCHEMA_PATH = ROOT / "schema" / "source-artifact.schema.json"
+from gdi.resources import ResourceError, resource_path
+
 HASH_PREFIX = "sha256:"
 URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*$")
 
@@ -62,14 +62,23 @@ def _validate_offset_datetime(value: Any, field: str) -> None:
     try:
         parsed = datetime.fromisoformat(candidate)
     except ValueError as exc:
-        raise SourceArtifactError(f"{field} must be a valid RFC 3339-style date-time", code="SRC002") from exc
+        raise SourceArtifactError(
+            f"{field} must be a valid RFC 3339-style date-time",
+            code="SRC002",
+        ) from exc
     if parsed.tzinfo is None or parsed.utcoffset() is None:
-        raise SourceArtifactError(f"{field} must include a UTC designator or numeric offset", code="SRC002")
+        raise SourceArtifactError(
+            f"{field} must include a UTC designator or numeric offset",
+            code="SRC002",
+        )
 
 
 def _validate_uri(value: Any, field: str) -> None:
     if not isinstance(value, str) or not value or any(character.isspace() for character in value):
-        raise SourceArtifactError(f"{field} must be a non-empty URI without whitespace", code="SRC002")
+        raise SourceArtifactError(
+            f"{field} must be a non-empty URI without whitespace",
+            code="SRC002",
+        )
     try:
         parsed = urlsplit(value)
     except ValueError as exc:
@@ -82,14 +91,24 @@ def validate_source_artifact(value: dict[str, Any]) -> None:
     import jsonschema
 
     try:
-        schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise SourceArtifactError(f"cannot load source-artifact schema: {exc}", code="SRC006") from exc
+        schema_path = resource_path("schema", "source-artifact.schema.json")
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, ResourceError) as exc:
+        raise SourceArtifactError(
+            f"cannot load source-artifact schema: {exc}",
+            code="SRC006",
+        ) from exc
     try:
         jsonschema.Draft202012Validator.check_schema(schema)
     except jsonschema.SchemaError as exc:
-        raise SourceArtifactError(f"source-artifact schema is invalid: {exc.message}", code="SRC006") from exc
-    validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+        raise SourceArtifactError(
+            f"source-artifact schema is invalid: {exc.message}",
+            code="SRC006",
+        ) from exc
+    validator = jsonschema.Draft202012Validator(
+        schema,
+        format_checker=jsonschema.FormatChecker(),
+    )
     errors = sorted(validator.iter_errors(value), key=lambda item: list(item.absolute_path))
     if errors:
         first = errors[0]
@@ -99,8 +118,6 @@ def validate_source_artifact(value: dict[str, Any]) -> None:
             code="SRC002",
         )
 
-    # Do not rely on optional jsonschema format-checking dependencies for critical
-    # provenance fields. Enforce the minimum URI/date-time contract explicitly.
     _validate_offset_datetime(value.get("capturedAt"), "capturedAt")
     _validate_uri(value.get("sourceUri"), "sourceUri")
     for field in ("resolvedUri", "archiveUri"):
@@ -131,7 +148,8 @@ def build_artifact(
         "artifactVersion": "1",
         "artifactId": artifact_id,
         "sourceUri": source_uri,
-        "capturedAt": captured_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "capturedAt": captured_at
+        or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "mediaType": media_type,
         "byteLength": size,
         "contentHash": content_hash,
@@ -189,7 +207,7 @@ def verification_result(verified: VerifiedSourceArtifact) -> dict[str, Any]:
             "Byte identity does not establish source truth or completeness.",
             "Byte identity does not establish institutional adoption or authority.",
             "capturedAt is capture metadata, not an independently verified timestamp.",
-            "sourceUri and resolvedUri are declared provenance fields; this verifier does not authenticate source ownership.",
+            "sourceUri and resolvedUri are declared provenance fields; source ownership is not authenticated.",
         ],
     }
 
@@ -221,7 +239,9 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build, capture, or verify preserved source-artifact metadata")
+    parser = argparse.ArgumentParser(
+        description="Build, capture, or verify preserved source-artifact metadata"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     build = sub.add_parser("build")
@@ -256,7 +276,10 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--observation", action="append", dest="observations")
     build.add_argument("--out", required=True)
 
-    capture = sub.add_parser("capture", help="SSRF-safe capture into content-addressed storage")
+    capture = sub.add_parser(
+        "capture",
+        help="SSRF-hardened capture into content-addressed storage",
+    )
     capture.add_argument("--source-uri", required=True)
     capture.add_argument("--out-dir", required=True)
     capture.add_argument("--artifact-id", required=True)
@@ -325,7 +348,10 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.method == "manual-file":
                 if not args.file:
-                    raise SourceArtifactError("manual-file capture requires --file", code="CAP017")
+                    raise SourceArtifactError(
+                        "manual-file capture requires --file",
+                        code="CAP017",
+                    )
                 result = capture_manual_file(
                     source_uri=args.source_uri,
                     file_path=Path(args.file),
