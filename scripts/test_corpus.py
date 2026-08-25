@@ -41,6 +41,8 @@ def _case() -> dict:
     case["title"] = "Historical test case"
     case["template"] = False
     case["sourceArtifacts"] = [_source()]
+    case["recordSnapshots"]["initial"]["recordHash"] = "sha256:" + "11" * 32
+    case["recordSnapshots"]["initial"]["notes"] = "Synthetic non-template hash for test fixture."
     case["annotations"][0]["annotationId"] = "ann-1"
     case["annotations"][0]["annotatorId"] = "reviewer-a"
     case["annotations"][0]["elapsedMinutes"] = 30
@@ -58,6 +60,23 @@ def test_template_is_schema_and_protocol_valid_but_flagged_template() -> None:
     assert result["ok"]
     assert result["template"] is True
     assert result["annotations"][0]["unknownRate"] == 1.0
+
+
+def test_empirical_case_requires_source_artifact_reference() -> None:
+    case = _case()
+    case["sourceArtifacts"] = []
+    case["annotations"][0]["fields"] = [_field("/challenge/processDefined", "unknown")]
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP014"
+
+
+def test_empirical_case_rejects_template_zero_hash() -> None:
+    case = _case()
+    case["recordSnapshots"]["initial"]["recordHash"] = "sha256:" + "0" * 64
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP015"
 
 
 def test_required_field_metrics_do_not_treat_unknown_as_success() -> None:
@@ -119,6 +138,16 @@ def test_changed_record_requires_reconciled_snapshot_at_schema_level() -> None:
     with pytest.raises(CorpusCaseError) as exc:
         validate_case(case)
     assert exc.value.code == "CORP002"
+
+
+def test_empirical_reconciled_record_rejects_template_zero_hash() -> None:
+    case = _case()
+    case["verification"]["recordChangedAfterReview"] = True
+    case["verification"]["changeRationale"] = "Review corrected an annotation defect."
+    case["recordSnapshots"]["reconciled"] = {"recordHash": "sha256:" + "0" * 64}
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP015"
 
 
 def test_double_annotation_requires_same_field_set() -> None:
