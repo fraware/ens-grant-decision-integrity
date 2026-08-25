@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/fraware/ens-grant-decision-integrity/profiles/profile.schema.json",
+  "title": "GDI operational adoption profile",
+  "description": "Versioned requirements for evidence and reconstruction. Profiles MUST NOT encode merit criteria, eligibility rules, or institutional authority assignments.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profileVersion",
+    "profileId",
+    "title",
+    "recordSchema",
+    "requiredDecisionSurfaces",
+    "requiredEvidenceClasses",
+    "requiredClaims",
+    "optionalClaims",
+    "phase2Policy",
+    "operatorConfirmations",
+    "nonGoals",
+    "burdenBudget"
+  ],
+  "properties": {
+    "profileVersion": {
+      "type": "string",
+      "const": "1"
+    },
+    "profileId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-v[0-9]+$"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string" },
+    "recordSchema": {
+      "type": "string",
+      "description": "Grant-decision record schemaVersion expected by default.",
+      "enum": ["0.1"]
+    },
+    "extensions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "0.2-policy-pinning",
+          "0.2-authority-identity",
+          "projection-v1",
+          "projection-v2",
+          "phase2-commitment",
+          "source-artifact"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "requiredDecisionSurfaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "mandate",
+          "eligibility",
+          "evaluationCriteria",
+          "conflictRules",
+          "decisionProcedure"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "requiredEvidenceClasses": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "projectionProfile": {
+      "type": ["string", "null"]
+    },
+    "phase2Policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "notes"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["omit", "optional", "required-when-material-ai", "required"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "requiredClaims": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "optionalClaims": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "policySourceCapture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "operatorConfirmations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "material"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "material": { "type": "boolean" }
+        }
+      }
+    },
+    "nonGoals": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "burdenBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "intent"],
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": ["A", "B", "C", "legacy"]
+        },
+        "intent": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+    "legacyMapping": {
+      "type": "object",
+      "description": "Present only for historical/legacy mapping profiles. Does not claim contemporaneous GDI compliance.",
+      "additionalProperties": false,
+      "required": ["historicalOnly", "disclaimer"],
+      "properties": {
+        "historicalOnly": { "type": "boolean", "const": true },
+        "disclaimer": { "type": "string", "minLength": 1 },
+        "conventions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

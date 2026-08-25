@@ -1,0 +1,109 @@
+{
+  "profileVersion": "1",
+  "profileId": "ens-foundation-tier-c-v1",
+  "title": "ENS Foundation Tier C (v1)",
+  "summary": "High-value, contested, or committee-heavy rounds with stronger preservation, protected bundles, and Phase II when AI is material.",
+  "recordSchema": "0.1",
+  "extensions": [
+    "0.2-policy-pinning",
+    "0.2-authority-identity",
+    "projection-v1",
+    "projection-v2",
+    "phase2-commitment",
+    "source-artifact"
+  ],
+  "requiredDecisionSurfaces": [
+    "mandate",
+    "eligibility",
+    "evaluationCriteria",
+    "conflictRules",
+    "decisionProcedure"
+  ],
+  "requiredEvidenceClasses": [
+    "governing-policy-uri",
+    "five-surface-policy-mapping",
+    "strong-source-preservation",
+    "schema-0.2-policy-pinning",
+    "committee-roster-quorum-decision-rule",
+    "explicit-recusal-substitution",
+    "disagreement-preservation",
+    "structured-authority-identity",
+    "human-or-committee-authority",
+    "decision-rationale",
+    "challenge-correction-procedure",
+    "delivery-milestone-evidence",
+    "protected-canonical-bundle",
+    "public-projection"
+  ],
+  "projectionProfile": "public-tier-c-v1",
+  "phase2Policy": {
+    "mode": "required-when-material-ai",
+    "notes": "Phase II when automated evaluators materially inform recommendation. Production C2 requires an accepted external trust policy; fixture profiles never establish production C2."
+  },
+  "requiredClaims": [],
+  "optionalClaims": ["C1", "C2", "C3", "C4", "C5", "C6"],
+  "policySourceCapture": {
+    "required": true,
+    "notes": "Strong source preservation and pinning required for governing-policy artifacts."
+  },
+  "operatorConfirmations": [
+    {
+      "id": "confirm-governing-surfaces",
+      "description": "Confirm which artifact governs each of the five decision surfaces.",
+      "material": true
+    },
+    {
+      "id": "confirm-eligibility-vs-merit",
+      "description": "Confirm whether each gate is eligibility versus merit evaluation.",
+      "material": true
+    },
+    {
+      "id": "confirm-roster-vs-participation",
+      "description": "Confirm evaluator participation versus roster membership.",
+      "material": true
+    },
+    {
+      "id": "confirm-decision-authority",
+      "description": "Confirm committee/human authority, quorum, and decision rule.",
+      "material": true
+    },
+    {
+      "id": "confirm-conflict-status",
+      "description": "Confirm conflict status, recusal, and substitution.",
+      "material": true
+    },
+    {
+      "id": "confirm-finding-epistemics",
+      "description": "Confirm whether a finding is supported fact, judgment, uncertainty, or unverified claim.",
+      "material": true
+    },
+    {
+      "id": "confirm-unavailable-vs-protected",
+      "description": "Confirm unavailable versus protected fields and redaction basis.",
+      "material": true
+    },
+    {
+      "id": "confirm-material-ai-influence",
+      "description": "Confirm whether automated evaluation was materially influential.",
+      "material": true
+    },
+    {
+      "id": "confirm-production-anchor-claim",
+      "description": "Confirm whether a production C2/C3 claim is intended and which trust policy applies.",
+      "material": true
+    }
+  ],
+  "nonGoals": [
+    "No merit scoring or approve/reject recommendation engine.",
+    "No inference of eligibility without operator confirmation.",
+    "No automated conflict resolution or invented quorum.",
+    "No assignment of institutional authority by the adapter or Phase II objects.",
+    "No fixture-based production C2 claim.",
+    "No ENS endorsement claim from profile use alone."
+  ],
+  "burdenBudget": {
+    "tier": "C",
+    "intent": "Higher reconstruction strength for contested or high-value rounds.",
+    "notes": "Expect protected bundle, projection worksheet, and Phase II when AI is material."
+  }
+}

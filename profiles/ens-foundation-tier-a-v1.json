@@ -1,0 +1,73 @@
+{
+  "profileVersion": "1",
+  "profileId": "ens-foundation-tier-a-v1",
+  "title": "ENS Foundation Tier A (v1)",
+  "summary": "Low-value or routine grants where administrative cost must remain minimal. Evidence marshaling only; no merit scoring.",
+  "recordSchema": "0.1",
+  "extensions": ["source-artifact"],
+  "requiredDecisionSurfaces": [
+    "mandate",
+    "eligibility",
+    "evaluationCriteria",
+    "conflictRules",
+    "decisionProcedure"
+  ],
+  "requiredEvidenceClasses": [
+    "governing-policy-uri",
+    "human-authority",
+    "decision-rationale",
+    "conflicts-or-recusals-if-applicable",
+    "factual-procedural-correction-route",
+    "delivery-conditions-for-awards"
+  ],
+  "projectionProfile": null,
+  "phase2Policy": {
+    "mode": "omit",
+    "notes": "Omit Phase II unless automated evaluation materially informs a recommendation; if so, escalate toward Tier B/C."
+  },
+  "requiredClaims": [],
+  "optionalClaims": ["C6"],
+  "policySourceCapture": {
+    "required": false,
+    "notes": "Governing-policy URIs required; exact-byte pinning optional at Tier A."
+  },
+  "operatorConfirmations": [
+    {
+      "id": "confirm-governing-surfaces",
+      "description": "Confirm which artifact governs each of the five decision surfaces.",
+      "material": true
+    },
+    {
+      "id": "confirm-eligibility-vs-merit",
+      "description": "Confirm whether each gate is eligibility versus merit evaluation.",
+      "material": true
+    },
+    {
+      "id": "confirm-decision-authority",
+      "description": "Confirm human/committee decision authority and decision rule.",
+      "material": true
+    },
+    {
+      "id": "confirm-conflict-status",
+      "description": "Confirm conflict/recusal status where applicable.",
+      "material": true
+    },
+    {
+      "id": "confirm-unavailable-vs-protected",
+      "description": "Confirm whether a missing field is unavailable versus protected.",
+      "material": true
+    }
+  ],
+  "nonGoals": [
+    "No merit scoring or approve/reject recommendation engine.",
+    "No inference of eligibility from ambiguous prose without operator confirmation.",
+    "No automated conflict resolution or quorum invention.",
+    "No assignment of institutional authority by the adapter.",
+    "No ENS endorsement claim from profile use alone."
+  ],
+  "burdenBudget": {
+    "tier": "A",
+    "intent": "Minimize new artifacts; reuse ordinary workflow outputs.",
+    "notes": "Templates may be filled without editing raw JSON."
+  }
+}
