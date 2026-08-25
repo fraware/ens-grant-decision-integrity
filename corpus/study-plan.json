@@ -1,0 +1,57 @@
+{
+  "studyPlanVersion": "1",
+  "status": "predeclared-infrastructure",
+  "objective": "Test whether the Grant Decision Integrity ontology and tooling improve reconstructability of real historical decision processes without creating disproportionate administrative burden.",
+  "unitOfAnalysis": "one historical grant or service-provider decision process reconstructed from public or authorized audit artifacts",
+  "sampling": {
+    "strategy": "heterogeneous stress-test, not a statistically representative estimate of all ENS decisions",
+    "targetMinimumCases": 8,
+    "targetMaximumCases": 12,
+    "requiredStrataWhereEvidenceExists": [
+      "hard-eligibility",
+      "merit-decision",
+      "approved-award",
+      "committee-quorum",
+      "recusal-or-conflict",
+      "policy-change-or-ambiguity",
+      "delivery-or-milestone",
+      "incomplete-public-record"
+    ],
+    "conditionalStrata": [
+      "public-private-separation",
+      "ai-assisted-when-evidenced"
+    ],
+    "selectionRule": "Select cases to cover predeclared strata before considering validator outcomes. Do not add or remove a case because it passes or fails validation."
+  },
+  "annotation": {
+    "classifications": ["direct-source", "derived", "interpretive", "unknown", "not-applicable"],
+    "doubleAnnotationMinimumFraction": 0.25,
+    "doubleAnnotationRule": "Cases selected for double annotation are encoded independently before reconciliation using the same material field set.",
+    "unknownRule": "Insufficient public evidence remains unknown. Missing public evidence is not evidence that a private or internal procedure did not exist."
+  },
+  "primaryMetrics": [
+    "required-field reconstructability rate",
+    "required-field direct-source rate",
+    "required-field unknown rate",
+    "interpretive share among reconstructable required fields",
+    "annotation elapsed minutes",
+    "source-artifact count",
+    "initial validator errors and warnings",
+    "finding dispositions after review",
+    "raw classification agreement on double-annotated cases",
+    "Cohen kappa on classification for double-annotated cases"
+  ],
+  "adjudication": {
+    "preserveInitialRecordHash": true,
+    "preserveInitialFindings": true,
+    "validatorSuccessIsOutcome": false,
+    "rule": "Do not edit records to make validators pass without recording the change and evidence/rationale. Distinguish confirmed process gaps from annotation defects, model defects, expected warnings, and unresolved questions."
+  },
+  "meritBoundary": "The corpus does not rescore applicants, decide whether historical funding judgments were substantively correct, or infer confidential facts to complete a record.",
+  "privacyBoundary": "Protected applicant material is not added to the public repository merely to improve corpus completeness.",
+  "nonClaims": [
+    "This study is a heterogeneous assurance stress-test, not a representative causal estimate of all ENS decisions.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Missing public evidence does not prove a private or internal procedure did not exist."
+  ]
+}

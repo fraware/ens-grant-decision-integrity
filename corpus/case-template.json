@@ -1,0 +1,54 @@
+{
+  "caseVersion": "1",
+  "caseId": "template-case",
+  "title": "Template — replace with a historical decision process",
+  "template": true,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "other",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Template only; replace with the case-specific pre-outcome selection rationale.",
+    "strata": ["other"]
+  },
+  "sourceArtifacts": [],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "notes": "Template placeholder; hash exact initial record bytes in a real case."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "template-annotation",
+      "annotatorId": "template-annotator",
+      "independent": true,
+      "elapsedMinutes": 0,
+      "fields": [
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [],
+    "recordChangedAfterReview": false,
+    "finalErrors": [],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": []
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy."
+  ]
+}
