@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from collections import Counter
 from pathlib import Path
@@ -50,7 +51,39 @@ def _unique(values: list[str], *, label: str, code: str) -> None:
         raise CorpusCaseError(f"{label} must be unique", code=code)
 
 
-def validate_case(case: dict[str, Any]) -> None:
+def _hash_file(path: Path) -> str:
+    try:
+        handle = path.open("rb")
+    except OSError as exc:
+        raise CorpusCaseError(f"cannot open corpus record snapshot {path}: {exc}", code="CORP018") from exc
+    digest = hashlib.sha256()
+    with handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return "sha256:" + digest.hexdigest()
+
+
+def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) -> None:
+    raw_path = snapshot.get("path")
+    if not isinstance(raw_path, str) or not raw_path:
+        raise CorpusCaseError(f"empirical {label} snapshot must declare a path", code="CORP018")
+    candidate = (base_dir / raw_path).resolve()
+    try:
+        candidate.relative_to(base_dir.resolve())
+    except ValueError as exc:
+        raise CorpusCaseError(
+            f"empirical {label} snapshot path escapes the case directory: {raw_path}",
+            code="CORP019",
+        ) from exc
+    observed = _hash_file(candidate)
+    if observed != snapshot["recordHash"]:
+        raise CorpusCaseError(
+            f"empirical {label} snapshot hash mismatch: declared {snapshot['recordHash']}, observed {observed}",
+            code="CORP020",
+        )
+
+
+def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> None:
     _schema_validate(case)
 
     source_ids = [item["artifactId"] for item in case["sourceArtifacts"]]
@@ -68,6 +101,8 @@ def validate_case(case: dict[str, Any]) -> None:
                 "an empirical corpus case cannot use the template zero hash for its initial record",
                 code="CORP015",
             )
+        if base_dir is not None:
+            _verify_snapshot(case["recordSnapshots"]["initial"], base_dir=base_dir, label="initial")
 
     annotations = case["annotations"]
     _unique([item["annotationId"] for item in annotations], label="annotation ids", code="CORP004")
@@ -114,19 +149,34 @@ def validate_case(case: dict[str, Any]) -> None:
             code="CORP009",
         )
 
-    if case["verification"]["recordChangedAfterReview"]:
+    changed = case["verification"]["recordChangedAfterReview"]
+    if changed:
         initial_hash = case["recordSnapshots"]["initial"]["recordHash"]
-        reconciled_hash = case["recordSnapshots"]["reconciled"]["recordHash"]
+        reconciled = case["recordSnapshots"]["reconciled"]
+        reconciled_hash = reconciled["recordHash"]
         if initial_hash == reconciled_hash:
             raise CorpusCaseError(
                 "recordChangedAfterReview is true but initial and reconciled record hashes are identical",
                 code="CORP011",
+            )
+        if not case["review"]["reconciled"]:
+            raise CorpusCaseError(
+                "recordChangedAfterReview requires review.reconciled=true",
+                code="CORP016",
             )
         if not case["template"] and reconciled_hash == ZERO_HASH:
             raise CorpusCaseError(
                 "an empirical reconciled record cannot use the template zero hash",
                 code="CORP015",
             )
+        if not case["template"] and base_dir is not None:
+            _verify_snapshot(reconciled, base_dir=base_dir, label="reconciled")
+
+    if case["review"]["reconciled"] and not case["review"]["reconciliationNotes"]:
+        raise CorpusCaseError(
+            "a reconciled review must retain at least one reconciliation note",
+            code="CORP017",
+        )
 
     if not REQUIRED_NONCLAIMS.issubset(set(case["nonClaims"])):
         missing = sorted(REQUIRED_NONCLAIMS - set(case["nonClaims"]))
@@ -179,8 +229,8 @@ def _agreement(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def compute_metrics(case: dict[str, Any]) -> dict[str, Any]:
-    validate_case(case)
+def compute_metrics(case: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
+    validate_case(case, base_dir=base_dir)
     finding_counts = Counter(item["disposition"] for item in case["verification"]["initialFindings"])
     result: dict[str, Any] = {
         "ok": True,
@@ -218,8 +268,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate a retrospective corpus case and compute metrics")
     parser.add_argument("case")
     args = parser.parse_args(argv)
+    case_path = Path(args.case)
     try:
-        result = compute_metrics(_load_case(Path(args.case)))
+        result = compute_metrics(_load_case(case_path), base_dir=case_path.parent)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     except CorpusCaseError as exc:
