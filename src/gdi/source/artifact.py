@@ -221,7 +221,7 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build or verify preserved source-artifact metadata")
+    parser = argparse.ArgumentParser(description="Build, capture, or verify preserved source-artifact metadata")
     sub = parser.add_subparsers(dest="command", required=True)
 
     build = sub.add_parser("build")
@@ -229,7 +229,21 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--source-uri", required=True)
     build.add_argument("--file", required=True)
     build.add_argument("--media-type", required=True)
-    build.add_argument("--method", required=True, choices=["http", "manual-export", "api", "repository", "onchain", "other"])
+    build.add_argument(
+        "--method",
+        required=True,
+        choices=[
+            "http",
+            "manual-export",
+            "manual-file",
+            "browser-export",
+            "git-blob",
+            "api",
+            "repository",
+            "onchain",
+            "other",
+        ],
+    )
     build.add_argument("--tool", required=True)
     build.add_argument("--tool-version", required=True)
     build.add_argument("--captured-at")
@@ -241,6 +255,26 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--capture-notes")
     build.add_argument("--observation", action="append", dest="observations")
     build.add_argument("--out", required=True)
+
+    capture = sub.add_parser("capture", help="SSRF-safe capture into content-addressed storage")
+    capture.add_argument("--source-uri", required=True)
+    capture.add_argument("--out-dir", required=True)
+    capture.add_argument("--artifact-id", required=True)
+    capture.add_argument(
+        "--method",
+        required=True,
+        choices=["http", "browser-export", "git-blob", "manual-file"],
+    )
+    capture.add_argument("--file")
+    capture.add_argument("--media-type", default="application/octet-stream")
+    capture.add_argument("--allow-http", action="store_true")
+    capture.add_argument("--allow-private", action="store_true")
+    capture.add_argument("--browser-tool")
+    capture.add_argument("--browser-version")
+    capture.add_argument("--repository")
+    capture.add_argument("--commit-sha")
+    capture.add_argument("--blob-sha")
+    capture.add_argument("--max-bytes", type=int, default=5 * 1024 * 1024)
 
     verify = sub.add_parser("verify")
     verify.add_argument("--metadata", required=True)
@@ -268,6 +302,81 @@ def main(argv: list[str] | None = None) -> int:
             )
             _write_json(Path(args.out), value)
             print(json.dumps({"ok": True, "artifact": value}, indent=2))
+            return 0
+
+        if args.command == "capture":
+            from gdi.source.capture import (
+                capture_browser_export,
+                capture_git_blob,
+                capture_http,
+                capture_manual_file,
+            )
+
+            out_dir = Path(args.out_dir)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            if args.method == "http":
+                result = capture_http(
+                    source_uri=args.source_uri,
+                    out_dir=out_dir,
+                    artifact_id=args.artifact_id,
+                    allow_http=bool(args.allow_http),
+                    allow_private=bool(args.allow_private),
+                    max_bytes=int(args.max_bytes),
+                )
+            elif args.method == "manual-file":
+                if not args.file:
+                    raise SourceArtifactError("manual-file capture requires --file", code="CAP017")
+                result = capture_manual_file(
+                    source_uri=args.source_uri,
+                    file_path=Path(args.file),
+                    out_dir=out_dir,
+                    artifact_id=args.artifact_id,
+                    media_type=args.media_type,
+                )
+            elif args.method == "browser-export":
+                if not args.file or not args.browser_tool or not args.browser_version:
+                    raise SourceArtifactError(
+                        "browser-export requires --file, --browser-tool, and --browser-version",
+                        code="CAP018",
+                    )
+                result = capture_browser_export(
+                    source_uri=args.source_uri,
+                    export_path=Path(args.file),
+                    out_dir=out_dir,
+                    artifact_id=args.artifact_id,
+                    media_type=args.media_type,
+                    browser_tool=args.browser_tool,
+                    browser_version=args.browser_version,
+                )
+            else:
+                if not args.file or not args.repository or not args.commit_sha or not args.blob_sha:
+                    raise SourceArtifactError(
+                        "git-blob requires --file, --repository, --commit-sha, and --blob-sha",
+                        code="CAP019",
+                    )
+                result = capture_git_blob(
+                    source_uri=args.source_uri,
+                    blob_path=Path(args.file),
+                    out_dir=out_dir,
+                    artifact_id=args.artifact_id,
+                    repository=args.repository,
+                    commit_sha=args.commit_sha,
+                    blob_sha=args.blob_sha,
+                    media_type=args.media_type,
+                )
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "artifact": result.artifact,
+                        "bytesPath": str(result.bytes_path),
+                        "artifactPath": str(result.artifact_path),
+                        "captureLogPath": str(result.capture_log_path),
+                        "nonClaims": result.capture_log.get("nonClaims", []),
+                    },
+                    indent=2,
+                )
+            )
             return 0
 
         metadata = _load_json(Path(args.metadata))

@@ -107,27 +107,55 @@ def verify_policy_pins(
         uri = pin["uri"]
         candidates = indexed.get(uri, [])
         matches = [artifact for artifact in candidates if artifact.observed_content_hash == pin["contentHash"]]
+        digest_mismatches = [
+            artifact for artifact in candidates if artifact.observed_content_hash != pin["contentHash"]
+        ]
+        if not candidates:
+            disposition, ok, matched_via = "missing-artifact", False, None
+        elif len(matches) > 1:
+            disposition, ok, matched_via = "ambiguous-match", False, None
+        elif len(matches) == 1:
+            disposition, ok = "verified", True
+            matched = matches[0]
+            matched_via = "sourceUri" if matched.metadata.get("sourceUri") == uri else "resolvedUri"
+        elif digest_mismatches:
+            disposition, ok, matched_via = "digest-mismatch", False, None
+        else:
+            disposition, ok, matched_via = "uri-mismatch", False, None
         check = {
             "uri": uri,
             "surface": pin.get("surface"),
             "expectedContentHash": pin["contentHash"],
+            "expectedDigest": pin["contentHash"],
             "candidateArtifactIds": [artifact.artifact_id for artifact in candidates],
             "matchingArtifactIds": [artifact.artifact_id for artifact in matches],
-            "ok": bool(matches),
+            "matchedArtifactId": matches[0].artifact_id if len(matches) == 1 else None,
+            "matchedVia": matched_via,
+            "observedContentHash": (
+                matches[0].observed_content_hash if len(matches) == 1 else (candidates[0].observed_content_hash if candidates else None)
+            ),
+            "observedByteLength": (
+                matches[0].observed_byte_length if len(matches) == 1 else (candidates[0].observed_byte_length if candidates else None)
+            ),
+            "result": disposition,
+            "ok": ok,
+            "nonClaims": ["Pin verification is content-identity only; it does not establish adoption or authority."],
         }
         checks.append(check)
-        overall_ok = overall_ok and check["ok"]
+        overall_ok = overall_ok and ok
 
     return {
         "ok": overall_ok,
         "applicable": True,
         "checks": checks,
+        "dispositions": [{"uri": c["uri"], "result": c["result"]} for c in checks],
         "nonClaims": [
             "A matching byte hash establishes content identity for preserved bytes, not institutional adoption.",
             "A matching byte hash does not establish source truth, completeness, or ownership.",
             "URI matching is exact against sourceUri or resolvedUri; it is not semantic URL equivalence.",
             "The policy pin's decision-surface classification is checked by record conformance, not inferred from source bytes.",
             "This check does not independently prove that the bytes existed at policyPinning.pinnedAt.",
+            "Do not upgrade historical reference-only corpus sources to byte-verified from a later live capture.",
         ],
     }
 
