@@ -9,6 +9,7 @@ The project is optimized for narrow, evidence-backed improvements to grant decis
 - add a missing invariant with a concrete motivating case;
 - improve schema interoperability without weakening semantics;
 - contribute a non-evaluative mapping from a public grant process into the schema;
+- improve source/policy provenance without turning metadata into stronger evidence than it is;
 - report implementation friction from an actual review workflow.
 
 ## Review standard
@@ -23,6 +24,8 @@ A proposed change should state:
 
 Please avoid broad governance manifestos or unsupported claims of objectivity. The artifact governs decision integrity; it does not determine which projects should receive funding. The Charter is a draft proposal, not adopted ENS policy.
 
+Source-provenance changes must distinguish content identity from source truth, ownership, authority, adoption, and independent timing. A matching hash is not permission to collapse those propositions.
+
 ## Validation before proposing a change
 
 Run the validation contract that covers the surfaces you touch. For changes that could affect any of the shipped profiles, run the full local suite:
@@ -34,6 +37,7 @@ python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 python scripts/test_regressions.py
+python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
 python -m pytest phase2/tests
 python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
@@ -41,7 +45,7 @@ python -m pytest projection/tests
 
 Expected Marketplace outcome: no conformance errors; warning set exactly `{CHAL003}`.
 
-A contribution that intentionally changes a conformance rule should update the corresponding adversarial or regression test and explain the new guarantee or trade-off. A result from an earlier branch head is not validation evidence for a later head; release-facing claims must identify the exact commit that was tested. See `VALIDATION.md` and `CONFORMANCE.md`.
+A contribution that intentionally changes a conformance rule should update the corresponding adversarial or regression test and explain the new guarantee or trade-off. A source-artifact change should include tampering or mismatch tests that fail closed. A result from an earlier branch head is not validation evidence for a later head; release-facing claims must identify the exact commit that was tested. See `VALIDATION.md`, `CONFORMANCE.md`, and `SOURCE-ARTIFACTS.md`.
 
 ## Sensitive reports
 

@@ -22,7 +22,7 @@ Expected results:
 - the worked example emits only warning `CHAL003` while the reviewed public process lacks a documented factual/procedural correction route;
 - the adversarial suites reject the specified inconsistent states;
 - valid edge cases, including retrospective records and legitimate recusals, remain accepted;
-- the recorded Simocracy allocation amounts in `provenance/simocracy-funding.json` reconcile to $219; allocation is a separate proposition from payment or receipt, and the current provenance snapshot records no payment or receipt evidence.
+- the historical allocation amounts in `provenance/simocracy-funding.json` reconcile to $219 without treating allocation as payment, transfer, receipt, or settlement evidence.
 
 `python scripts/conformance.py --strict examples/spp3-marketplace-rfp.example.json` intentionally fails while `CHAL003` is present, because strict mode promotes warnings to failures.
 
@@ -81,6 +81,29 @@ Expected results:
 - the declared commitment time precedes the submission deadline;
 - departures from materially influential AI recommendations are recorded only on non-pending dispositions and include rationale.
 
+## Source-artifact and policy-pin contract (additive)
+
+Schema 0.2 `policyPinning` metadata is not self-verifying. The source-artifact module adds an exact-byte verification path that remains separate from record conformance:
+
+```bash
+python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
+python scripts/source_artifact.py verify --metadata path/to/source.artifact.json --file path/to/captured.bytes
+python scripts/verify_policy_pins.py --record path/to/record.json --artifact path/to/source.artifact.json path/to/captured.bytes
+```
+
+Expected results:
+
+- `schema/source-artifact.schema.json` validates under Draft 2020-12;
+- the verifier re-hashes exact supplied bytes and rejects same-length byte tampering, forged hashes, and forged byte lengths;
+- invalid source-artifact URI/hash/time encodings fail structurally;
+- a policy pin succeeds only when an exact `sourceUri` or `resolvedUri` and the declared SHA-256 both match a byte-verified artifact;
+- URI mismatch fails even when byte content is identical;
+- duplicate source-artifact IDs and duplicate policy-pin URIs fail closed;
+- source-artifact capture metadata does not become a second authority for the policy surface represented by the decision record;
+- a record without `policyPinning` is explicitly reported as not applicable rather than as a successful pin check.
+
+A successful source-artifact check establishes byte identity only for the supplied file and metadata. A successful policy-pin check additionally establishes exact URI/hash linkage to a byte-verified artifact. Neither establishes source truth, completeness, ownership, institutional adoption, or independent existence at `capturedAt` / `policyPinning.pinnedAt`.
+
 ## Phase II contract (additive)
 
 The v0.1 commands and expected results above are unchanged. Phase II adds a second suite that must not be substituted for them:
@@ -136,6 +159,12 @@ Expected schema 0.2 / projection results:
 
 Live Rekor v1 observation: POST to `https://rekor.sigstore.dev` failed with `ConnectionResetError` from the development environment on 2026-08-19. T7 continues to use `rekor-v1-recorded-fixture`; the optional live-vector case may skip. A skipped network-dependent case must be reported as skipped, not passed.
 
+## Funding-provenance status contract
+
+`provenance/simocracy-status-2026-08-24.json` is a dated public-status snapshot, not a timeless assertion. It records five relevant rounds totaling $219, with three labeled `ratified` and two labeled `provisional` on the captured platform status surface. Its null financial-evidence fields mean only that the snapshot contains no payment-authorization, transfer, receipt, or settlement evidence.
+
+Future status changes should be represented by a new dated snapshot. Historical snapshots should not be rewritten to imply continuity or settlement. See `provenance/ALLOCATION-CAPTURE.md`.
+
 ## Full local suite (pre-release)
 
 Run all of the following on the exact candidate commit before tagging:
@@ -147,24 +176,27 @@ python scripts/validate.py
 python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
 python scripts/test_conformance.py
 python scripts/test_regressions.py
+python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
 python -m pytest phase2/tests
 python -m pytest scripts/test_schema_02.py
 python -m pytest projection/tests
 ```
 
-CI mirrors this split across jobs `conformance`, `phase2`, and `schema-02` (see `.github/workflows/validate.yml`). A release statement must identify the exact commit whose checks ran; success on an earlier head is not evidence for a later head.
+CI mirrors this split across jobs `conformance`, `phase2`, and `schema-02` (see `.github/workflows/validate.yml`). The `conformance` job also runs the source-artifact and policy-pin tests. A release statement must identify the exact commit whose checks ran; success on an earlier head is not evidence for a later head.
 
 ## Limits
 
 Validation establishes structural and declared cross-field consistency and the narrowly stated claims of successful additive verifiers. It does not establish:
 
-- the truth of cited evidence;
+- the truth, completeness, or ownership of cited evidence;
+- institutional adoption merely because policy bytes match a recorded hash;
 - the quality of substantive judgment;
 - the legitimacy of the governing policy;
+- independently verifiable source capture time from `capturedAt` metadata alone;
 - independently verifiable existence of an AI manifest commitment at the declared time unless a supported anchor profile is actually verified;
 - execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact;
 - production RFC 3161 C2 evidence while the production profile is fail-closed;
 - institutional adoption of the Charter;
-- payment or receipt of recorded Simocracy allocations.
+- payment, transfer, receipt, or settlement of recorded Simocracy allocations.
 
 Release validation should be run against the exact release commit. `RELEASE-INTEGRITY.md` defines the release identity and archive-integrity procedure.
