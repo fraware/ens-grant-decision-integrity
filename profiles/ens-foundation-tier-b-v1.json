@@ -1,0 +1,98 @@
+{
+  "profileVersion": "1",
+  "profileId": "ens-foundation-tier-b-v1",
+  "title": "ENS Foundation Tier B (v1)",
+  "summary": "Material community grants with explicit five-surface mapping, policy pinning, and public projection expectations.",
+  "recordSchema": "0.1",
+  "extensions": [
+    "0.2-policy-pinning",
+    "0.2-authority-identity",
+    "projection-v1",
+    "source-artifact"
+  ],
+  "requiredDecisionSurfaces": [
+    "mandate",
+    "eligibility",
+    "evaluationCriteria",
+    "conflictRules",
+    "decisionProcedure"
+  ],
+  "requiredEvidenceClasses": [
+    "governing-policy-uri",
+    "five-surface-policy-mapping",
+    "preserved-governing-policy-bytes-where-feasible",
+    "schema-0.2-policy-pinning",
+    "structured-authority-identity-where-available",
+    "human-authority",
+    "decision-rationale",
+    "conflicts-or-recusals",
+    "challenge-correction-procedure",
+    "delivery-milestone-evidence-expectations",
+    "public-projection"
+  ],
+  "projectionProfile": "public-tier-b-v1",
+  "phase2Policy": {
+    "mode": "required-when-material-ai",
+    "notes": "Phase II required only when automated evaluators materially inform recommendations."
+  },
+  "requiredClaims": [],
+  "optionalClaims": ["C1", "C2", "C3", "C4", "C5", "C6"],
+  "policySourceCapture": {
+    "required": true,
+    "notes": "Exact-byte capture and schema 0.2 pinning required where feasible for governing-policy sources."
+  },
+  "operatorConfirmations": [
+    {
+      "id": "confirm-governing-surfaces",
+      "description": "Confirm which artifact governs each of the five decision surfaces.",
+      "material": true
+    },
+    {
+      "id": "confirm-eligibility-vs-merit",
+      "description": "Confirm whether each gate is eligibility versus merit evaluation.",
+      "material": true
+    },
+    {
+      "id": "confirm-roster-vs-participation",
+      "description": "Confirm evaluator participation versus roster membership.",
+      "material": true
+    },
+    {
+      "id": "confirm-decision-authority",
+      "description": "Confirm decision authority and decision rule.",
+      "material": true
+    },
+    {
+      "id": "confirm-conflict-status",
+      "description": "Confirm conflict status, recusal, and substitution.",
+      "material": true
+    },
+    {
+      "id": "confirm-finding-epistemics",
+      "description": "Confirm whether a finding is supported fact, judgment, uncertainty, or unverified claim.",
+      "material": true
+    },
+    {
+      "id": "confirm-unavailable-vs-protected",
+      "description": "Confirm unavailable versus protected fields and redaction basis.",
+      "material": true
+    },
+    {
+      "id": "confirm-material-ai-influence",
+      "description": "Confirm whether automated evaluation was materially influential.",
+      "material": true
+    }
+  ],
+  "nonGoals": [
+    "No merit scoring or approve/reject recommendation engine.",
+    "No inference of eligibility without operator confirmation.",
+    "No automated conflict resolution.",
+    "No assignment of institutional authority by the adapter.",
+    "No ENS endorsement claim from profile use alone."
+  ],
+  "burdenBudget": {
+    "tier": "B",
+    "intent": "Proportionate evidence for material community grants.",
+    "notes": "Expect source capture, pinning, and projection worksheets."
+  }
+}

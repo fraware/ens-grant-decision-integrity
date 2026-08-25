@@ -1,0 +1,76 @@
+{
+  "profileVersion": "1",
+  "profileId": "legacy-spp-mapping-v1",
+  "title": "Legacy SPP mapping profile (v1)",
+  "summary": "Historical mapping conventions for SPP-style rounds and corpus adapters. Does not claim that historic SPP artifacts followed GDI contemporaneously.",
+  "recordSchema": "0.1",
+  "extensions": ["source-artifact"],
+  "requiredDecisionSurfaces": [
+    "mandate",
+    "eligibility",
+    "evaluationCriteria",
+    "conflictRules",
+    "decisionProcedure"
+  ],
+  "requiredEvidenceClasses": [
+    "public-source-or-authorized-reconstruction",
+    "governing-policy-uri-or-unknown-with-reason",
+    "eligibility-disposition-or-unknown",
+    "decision-disposition-or-unknown",
+    "field-level-provenance"
+  ],
+  "projectionProfile": null,
+  "phase2Policy": {
+    "mode": "omit",
+    "notes": "Legacy retrospective mapping does not invent Phase II evidence."
+  },
+  "requiredClaims": [],
+  "optionalClaims": [],
+  "policySourceCapture": {
+    "required": false,
+    "notes": "Capture exact public/authorized bytes when available; otherwise mark unknown with reason."
+  },
+  "operatorConfirmations": [
+    {
+      "id": "confirm-governing-surfaces",
+      "description": "Confirm mapping of available public artifacts to decision surfaces, or mark unknown.",
+      "material": true
+    },
+    {
+      "id": "confirm-eligibility-vs-merit",
+      "description": "Confirm eligibility versus merit interpretation of historical dispositions.",
+      "material": true
+    },
+    {
+      "id": "confirm-unavailable-vs-protected",
+      "description": "Confirm whether missing historical fields are unavailable, protected, or unknown.",
+      "material": true
+    },
+    {
+      "id": "confirm-no-contemporaneous-gdi-claim",
+      "description": "Confirm that retrospective mapping does not claim contemporaneous GDI compliance.",
+      "material": true
+    }
+  ],
+  "nonGoals": [
+    "No claim that historic SPP rounds used GDI contemporaneously.",
+    "No fabrication of missing fields to force validation pass.",
+    "No merit scoring of historical applications.",
+    "No ENS endorsement from retrospective reconstruction."
+  ],
+  "burdenBudget": {
+    "tier": "legacy",
+    "intent": "Stable adapter boundary for corpus and historical examples.",
+    "notes": "Prefer unknown over invented completeness."
+  },
+  "legacyMapping": {
+    "historicalOnly": true,
+    "disclaimer": "This profile encodes mapping conventions for retrospective compatibility. It MUST NOT be read as evidence that historic SPP artifacts followed GDI contemporaneously.",
+    "conventions": [
+      "Map public forum/proposal/decision artifacts to the five surfaces only with operator confirmation.",
+      "Preserve eligibility dispositions separately from merit evaluations when both are observable.",
+      "Leave unknown fields as unknown; do not convert unknown to pass.",
+      "Record field-level provenance as direct, derived, interpretive, or unknown."
+    ]
+  }
+}
