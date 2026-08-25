@@ -61,9 +61,10 @@ Pilot burden metrics (operator time, confirmation counts, provenance mix, valida
 
 ## Upgrade / version policy
 
-- Software package version is independent of grant-decision `schemaVersion` (still `"0.1"` for the core record).
+- Software package version (`ens-gdi` `0.4.0`) is independent of grant-decision `schemaVersion` (still `"0.1"` for the core record).
 - Profiles and adapter mapping versions are versioned identifiers; changing mapping rules requires a new version.
 - Prefer additive extensions over silent v0.1 redesign.
+- Do not treat package `0.4.0` or docs gate trackers as a completed `v1.0.0` release.
 
 ## Related documents
 

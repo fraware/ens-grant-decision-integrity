@@ -1,8 +1,10 @@
 # Deferred work, non-goals, and closure boundary
 
-This register summarizes deferred technical work and explicit non-goals for the `v1.0.0` assurance boundary. It is derived from the engineering completion scope (Workstream 10). Phase II-specific deferred cryptography remains detailed in `phase2/DEFERRED.md`.
+This register summarizes deferred technical work and explicit non-goals for the **target** `v1.0.0` assurance boundary. The current package is `ens-gdi` **0.4.0**; this document does **not** claim that `v1.0.0` gates are closed or that a `v1.0.0` tag exists. See `docs/V1_0_0_GATE_CHECKLIST.md` for the engineering tracker.
 
-## Explicit non-goals for v1.0.0
+Phase II-specific deferred cryptography remains detailed in `phase2/DEFERRED.md`.
+
+## Explicit non-goals for a future v1.0.0 boundary
 
 1. **No grant-merit or fairness scoring engine** — no universal scoring, automatic approve/reject as a repository feature, fairness/legitimacy/evaluator-quality scores, or model-based merits appeals.
 2. **No transfer of institutional authority to automation** — automated evaluators may be advisory only; they never become final funding authority via Phase II, signatures, hashes, adapters, or profiles.
@@ -38,11 +40,11 @@ Preserve as findings rather than patching the stable schema solely to erase them
 - administrative burden by materiality tier;
 - equality leakage risk of deterministic withheld commitments for specific fields.
 
-## Maintenance after v1.0.0
+## Maintenance after a future v1.0.0
 
-Expected maintenance: security/correctness fixes; supported Python/dependency compatibility; external trust-policy updates for roots/log shards where possible; versioned new ENS profiles; explicit protocol versioning; deprecation windows for public CLI/API; historical wire-format parseability per compatibility policy; fixture evidence labeled test-only.
+If and when a reviewed `v1.0.0` is tagged, expected maintenance includes: security/correctness fixes; supported Python/dependency compatibility; external trust-policy updates for roots/log shards where possible; versioned new ENS profiles; explicit protocol versioning; deprecation windows for public CLI/API; historical wire-format parseability per compatibility policy; fixture evidence labeled test-only.
 
-Do not promise indefinite support for every protocol version. Publish a support matrix with the release.
+Do not promise indefinite support for every protocol version. Publish a support matrix with any such release.
 
 ## Change-control for post-v1 features
 

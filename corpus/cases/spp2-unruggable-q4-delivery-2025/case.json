@@ -1,0 +1,441 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp2-2025-unruggable-q4-delivery",
+  "title": "SPP2 Unruggable Q4 2025 delivery report — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "other",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected from the post-start selection addendum because the public Q4 2025 quarterly report exercises post-award delivery/milestone accountability distinct from initial award encoding.",
+    "exclusionBoundary": "Does not convert provider self-report into independent verification of every claimed deliverable, invent stream-pause decisions, or treat AI-agent research mentions as historical AI-assisted evaluation of applicants.",
+    "strata": [
+      "delivery-or-milestone",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-REPORT",
+      "sourceUri": "https://discuss.ens.domains/t/unruggable-update-and-spp2-q4-2025-quarterly-report/22093",
+      "role": "delivery",
+      "availability": "reference-only",
+      "notes": "Public Unruggable SPP2 Q4 2025 quarterly report describing delivery progress. Provider self-report; not independent verification of every claimed deliverable."
+    },
+    {
+      "artifactId": "SRC-VOTE",
+      "sourceUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public SPP2 selection proposal establishing Unruggable as an SPP2 applicant/provider context."
+    },
+    {
+      "artifactId": "SRC-IMPLEMENTATION",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public EP6.13 implementation listing Unruggable at $400,000 for a one-year stream."
+    },
+    {
+      "artifactId": "SRC-REPORTS-CATEGORY",
+      "sourceUri": "https://discuss.ens.domains/c/service-provider-program/reports/80",
+      "role": "delivery",
+      "availability": "reference-only",
+      "notes": "Public Service Provider Program reports category collecting provider quarterly updates."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:86ffca2163a216717c1b1c2170cf197af41e412f24d2b26bfc6cb8ca1201c3fb",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction of the Q4 delivery report unit."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "unruggable-q4-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 4.5,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-VOTE"
+          ],
+          "rationale": "SPP2-2025 is a reconstruction identifier for the funded season."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ],
+          "rationale": "Reconstruction identifier for the Q4 delivery-report unit of analysis."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORT",
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORTS-CATEGORY",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORTS-CATEGORY",
+            "SRC-IMPLEMENTATION"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORTS-CATEGORY"
+          ]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORTS-CATEGORY",
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORT",
+            "SRC-IMPLEMENTATION",
+            "SRC-VOTE"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ]
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-REPORT",
+            "SRC-REPORTS-CATEGORY"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ],
+          "rationale": "No Q4-report-specific conflict disclosure appears in the reviewed sources."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORT",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORTS-CATEGORY"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ]
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ],
+          "rationale": "Mapped to dao-vote because the funded relationship originates in DAO selection/implementation votes; the Q4 unit does not claim a fresh award vote."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION"
+          ]
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": [
+            "SRC-REPORT",
+            "SRC-REPORTS-CATEGORY"
+          ]
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": [
+            "SRC-REPORT"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": [
+            "SRC-REPORT",
+            "SRC-VOTE",
+            "SRC-IMPLEMENTATION",
+            "SRC-REPORTS-CATEGORY"
+          ],
+          "rationale": "See case residual questions and record notes for the mapping judgment."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact byte identity is provided by the corpus snapshot hash instead."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-DECISION-DECIDEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.decidedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      },
+      {
+        "findingId": "INIT-SCHEMA-GOVERNINGPOLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Exact validator finding preserved from the initial record bytes. Null or non-fitting values are retained rather than invented.",
+        "sourceArtifactIds": []
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA decision.decidedAt: None is not of type 'string'",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "Was any independent institutional acceptance recorded for Q4 milestones beyond the public self-report?",
+      "What exact targetDate should attach to the Q4 reporting obligation?",
+      "Should delivery-report units use a dedicated recordType distinct from service-provider-decision?"
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures.",
+    "Provider self-report is not independent verification of every claimed deliverable.",
+    "Mentions of AI-agent identity research are not evidence that historical SPP applicant evaluation used material AI assistance."
+  ]
+}

@@ -1,15 +1,7 @@
 # Hash-locked dependency set for release/validation installs.
-# Generated from PyPI artifacts in _lock_wheels/.
 # Supported / CI-tested runtime: Python 3.12.
-# Install example:
-#   python -m pip install --require-hashes -r requirements.lock.txt
-# Notes:
-# - Direct pins live in requirements-dev.txt / pyproject.toml.
-# - This file records direct + transitive artifacts observed at lock generation.
-# - Do not confuse first-order version pins with a complete transitive lock;
-#   regenerate this file whenever release dependencies change.
-# - Platform-specific wheels may differ; release validation should regenerate
-#   or verify under the documented CI platform (ubuntu / CPython 3.12).
+# Install: python -m pip install --require-hashes -r requirements.lock.txt
+# Regenerate under ubuntu+CPython3.12 for release validation when platform wheels differ.
 
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309

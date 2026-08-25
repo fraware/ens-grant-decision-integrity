@@ -4,16 +4,23 @@ __pycache__/
 venv/
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
 .DS_Store
+Thumbs.db
 
 # Local release artifacts (official archives belong on GitHub Releases only)
 *.zip
 *.zip.sha256
 *.sha256
 
-# Internal handoff and planning documents
+# Internal handoff and planning documents (keep local; do not publish)
 *.docx
 _dossier*
+ENS_GDI_Final_Engineering_Completion_Specs/
+
+# Accidental local extract / scratch files
+_specs_extract.txt
+_test_*.txt
 
 # Local editable install metadata
 src/*.egg-info/

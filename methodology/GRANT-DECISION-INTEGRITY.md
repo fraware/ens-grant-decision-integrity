@@ -84,4 +84,4 @@ A review should produce:
 
 ## Relationship to repository releases
 
-Pin reviews to an exact repository tag and commit SHA. The latest tagged release is `v0.3.2`; later development commits may contain unreleased hardening and must not be attributed to that tag. v0.1 records remain valid without source-artifact or Phase II bundles. Schema 0.2 extensions are additive; v0.1 records must continue to validate unchanged. The Charter and this methodology remain drafts until ENS governance adopts them.
+Pin reviews to an exact repository tag and commit SHA. The latest annotated tag is `v0.3.2`; package `ens-gdi` `0.4.0` on `main` may contain unreleased hardening and must not be attributed to that tag or described as `v1.0.0`. v0.1 records remain valid without source-artifact or Phase II bundles. Schema 0.2 extensions are additive; v0.1 records must continue to validate unchanged. The Charter and this methodology remain drafts until ENS governance adopts them.

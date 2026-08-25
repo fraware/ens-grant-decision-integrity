@@ -1,7 +1,7 @@
 {
   "logVersion": "1",
   "createdOn": "2026-08-25",
-  "status": "post-start-selection-addendum",
+  "status": "post-start-selection-addendum-partially-encoded",
   "studyPlanVersion": "1",
   "studyPlanPath": "corpus/study-plan.json",
   "nonRewriteRule": "This file is a versioned selection addendum. It does not rewrite study-plan.json. Selection precedes encoding and is independent of expected validator outcomes.",
@@ -14,6 +14,17 @@
       "ens-spp3-2026-namespace-award"
     ],
     "notes": "PR #19 hard-eligibility case is included in the baseline count after merge to main. At least four additional encoded cases are still required to reach the study-plan minimum of eight."
+  },
+  "encodedAfterAddendum": {
+    "empiricalCaseCountAfterEncoding": 9,
+    "newlyEncodedCaseIds": [
+      "ens-spp3-2026-goldsky-award",
+      "ens-spp2-2025-justaname-award",
+      "ens-spp2-2025-ep65-vote-amendment",
+      "ens-spp2-2025-unruggable-q4-delivery",
+      "ens-spp3-2026-marketplace-rfp-amendment"
+    ],
+    "notes": "Five selection-addendum candidates were encoded from public sources only. Case-count gate (8–12) is met. ready-for-final-review remains blocked on double annotation."
   },
   "selectionRule": "Prefer candidates that add distinct evidence structures over clones of the same award pattern. Encode only source-bounded public ENS/SPP facts. Do not invent AI-assisted historical involvement.",
   "candidates": [
@@ -36,7 +47,9 @@
       "exclusionBoundary": "Does not reconstruct other cohort members, private individual scores beyond published means, KYC/Award Notice contents, or application bytes if retrieval fails. Does not invent AI-evaluator involvement.",
       "selectionTimestamp": "2026-08-25T16:00:00Z",
       "sourceAccess": "public-only",
-      "encodingStatus": "selected-not-yet-encoded"
+      "encodingStatus": "encoded",
+      "encodedCaseId": "ens-spp3-2026-goldsky-award",
+      "encodedCasePath": "corpus/cases/spp3-goldsky-award-2026/"
     },
     {
       "candidateId": "cand-spp2-justaname-award-2025",
@@ -52,13 +65,18 @@
         "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
         "https://docs.ens.domains/dao/proposals/6.5/",
         "https://spp.vote/",
-        "https://github.com/5ajaki/SPP2-Streams"
+        "https://github.com/5ajaki/SPP2-Streams",
+        "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971",
+        "https://discuss.ens.domains/t/spp2-justaname-application/20430"
       ],
       "inclusionRationale": "SPP2 used delegate ranked-choice selection under EP 6.10 with Snapshot/spp.vote quorum-visible mechanics. JustaName is publicly documented as a new SPP2-funded provider ($300,000 one-year stream), supplying a prior-season award structure distinct from SPP3 committee recommendation.",
       "exclusionBoundary": "Does not rescore JustaName, reconstruct every delegate ballot, or treat unofficial stream-tracking repositories as cryptographic proof. Application and vote mirrors remain reference-only unless bytes are preserved.",
       "selectionTimestamp": "2026-08-25T16:00:00Z",
       "sourceAccess": "public-only",
-      "encodingStatus": "selected-not-yet-encoded"
+      "encodingStatus": "encoded",
+      "encodedCaseId": "ens-spp2-2025-justaname-award",
+      "encodedCasePath": "corpus/cases/spp2-justaname-award-2025/",
+      "encodingNote": "committee-quorum was an intended stratum at selection time; the encoded case does not claim that stratum because no source-bounded quorum percentage was bound in the reconstruction. Funding is taken from public EP6.13."
     },
     {
       "candidateId": "cand-spp2-ep65-vote-amendment-2025",
@@ -77,7 +95,9 @@
       "exclusionBoundary": "Represents the amendment decision/process change, not every subsequent SPP2 award. Does not treat the Agora no-award outcome as this case's unit of analysis.",
       "selectionTimestamp": "2026-08-25T16:00:00Z",
       "sourceAccess": "public-only",
-      "encodingStatus": "selected-not-yet-encoded"
+      "encodingStatus": "encoded",
+      "encodedCaseId": "ens-spp2-2025-ep65-vote-amendment",
+      "encodedCasePath": "corpus/cases/spp2-ep65-vote-amendment-2025/"
     },
     {
       "candidateId": "cand-spp2-unruggable-q4-delivery-2025",
@@ -95,7 +115,9 @@
       "exclusionBoundary": "Does not convert provider self-report into independent verification of every claimed deliverable, invent stream-pause decisions, or treat AI-agent research mentions as historical AI-assisted evaluation of applicants.",
       "selectionTimestamp": "2026-08-25T16:00:00Z",
       "sourceAccess": "public-only",
-      "encodingStatus": "selected-not-yet-encoded"
+      "encodingStatus": "encoded",
+      "encodedCaseId": "ens-spp2-2025-unruggable-q4-delivery",
+      "encodedCasePath": "corpus/cases/spp2-unruggable-q4-delivery-2025/"
     },
     {
       "candidateId": "cand-spp3-marketplace-rfp-amendment-2026",
@@ -108,13 +130,16 @@
       "sourceUrls": [
         "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
         "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
-        "https://discuss.ens.domains/t/meta-gov-working-group-term-7-meetings-thursday-4pm-utc-bi-weekly/22280"
+        "https://discuss.ens.domains/t/meta-gov-working-group-term-7-meetings-thursday-4pm-utc-bi-weekly/22280",
+        "https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309"
       ],
       "inclusionRationale": "EP 7.1 is a public one-time amendment authorizing a scoped Marketplace RFP from uncommitted SPP3 budget after EthID withdrawal, with milestone-gated award design. At selection time the RFP process is publicly incomplete (submissions/review reported; final award not treated as settled here), which exercises incomplete-public-record outside a standard cohort award.",
       "exclusionBoundary": "Does not invent a final marketplace awardee, award amount, or interview outcomes. Does not reopen EthID withdrawal as this case's primary unit of analysis (already encoded separately).",
       "selectionTimestamp": "2026-08-25T16:00:00Z",
       "sourceAccess": "public-only",
-      "encodingStatus": "selected-not-yet-encoded"
+      "encodingStatus": "encoded",
+      "encodedCaseId": "ens-spp3-2026-marketplace-rfp-amendment",
+      "encodedCasePath": "corpus/cases/spp3-marketplace-rfp-2026/"
     },
     {
       "candidateId": "cand-spp3-fluidkey-award-2026",
@@ -135,7 +160,8 @@
       "exclusionBoundary": "Does not reconstruct private scoring sheets, KYC, or Award Notice text. Application URI remains reference-only unless bytes are lawfully preserved.",
       "selectionTimestamp": "2026-08-25T16:00:00Z",
       "sourceAccess": "public-only",
-      "encodingStatus": "selected-not-yet-encoded"
+      "encodingStatus": "selected-not-yet-encoded",
+      "holdReason": "Case-count minimum already met after five preferred encodings; Fluidkey remains available if further structural diversity or public-private-separation stress is needed before the 12-case ceiling."
     }
   ],
   "researchedButNotSelectedAsSeparateCase": [
@@ -152,22 +178,25 @@
     {
       "topic": "Unruggable or Blockful SPP3/SPP2 duplicate awards",
       "disposition": "held-in-reserve",
-      "rationale": "Additional award clones are available from public sources but would add less structural diversity than the six selected candidates. May be encoded later only if needed for the 8–12 case-count gate after the preferred set."
+      "rationale": "Additional award clones are available from public sources but would add less structural diversity than the preferred encoded set. May be encoded later only if needed before the 12-case ceiling."
     }
   ],
   "remainingWork": [
-    "Encode at least four candidates into full corpus cases (case.json + record-initial + annotations + validator binding) without inventing facts.",
-    "Prefer encoding order that maximizes new strata/structure: Goldsky (or Fluidkey), JustaName (quorum-rich SPP2), EP 6.5 amendment, Unruggable Q4 delivery, Marketplace RFP incomplete process.",
-    "Do not mark study ready-for-final-review until case-count, stratum, and double-annotation machine gates are actually satisfied."
+    "Human second annotations remain required for the double-annotation gate (minimum 25% of counted cases; currently 0/9).",
+    "Optional: encode Fluidkey if additional public-private-separation stress is desired before the maximum of 12.",
+    "Do not mark study ready-for-final-review until double-annotation (and any remaining research dispositions) actually satisfy machine gates.",
+    "Do not invent an AI-assisted historical case."
   ],
   "limitations": [
     "Candidate inclusion is source-bounded and pre-encoding; it does not claim that every intended stratum will be reconstructable once annotated.",
     "Some application IPFS URIs may be retrieval-failed at encoding time; unknowns remain admissible.",
-    "This addendum is not a preregistration rewrite and must not be described as part of the original study-plan declaration."
+    "This addendum is not a preregistration rewrite and must not be described as part of the original study-plan declaration.",
+    "JustaName intended committee-quorum at selection time; encoded strata omit that claim absent a bound quorum figure."
   ],
   "nonClaims": [
     "Selection does not establish annotation correctness, source truth, fairness, merit, or institutional legitimacy.",
     "Listing a candidate does not count it as an empirical corpus case until the corpus contract passes.",
-    "Absence of an AI-assisted case here does not prove no ENS process ever used AI; it only records that this corpus has not evidenced that conditional stratum."
+    "Absence of an AI-assisted case here does not prove no ENS process ever used AI; it only records that this corpus has not evidenced that conditional stratum.",
+    "Meeting the 8–12 case-count band does not by itself make the study ready-for-final-review."
   ]
 }

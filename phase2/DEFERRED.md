@@ -1,6 +1,6 @@
 # Phase II deferred work
 
-Items intentionally not shipped as production guarantees because half-built cryptography or verification logic would overclaim privacy, provenance, temporal, or fairness guarantees.
+Items intentionally not shipped as production guarantees because half-built cryptography or verification logic would overclaim privacy, provenance, temporal, or fairness guarantees. Aligns with repository `DEFERRED.md` for the target `v1.0.0` boundary; current package is `0.4.0`.
 
 ## Production RFC 3161 verification
 

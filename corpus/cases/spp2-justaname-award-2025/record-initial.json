@@ -1,0 +1,234 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp2-2025-justaname-award-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 2 (SPP2)",
+    "roundId": "SPP2-2025",
+    "authority": "ENS DAO through a ranked-choice social selection vote under the amended SPP2 allocation procedure, followed by executable stream implementation",
+    "programUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "justaname-spp2-2025",
+    "applicantName": "JustaName",
+    "applicationUri": "https://discuss.ens.domains/t/spp2-justaname-application/20430",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP2-2025-EP6.5",
+    "version": "EP6.3 program plus EP6.5 amended selection procedure",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+    "sources": [
+      "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "https://docs.ens.domains/dao/proposals/6.5/",
+      "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+      "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "eligibility": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "evaluationCriteria": "https://docs.ens.domains/dao/proposals/6.5/",
+      "conflictRules": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "decisionProcedure": "https://docs.ens.domains/dao/proposals/6.5/"
+    },
+    "changeDuringReview": true,
+    "changeSummary": "After applications were submitted and eligibility review had begun, the DAO amended the SPP2 voting and budget-allocation procedure through EP6.5 and MetaGov reopened a limited application edit window before the final selection vote.",
+    "previousVersion": "SPP2 original facilitation under EP6.3",
+    "changeNoticeUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+    "priorEvaluationsRerun": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "SPP2-ELIGIBILITY-CONFIRMED",
+        "description": "MetaGov publicly confirmed on the JustaName application thread that the application met SPP2 eligibility criteria; the amended facilitation plan states that all applications advancing to the final vote were eligible.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-APPLICATION",
+          "E-AMENDED-PLAN"
+        ]
+      }
+    ],
+    "rationale": "JustaName's application thread contains an explicit MetaGov eligibility confirmation. Exact eligibility-check timestamp is not established."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "ens-dao-electorate",
+      "displayName": "ENS DAO SPP2 voting electorate",
+      "kind": "other",
+      "role": "rank and select SPP2 service providers and budget options under the EP6.5 voting procedure",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-ORIGINAL-PLAN",
+      "kind": "forum",
+      "description": "MetaGov's original SPP2 facilitation plan.",
+      "uri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-EP65",
+      "kind": "document",
+      "description": "ENS governance documentation for passed EP6.5 amendment defining Copeland ranking and $4.5M allocation.",
+      "uri": "https://docs.ens.domains/dao/proposals/6.5/",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-AMENDED-PLAN",
+      "kind": "forum",
+      "description": "MetaGov amended facilitation plan stating EP6.5 governs the selection vote and all final-vote applications are eligible.",
+      "uri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-APPLICATION",
+      "kind": "application",
+      "description": "JustaName public SPP2 application with MetaGov eligibility confirmation and $300,000 basic budget listing in the EP6.10 index.",
+      "uri": "https://discuss.ens.domains/t/spp2-justaname-application/20430",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-VOTE",
+      "kind": "forum",
+      "description": "EP6.10 social selection proposal describing ranked-choice mechanics and listing JustaName.",
+      "uri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-IMPLEMENTATION",
+      "kind": "forum",
+      "description": "EP6.13 executable SPP2 implementation naming Justaname at $300,000 annual allocation for a one-year stream.",
+      "uri": "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "RANK",
+        "name": "Copeland pairwise ranking with average support as tiebreaker under EP6.5",
+        "score": null,
+        "scoreScale": "ordinal funding-priority rank among budget entries; exact JustaName Copeland rank is not independently recomputed in this reconstruction"
+      },
+      {
+        "criterionId": "CUTOFF",
+        "name": "NONE BELOW approval cutoff and budget allocation under the $4.5M envelope",
+        "score": null,
+        "scoreScale": "procedural cutoff and budget-fit rule"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-ELIGIBLE",
+        "statement": "MetaGov publicly confirmed that JustaName met the SPP2 eligibility criteria.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-APPLICATION",
+          "E-AMENDED-PLAN"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "high"
+      },
+      {
+        "findingId": "F-FUNDED",
+        "statement": "The public EP6.13 SPP2 implementation lists Justaname among funded providers at $300,000 for a one-year stream.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-IMPLEMENTATION"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-NEW-PROVIDER",
+        "statement": "Public EP6.13 materials describe JustaName as a new SPP2 provider receiving a newly established stream.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-IMPLEMENTATION"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "medium"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "No scalar applicant-merit score; the public decision used ranked pairwise voting and budget allocation."
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "approved",
+    "authority": "ENS DAO SPP2 ranked-choice social selection (EP6.10) implemented by executable EP6.13 stream configuration",
+    "authorityKind": "dao-vote",
+    "decidedAt": null,
+    "awardedAmount": 300000,
+    "currency": "USD",
+    "rationale": "JustaName passed eligibility, participated in the EP6.10 ranked-choice selection under EP6.5, and is listed in the EP6.13 implementation as a funded one-year provider at $300,000.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": null,
+    "decisionRule": "Rank budget entries by Copeland pairwise results with average support as tiebreaker, then allocate in rank order subject to two-year eligibility/cap rules and the $4.5M total budget, stopping when the budget is fully allocated or NONE BELOW is reached.",
+    "voteRecordUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741"
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "The reviewed public SPP2 governing and implementation artifacts do not identify a dedicated post-result factual or procedural correction process for an individual funded applicant. This is a public-evidence limitation, not a claim that no internal channel existed.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [
+    {
+      "conditionId": "SPP2-JUSTANAME-STREAM",
+      "description": "Operate as a funded SPP2 service provider under the one-year $300,000 stream established in the EP6.13 implementation, subject to program reporting and Stream Management Pod administration.",
+      "targetDate": null,
+      "reviewWindow": "SPP2 funded cycle / quarterly reporting practice for service providers",
+      "verificationMethod": "Public program reporting and Stream Management Pod / Foundation administration under SPP2 terms.",
+      "verifier": "ENS DAO Stream Management Pod and program facilitators according to public SPP2 terms",
+      "dependencies": [
+        "Executable EP6.13 stream configuration and program onboarding"
+      ],
+      "paymentAmount": 300000,
+      "currency": "USD",
+      "status": "pending",
+      "evidenceIds": [
+        "E-IMPLEMENTATION",
+        "E-VOTE"
+      ],
+      "consequence": "Stream administration may adjust or end streams under DAO/program processes; this reconstruction does not invent a JustaName-specific pause or termination event."
+    }
+  ],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T18:30:00Z",
+    "updatedAt": "2026-08-25T18:30:00Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Public-only retrospective reconstruction; this is not a contemporaneous institutional decision record.",
+    "Exact Copeland rank and pairwise tallies for JustaName are not independently recomputed here; funding is taken from the public EP6.13 implementation table.",
+    "governingPolicy.effectiveAt, eligibility.checkedAt, and decision.decidedAt remain null at schema-v0.1 precision.",
+    "spp.vote and unofficial stream-tracking repositories are not treated as cryptographic proofs in this case.",
+    "Reference-only remote sources are not represented as exact byte-preserved captures."
+  ]
+}

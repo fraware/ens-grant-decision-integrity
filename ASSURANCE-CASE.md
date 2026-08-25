@@ -1,6 +1,6 @@
 # Assurance Case — ENS Grant Decision Integrity
 
-This document maps the project objective to bounded machine claims in `claims/claim-registry.v1.json`. It is an assurance map, not a claim that every gate is currently satisfied for a `v1.0.0` tag.
+This document maps the project objective to bounded machine claims in `claims/claim-registry.v1.json`. It is an assurance map for package `0.4.0` / current `main`, not a claim that every gate is satisfied for a `v1.0.0` tag, and not ENS endorsement.
 
 ## Goal G0
 
@@ -79,4 +79,4 @@ A material grant/service-provider decision package can be reconstructed later wi
 
 ## Explicit non-goals
 
-Merit/fairness scoring, authority transfer to automation, dashboard-as-assurance, live Ethereum, ZK selective disclosure, and silent v0.1 redesign remain deferred. See `DEFERRED.md` / Workstream 10 when present at release.
+Merit/fairness scoring, authority transfer to automation, dashboard-as-assurance, live Ethereum, ZK selective disclosure, and silent v0.1 redesign remain deferred. See `DEFERRED.md`.

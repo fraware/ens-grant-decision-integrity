@@ -40,7 +40,10 @@ def _profiles_dir() -> Path:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="gdi", description="ENS Grant Decision Integrity verifier")
+    parser = argparse.ArgumentParser(
+        prog="gdi",
+        description="ENS Grant Decision Integrity verifier",
+    )
     parser.add_argument("--version", action="version", version=f"gdi {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -191,7 +194,8 @@ def main(argv: list[str] | None = None) -> int:
             root = _profiles_dir()
             if not root.is_dir():
                 raise FileNotFoundError(
-                    "profiles directory not found; set GDI_PROFILES_DIR or run from a source checkout"
+                    "profiles directory not found; "
+                    "set GDI_PROFILES_DIR or run from a source checkout"
                 )
             if args.profile_id:
                 path = root / f"{args.profile_id}.json"

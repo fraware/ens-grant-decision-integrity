@@ -1,6 +1,6 @@
 # Machine-Checkable Conformance
 
-`schema/grant-decision-record.schema.json` validates record structure. `scripts/conformance.py` checks cross-field relations that encode the v0.1 decision-integrity profile.
+`schema/grant-decision-record.schema.json` validates record structure. `scripts/conformance.py` checks cross-field relations that encode the v0.1 decision-integrity profile. Package `ens-gdi` `0.4.0` does not change these v0.1 semantics; additive surfaces (schema 0.2, Phase II, projection, corpus, `gdi`) are documented separately.
 
 A record passes the v0.1 profile when it has no schema or conformance errors. Warnings identify unresolved auditability or process questions and can be promoted to failures with `--strict`.
 

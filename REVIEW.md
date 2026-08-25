@@ -14,11 +14,12 @@ This repository currently ships:
 - grant-decision schema `0.1` and optional schema `0.2` extensions;
 - a conformance validator and adversarial suites;
 - a fictional mapping of the public SPP3 Marketplace process;
-- Phase II evaluator-manifest commitment, anchor verification, run attestation, and canonical artifact-recomputation evidence (additive);
-- deterministic confidential-to-public projection (additive; top-level redaction paths in the v1 reference).
+- Phase II evaluator-manifest commitment, anchor verification (Rekor v1/v2 modules; production RFC 3161 fail-closed), run attestation, and canonical artifact-recomputation evidence (additive);
+- deterministic confidential-to-public projection v1 and v2 (additive);
+- packaged `gdi` verifier, claim registry, profiles, and adapters;
+- a retrospective empirical corpus (in progress; double annotation not complete).
 
-Production RFC 3161 verification, actual evaluator implementation re-execution, cryptographic selective-disclosure proofs, and live Ethereum mainnet anchoring are not shipped as production guarantees; see `phase2/DEFERRED.md`.
-
+Production RFC 3161 verification, actual evaluator implementation re-execution, cryptographic selective-disclosure proofs, and live Ethereum mainnet anchoring are not shipped as production guarantees; see `phase2/DEFERRED.md`. Package `0.4.0` is not a `v1.0.0` claim.
 The worked Marketplace record is a dated, fictional process snapshot. It does not identify, score, recommend, or reject a real applicant, and it does not prescribe changes to the mapped process.
 
 ## Validation

@@ -11,7 +11,7 @@
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pip install -e .
-gdi version
+gdi --version
 gdi profiles
 python -m build
 ```
