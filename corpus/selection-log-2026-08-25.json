@@ -1,0 +1,173 @@
+{
+  "logVersion": "1",
+  "createdOn": "2026-08-25",
+  "status": "post-start-selection-addendum",
+  "studyPlanVersion": "1",
+  "studyPlanPath": "corpus/study-plan.json",
+  "nonRewriteRule": "This file is a versioned selection addendum. It does not rewrite study-plan.json. Selection precedes encoding and is independent of expected validator outcomes.",
+  "baselineCorpusAtAddendum": {
+    "empiricalCaseCount": 4,
+    "countedCaseIds": [
+      "ens-spp2-2025-agora-budget-rejection",
+      "ens-spp3-2026-anonymous-hard-eligibility-disqualification",
+      "ens-spp3-2026-ethid-withdrawal",
+      "ens-spp3-2026-namespace-award"
+    ],
+    "notes": "PR #19 hard-eligibility case is included in the baseline count after merge to main. At least four additional encoded cases are still required to reach the study-plan minimum of eight."
+  },
+  "selectionRule": "Prefer candidates that add distinct evidence structures over clones of the same award pattern. Encode only source-bounded public ENS/SPP facts. Do not invent AI-assisted historical involvement.",
+  "candidates": [
+    {
+      "candidateId": "cand-spp3-goldsky-award-2026",
+      "decisionClass": "approved-award",
+      "intendedStrata": [
+        "approved-award",
+        "merit-decision",
+        "delivery-or-milestone",
+        "incomplete-public-record"
+      ],
+      "sourceUrls": [
+        "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+        "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+        "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+        "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafybeidblcll7pt7s4jzlte6khv7twiqnckdoalanj2aoemd27afefhyou"
+      ],
+      "inclusionRationale": "Public SPP3 cohort recommendation names Goldsky for a $450,000 indexing award as a first-time SPP provider with Option B scope confirmation and milestone structure. Distinct from Namespace: new-to-SPP provider and standalone indexing mandate rather than subname infrastructure.",
+      "exclusionBoundary": "Does not reconstruct other cohort members, private individual scores beyond published means, KYC/Award Notice contents, or application bytes if retrieval fails. Does not invent AI-evaluator involvement.",
+      "selectionTimestamp": "2026-08-25T16:00:00Z",
+      "sourceAccess": "public-only",
+      "encodingStatus": "selected-not-yet-encoded"
+    },
+    {
+      "candidateId": "cand-spp2-justaname-award-2025",
+      "decisionClass": "approved-award",
+      "intendedStrata": [
+        "approved-award",
+        "merit-decision",
+        "committee-quorum",
+        "incomplete-public-record"
+      ],
+      "sourceUrls": [
+        "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+        "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+        "https://docs.ens.domains/dao/proposals/6.5/",
+        "https://spp.vote/",
+        "https://github.com/5ajaki/SPP2-Streams"
+      ],
+      "inclusionRationale": "SPP2 used delegate ranked-choice selection under EP 6.10 with Snapshot/spp.vote quorum-visible mechanics. JustaName is publicly documented as a new SPP2-funded provider ($300,000 one-year stream), supplying a prior-season award structure distinct from SPP3 committee recommendation.",
+      "exclusionBoundary": "Does not rescore JustaName, reconstruct every delegate ballot, or treat unofficial stream-tracking repositories as cryptographic proof. Application and vote mirrors remain reference-only unless bytes are preserved.",
+      "selectionTimestamp": "2026-08-25T16:00:00Z",
+      "sourceAccess": "public-only",
+      "encodingStatus": "selected-not-yet-encoded"
+    },
+    {
+      "candidateId": "cand-spp2-ep65-vote-amendment-2025",
+      "decisionClass": "other",
+      "intendedStrata": [
+        "policy-change-or-ambiguity",
+        "incomplete-public-record"
+      ],
+      "sourceUrls": [
+        "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638",
+        "https://docs.ens.domains/dao/proposals/6.5/",
+        "https://discuss.ens.domains/t/temp-check-social-service-provider-season-2-vote-amendment-proposal/20526",
+        "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340"
+      ],
+      "inclusionRationale": "EP 6.5 is an explicit published amendment changing SPP2 voting/allocation mechanics (rank-budget / NONE BELOW) with a dated facilitation-plan change notice. Exercises policy-change reconstruction without cloning an award outcome already covered by the Agora rejection case.",
+      "exclusionBoundary": "Represents the amendment decision/process change, not every subsequent SPP2 award. Does not treat the Agora no-award outcome as this case's unit of analysis.",
+      "selectionTimestamp": "2026-08-25T16:00:00Z",
+      "sourceAccess": "public-only",
+      "encodingStatus": "selected-not-yet-encoded"
+    },
+    {
+      "candidateId": "cand-spp2-unruggable-q4-delivery-2025",
+      "decisionClass": "other",
+      "intendedStrata": [
+        "delivery-or-milestone",
+        "incomplete-public-record"
+      ],
+      "sourceUrls": [
+        "https://discuss.ens.domains/t/unruggable-update-and-spp2-q4-2025-quarterly-report/22093",
+        "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+        "https://discuss.ens.domains/c/service-provider-program/reports/80"
+      ],
+      "inclusionRationale": "Public SPP2 Q4 2025 quarterly report from funded provider Unruggable documents post-award delivery/milestone reporting. Distinct structure from initial award encoding: accountability after funding rather than selection.",
+      "exclusionBoundary": "Does not convert provider self-report into independent verification of every claimed deliverable, invent stream-pause decisions, or treat AI-agent research mentions as historical AI-assisted evaluation of applicants.",
+      "selectionTimestamp": "2026-08-25T16:00:00Z",
+      "sourceAccess": "public-only",
+      "encodingStatus": "selected-not-yet-encoded"
+    },
+    {
+      "candidateId": "cand-spp3-marketplace-rfp-amendment-2026",
+      "decisionClass": "other",
+      "intendedStrata": [
+        "policy-change-or-ambiguity",
+        "delivery-or-milestone",
+        "incomplete-public-record"
+      ],
+      "sourceUrls": [
+        "https://discuss.ens.domains/t/7-1-social-spp3-marketplace-rfp/22263",
+        "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+        "https://discuss.ens.domains/t/meta-gov-working-group-term-7-meetings-thursday-4pm-utc-bi-weekly/22280"
+      ],
+      "inclusionRationale": "EP 7.1 is a public one-time amendment authorizing a scoped Marketplace RFP from uncommitted SPP3 budget after EthID withdrawal, with milestone-gated award design. At selection time the RFP process is publicly incomplete (submissions/review reported; final award not treated as settled here), which exercises incomplete-public-record outside a standard cohort award.",
+      "exclusionBoundary": "Does not invent a final marketplace awardee, award amount, or interview outcomes. Does not reopen EthID withdrawal as this case's primary unit of analysis (already encoded separately).",
+      "selectionTimestamp": "2026-08-25T16:00:00Z",
+      "sourceAccess": "public-only",
+      "encodingStatus": "selected-not-yet-encoded"
+    },
+    {
+      "candidateId": "cand-spp3-fluidkey-award-2026",
+      "decisionClass": "approved-award",
+      "intendedStrata": [
+        "approved-award",
+        "merit-decision",
+        "delivery-or-milestone",
+        "public-private-separation",
+        "incomplete-public-record"
+      ],
+      "sourceUrls": [
+        "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+        "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+        "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafkreiaplckhk72bu3wuxofgkbdoky7jb3o24kk7olbb6urfaquz2os4sm"
+      ],
+      "inclusionRationale": "Fluidkey is the smallest published SPP3 award ($340,000) with an explicit public-goods versus commercial-product separation in the cohort rationale. Adds a different award structure within the same season without cloning Namespace.",
+      "exclusionBoundary": "Does not reconstruct private scoring sheets, KYC, or Award Notice text. Application URI remains reference-only unless bytes are lawfully preserved.",
+      "selectionTimestamp": "2026-08-25T16:00:00Z",
+      "sourceAccess": "public-only",
+      "encodingStatus": "selected-not-yet-encoded"
+    }
+  ],
+  "researchedButNotSelectedAsSeparateCase": [
+    {
+      "topic": "Additional SPP3 recusal/conflict event",
+      "disposition": "deferred",
+      "rationale": "The published SPP3 cohort recommendation discloses one recusal (sovereignsignal.eth on Namespace). That event is already represented in the encoded Namespace case. No second, distinct public recusal event was verified for a separate case without inventing facts."
+    },
+    {
+      "topic": "ai-assisted-when-evidenced",
+      "disposition": "not-evidenced-in-selected-historical-decisions",
+      "rationale": "Public Unruggable delivery reports discuss AI-agent identity research as funded work product. That is not authoritative evidence that historical SPP applicant evaluation used material AI assistance. Conditional stratum remains not evidenced; Phase II stays synthetic/fixture-based."
+    },
+    {
+      "topic": "Unruggable or Blockful SPP3/SPP2 duplicate awards",
+      "disposition": "held-in-reserve",
+      "rationale": "Additional award clones are available from public sources but would add less structural diversity than the six selected candidates. May be encoded later only if needed for the 8–12 case-count gate after the preferred set."
+    }
+  ],
+  "remainingWork": [
+    "Encode at least four candidates into full corpus cases (case.json + record-initial + annotations + validator binding) without inventing facts.",
+    "Prefer encoding order that maximizes new strata/structure: Goldsky (or Fluidkey), JustaName (quorum-rich SPP2), EP 6.5 amendment, Unruggable Q4 delivery, Marketplace RFP incomplete process.",
+    "Do not mark study ready-for-final-review until case-count, stratum, and double-annotation machine gates are actually satisfied."
+  ],
+  "limitations": [
+    "Candidate inclusion is source-bounded and pre-encoding; it does not claim that every intended stratum will be reconstructable once annotated.",
+    "Some application IPFS URIs may be retrieval-failed at encoding time; unknowns remain admissible.",
+    "This addendum is not a preregistration rewrite and must not be described as part of the original study-plan declaration."
+  ],
+  "nonClaims": [
+    "Selection does not establish annotation correctness, source truth, fairness, merit, or institutional legitimacy.",
+    "Listing a candidate does not count it as an empirical corpus case until the corpus contract passes.",
+    "Absence of an AI-assisted case here does not prove no ENS process ever used AI; it only records that this corpus has not evidenced that conditional stratum."
+  ]
+}
