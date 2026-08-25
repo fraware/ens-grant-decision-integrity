@@ -103,3 +103,37 @@ def test_invalid_capture_timestamp_is_rejected(tmp_path: Path) -> None:
             captured_at="not-a-time",
         )
     assert exc.value.code == "SRC002"
+
+
+def test_capture_timestamp_requires_timezone(tmp_path: Path) -> None:
+    path = tmp_path / "policy.txt"
+    path.write_bytes(b"captured bytes\n")
+    with pytest.raises(SourceArtifactError) as exc:
+        build_artifact(
+            artifact_id="policy-1",
+            source_uri="https://example.org/policy",
+            file_path=path,
+            media_type="text/plain",
+            method="manual-export",
+            tool="test-harness",
+            tool_version="1",
+            captured_at="2026-08-24T12:00:00",
+        )
+    assert exc.value.code == "SRC002"
+
+
+def test_source_uri_requires_scheme(tmp_path: Path) -> None:
+    path = tmp_path / "policy.txt"
+    path.write_bytes(b"captured bytes\n")
+    with pytest.raises(SourceArtifactError) as exc:
+        build_artifact(
+            artifact_id="policy-1",
+            source_uri="example.org/policy",
+            file_path=path,
+            media_type="text/plain",
+            method="manual-export",
+            tool="test-harness",
+            tool_version="1",
+            captured_at="2026-08-24T12:00:00Z",
+        )
+    assert exc.value.code == "SRC002"
