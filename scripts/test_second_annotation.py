@@ -1,0 +1,105 @@
+from __future__ import annotations
+
+import copy
+import json
+from pathlib import Path
+
+import pytest
+
+from second_annotation import SecondAnnotationError, build_handoff, verify_submission
+
+ROOT = Path(__file__).resolve().parents[1]
+CASE_PATH = ROOT / "corpus" / "cases" / "spp3-namespace-2026" / "case.json"
+
+
+def _case() -> dict:
+    return json.loads(CASE_PATH.read_text(encoding="utf-8"))
+
+
+def _completed_unknown_handoff() -> tuple[dict, dict]:
+    case = _case()
+    handoff = build_handoff(case, base_dir=CASE_PATH.parent)
+    submission = handoff["annotationSubmission"]
+    submission["annotationId"] = "namespace-independent-second-v1"
+    submission["annotatorId"] = "independent-reviewer-b"
+    submission["independent"] = True
+    submission["elapsedMinutes"] = 12.5
+    for field in submission["fields"]:
+        field["classification"] = "unknown"
+        field["sourceArtifactIds"] = []
+        field["rationale"] = None
+    return case, handoff
+
+
+def test_prepare_strips_primary_reconstruction_material() -> None:
+    case = _case()
+    primary = case["annotations"][0]
+    handoff = build_handoff(case, base_dir=CASE_PATH.parent)
+    encoded = json.dumps(handoff, sort_keys=True)
+
+    assert primary["annotationId"] not in encoded
+    assert primary["annotatorId"] not in encoded
+    assert "selection" not in handoff
+    assert "verification" not in handoff
+    assert "review" not in handoff
+    assert "annotations" not in handoff
+    assert "decision" not in handoff
+    assert all(set(field) == {"path", "requiredForProfile"} for field in handoff["materialFields"])
+
+
+def test_verify_accepts_complete_independent_unknown_annotation() -> None:
+    case, handoff = _completed_unknown_handoff()
+    annotation = verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+
+    assert annotation["annotatorId"] == "independent-reviewer-b"
+    assert annotation["independent"] is True
+    assert len(annotation["fields"]) == len(case["annotations"][0]["fields"])
+    assert {field["classification"] for field in annotation["fields"]} == {"unknown"}
+
+
+def test_verify_rejects_primary_annotator_reuse() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"]["annotatorId"] = case["annotations"][0]["annotatorId"]
+
+    with pytest.raises(SecondAnnotationError, match="distinct") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN006"
+
+
+def test_verify_rejects_independence_not_attested() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"]["independent"] = False
+
+    with pytest.raises(SecondAnnotationError, match="independent=true") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN006"
+
+
+def test_verify_rejects_missing_material_field() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"]["fields"].pop()
+
+    with pytest.raises(SecondAnnotationError, match="complete fixed material field set") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN007"
+
+
+def test_verify_rejects_unknown_source_reference() -> None:
+    case, handoff = _completed_unknown_handoff()
+    field = handoff["annotationSubmission"]["fields"][0]
+    field["classification"] = "direct-source"
+    field["sourceArtifactIds"] = ["NOT-IN-HANDOFF"]
+
+    with pytest.raises(SecondAnnotationError, match="outside the handoff") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN008"
+
+
+def test_verify_rejects_static_handoff_tampering() -> None:
+    case, handoff = _completed_unknown_handoff()
+    tampered = copy.deepcopy(handoff)
+    tampered["initialRecordHash"] = "sha256:" + "0" * 64
+
+    with pytest.raises(SecondAnnotationError, match="initialRecordHash") as exc:
+        verify_submission(case, tampered, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN004"

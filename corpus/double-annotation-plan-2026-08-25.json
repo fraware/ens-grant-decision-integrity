@@ -1,0 +1,54 @@
+{
+  "planVersion": "1",
+  "createdOn": "2026-08-25",
+  "status": "post-start-execution-addendum",
+  "studyPlanVersion": "1",
+  "baseline": {
+    "repositoryCommit": "00fb82311d3be427f45d50697f4d74aa111886f2",
+    "empiricalCaseCount": 3,
+    "secondAnnotationsRecordedAtBaseline": 0
+  },
+  "selectionRule": "Select every empirical corpus case present at the exact baseline commit before any second annotation is recorded. This addendum fixes the double-annotation sample without using later agreement, validator, or reconciliation outcomes.",
+  "selectedCaseIds": [
+    "ens-spp2-2025-agora-budget-rejection",
+    "ens-spp3-2026-ethid-withdrawal",
+    "ens-spp3-2026-namespace-award"
+  ],
+  "coverageEffect": {
+    "selectedCaseCount": 3,
+    "studyPlanMinimumFraction": 0.25,
+    "fractionAtTargetMinimumEightCases": 0.375,
+    "fractionAtTargetMaximumTwelveCases": 0.25
+  },
+  "independenceProtocol": {
+    "sameMaterialFieldSet": true,
+    "distinctAnnotatorRequired": true,
+    "secondAnnotatorMustAttestIndependent": true,
+    "withholdBeforeSubmission": [
+      "primary annotation classifications and rationales",
+      "primary reconstructed decision-record values",
+      "validator findings and finding dispositions",
+      "case review and reconciliation notes",
+      "computed corpus metrics and agreement results"
+    ],
+    "provideBeforeSubmission": [
+      "source inventory and source access locations",
+      "the fixed material field paths and requiredForProfile flags",
+      "the annotation classification definitions",
+      "the corpus merit, privacy, and unknown-evidence boundaries"
+    ],
+    "reconciliationStartsAfterSecondAnnotationIsFrozen": true
+  },
+  "rationale": "All three empirical cases already present at the baseline are selected. This avoids choosing cases after observing second-annotation agreement and supplies three independently reviewed cases, which is sufficient to maintain the predeclared 0.25 minimum through the study-plan maximum of twelve total cases if all three second annotations are completed.",
+  "limitations": [
+    "This addendum was created after primary annotations already existed, so it is not part of the original pre-study declaration and must not be described as such.",
+    "The selection is deterministic over the baseline corpus but is not randomized and does not make the corpus statistically representative.",
+    "Public source material may itself reveal historical outcomes; the independence goal is independent encoding from sources, not blindness to facts contained in those sources.",
+    "An annotator's independent=true declaration is an attestation. Repository tooling can check separation of identifiers and field sets, but it cannot prove the human annotation process was independent."
+  ],
+  "nonClaims": [
+    "Selection under this addendum does not establish annotation correctness.",
+    "Independent agreement does not establish source truth, fairness, merit, or institutional legitimacy.",
+    "Completion of these three second annotations does not by itself make the retrospective study complete."
+  ]
+}
