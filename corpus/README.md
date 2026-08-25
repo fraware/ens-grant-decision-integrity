@@ -45,6 +45,16 @@ Real cases cannot use the template zero hash. If review changes a record, both i
 
 The file hash proves identity of the supplied bytes only. It does not prove that the annotation was correct or that the file contains every fact that existed historically.
 
+## Validator-output binding
+
+For a real case, the corpus CLI does not trust `verification.initialFindings` as self-authenticating bookkeeping. After verifying the exact initial record bytes, it parses that file and runs the repository decision-record validator on those bytes. The complete machine finding multiset must match the recorded initial findings by severity, code, path, and message. An omitted finding, an invented finding, or a nearby-but-different path/message fails closed.
+
+A schema-invalid initial record is admissible evidence. The corpus should preserve that exact initial state and its `SCHEMA` finding rather than repair the record before measuring it. This keeps validator success from becoming the study outcome.
+
+For the final state, the CLI validates `record-reconciled.json` when review changed the record and otherwise reuses the initial validator result. `verification.finalErrors` and `verification.finalWarnings` must equal the validator's rendered final output in validator order. The metrics output reports whether initial and final validator findings were actually verified. Without case-directory context, those verification flags remain false rather than implying that a record was checked.
+
+This binding establishes consistency between the supplied record bytes, the repository validator, and the recorded finding inventory. It does not establish that the validator is correct, that the record is complete, or that a finding corresponds to a real-world procedural defect.
+
 ## Annotation classes
 
 Each material field is classified as:
@@ -65,13 +75,13 @@ Run:
 python scripts/corpus_metrics.py corpus/path/to/case.json
 ```
 
-For real cases the CLI verifies declared record-snapshot bytes and any redistributable source artifacts before emitting metrics. It reports source counts, byte-verification counts, required-field reconstructability, direct-source and unknown rates, interpretive share, elapsed minutes, and finding dispositions. For exactly two independent annotations over the same material field set, it also reports raw classification agreement and Cohen's kappa.
+For real cases the CLI verifies declared record-snapshot bytes, the corresponding initial/final decision-record validator output, and any redistributable source artifacts before emitting metrics. It reports source counts, byte-verification status, validator-binding status, required-field reconstructability, direct-source and unknown rates, interpretive share, elapsed minutes, and finding dispositions. For exactly two independent annotations over the same material field set, it also reports raw classification agreement and Cohen's kappa.
 
 Kappa is descriptive agreement evidence, not proof that either annotation is substantively correct. It is undefined when expected agreement is 1. Small-case results must not be generalized as population estimates.
 
 ## Anti-circularity
 
-Validator success is not the outcome variable. Preserve the initial record bytes/hash and initial findings. If review changes a record, preserve reconciled bytes/hash and a non-empty rationale. Findings are classified after review as confirmed process gaps, annotation defects, model defects, expected warnings, unresolved, or other.
+Validator success is not the outcome variable. Preserve the initial record bytes/hash and the exact initial validator findings. If review changes a record, preserve reconciled bytes/hash, the exact final validator output, and a non-empty rationale. Findings are classified after review as confirmed process gaps, annotation defects, model defects, expected warnings, unresolved, or other.
 
 A case that cannot be completed from available artifacts remains informative. Do not infer undocumented facts to turn it green.
 

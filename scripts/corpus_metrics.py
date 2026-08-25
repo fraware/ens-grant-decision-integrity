@@ -10,6 +10,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from conformance import Finding as RecordFinding
+from conformance import validate_record
 from source_artifact import SourceArtifactError, verify_artifact
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,7 +83,7 @@ def _hash_file(path: Path) -> str:
     return "sha256:" + digest.hexdigest()
 
 
-def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) -> None:
+def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) -> Path:
     raw_path = snapshot.get("path")
     if not isinstance(raw_path, str) or not raw_path:
         raise CorpusCaseError(f"empirical {label} snapshot must declare a path", code="CORP018")
@@ -91,6 +93,82 @@ def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) ->
         raise CorpusCaseError(
             f"empirical {label} snapshot hash mismatch: declared {snapshot['recordHash']}, observed {observed}",
             code="CORP020",
+        )
+    return candidate
+
+
+def _load_decision_record(path: Path, *, label: str) -> dict[str, Any]:
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise CorpusCaseError(f"cannot load empirical {label} decision record: {exc}", code="CORP025") from exc
+    if not isinstance(record, dict):
+        raise CorpusCaseError(f"empirical {label} decision record must be a JSON object", code="CORP025")
+    return record
+
+
+def _run_record_validator(path: Path, *, label: str) -> list[RecordFinding]:
+    record = _load_decision_record(path, label=label)
+    try:
+        return validate_record(record)
+    except ValueError as exc:
+        raise CorpusCaseError(f"cannot validate empirical {label} decision record: {exc}", code="CORP025") from exc
+
+
+def _finding_key_from_observed(finding: RecordFinding) -> tuple[str, str, str, str]:
+    return (finding.severity, finding.code, finding.path, finding.message)
+
+
+def _finding_key_from_recorded(finding: dict[str, Any]) -> tuple[str, str, str, str]:
+    path = finding.get("path")
+    if not isinstance(path, str) or not path:
+        raise CorpusCaseError(
+            f"recorded initial finding {finding.get('findingId')!r} must include the validator path",
+            code="CORP026",
+        )
+    return (finding["severity"], finding["code"], path, finding["message"])
+
+
+def _format_finding_key(key: tuple[str, str, str, str]) -> str:
+    severity, code, path, message = key
+    return f"{severity.upper()} {code} {path}: {message}"
+
+
+def _verify_initial_findings(case: dict[str, Any], observed: list[RecordFinding]) -> None:
+    recorded = Counter(_finding_key_from_recorded(item) for item in case["verification"]["initialFindings"])
+    actual = Counter(_finding_key_from_observed(item) for item in observed)
+    if recorded == actual:
+        return
+
+    omitted = sorted(_format_finding_key(item) for item in (actual - recorded).elements())
+    unsupported = sorted(_format_finding_key(item) for item in (recorded - actual).elements())
+    details: list[str] = []
+    if omitted:
+        details.append(f"validator findings omitted from case: {omitted}")
+    if unsupported:
+        details.append(f"case findings not produced by validator: {unsupported}")
+    raise CorpusCaseError(
+        "verification.initialFindings does not match the exact initial decision-record validator output; " + "; ".join(details),
+        code="CORP026",
+    )
+
+
+def _verify_final_findings(case: dict[str, Any], observed: list[RecordFinding]) -> None:
+    expected_errors = [item.render() for item in observed if item.severity == "error"]
+    expected_warnings = [item.render() for item in observed if item.severity == "warning"]
+    recorded_errors = case["verification"].get("finalErrors")
+    recorded_warnings = case["verification"].get("finalWarnings")
+    if not isinstance(recorded_errors, list) or not isinstance(recorded_warnings, list):
+        raise CorpusCaseError(
+            "empirical corpus cases must record finalErrors and finalWarnings from the final decision-record validator run",
+            code="CORP027",
+        )
+    if recorded_errors != expected_errors or recorded_warnings != expected_warnings:
+        raise CorpusCaseError(
+            "verification.finalErrors/finalWarnings do not match the exact final decision-record validator output; "
+            f"expected errors={expected_errors}, warnings={expected_warnings}; "
+            f"recorded errors={recorded_errors}, warnings={recorded_warnings}",
+            code="CORP027",
         )
 
 
@@ -150,6 +228,8 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> int:
         )
 
     verified_redistributable = 0
+    initial_record_path: Path | None = None
+    final_record_path: Path | None = None
     if not case["template"]:
         if not source_ids:
             raise CorpusCaseError(
@@ -162,7 +242,8 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> int:
                 code="CORP015",
             )
         if base_dir is not None:
-            _verify_snapshot(case["recordSnapshots"]["initial"], base_dir=base_dir, label="initial")
+            initial_record_path = _verify_snapshot(case["recordSnapshots"]["initial"], base_dir=base_dir, label="initial")
+            final_record_path = initial_record_path
             verified_redistributable = _verify_redistributable_sources(case, base_dir=base_dir)
 
     annotations = case["annotations"]
@@ -233,7 +314,7 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> int:
         if not case["template"] and base_dir is not None:
             if "path" not in reconciled:
                 raise CorpusCaseError("empirical reconciled snapshot must declare a path", code="CORP018")
-            _verify_snapshot(reconciled, base_dir=base_dir, label="reconciled")
+            final_record_path = _verify_snapshot(reconciled, base_dir=base_dir, label="reconciled")
 
     if case["review"]["reconciled"] and not case["review"]["reconciliationNotes"]:
         raise CorpusCaseError(
@@ -244,6 +325,14 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> int:
     if not REQUIRED_NONCLAIMS.issubset(set(case["nonClaims"])):
         missing = sorted(REQUIRED_NONCLAIMS - set(case["nonClaims"]))
         raise CorpusCaseError(f"required corpus non-claims are missing: {missing}", code="CORP012")
+
+    if not case["template"] and base_dir is not None:
+        if initial_record_path is None or final_record_path is None:
+            raise CorpusCaseError("empirical decision-record paths were not resolved", code="CORP018")
+        initial_findings = _run_record_validator(initial_record_path, label="initial")
+        _verify_initial_findings(case, initial_findings)
+        final_findings = initial_findings if final_record_path == initial_record_path else _run_record_validator(final_record_path, label="final")
+        _verify_final_findings(case, final_findings)
 
     return verified_redistributable
 
@@ -297,13 +386,16 @@ def _agreement(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
 def compute_metrics(case: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
     verified_redistributable = validate_case(case, base_dir=base_dir)
     finding_counts = Counter(item["disposition"] for item in case["verification"]["initialFindings"])
+    validator_bound = bool(base_dir is not None and not case["template"])
     result: dict[str, Any] = {
         "ok": True,
         "caseId": case["caseId"],
         "template": case["template"],
         "sourceArtifactCount": len(case["sourceArtifacts"]),
         "redistributableSourceArtifactsVerified": verified_redistributable if base_dir is not None else None,
-        "recordSnapshotBytesVerified": bool(base_dir is not None and not case["template"]),
+        "recordSnapshotBytesVerified": validator_bound,
+        "initialValidatorFindingsVerified": validator_bound,
+        "finalValidatorFindingsVerified": validator_bound,
         "annotations": [_annotation_metrics(annotation) for annotation in case["annotations"]],
         "findingDispositionCounts": dict(sorted(finding_counts.items())),
         "initialFindingCount": len(case["verification"]["initialFindings"]),

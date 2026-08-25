@@ -19,6 +19,12 @@ from source_artifact import build_artifact  # noqa: E402
 
 ROOT = SCRIPT_DIR.parent
 TEMPLATE = json.loads((ROOT / "corpus" / "case-template.json").read_text(encoding="utf-8"))
+EXAMPLE = ROOT / "examples" / "spp3-marketplace-rfp.example.json"
+CHAL003_MESSAGE = (
+    "no factual or procedural correction process is recorded; "
+    "the reviewed public governing artifacts do not identify one"
+)
+CHAL003_RENDERED = f"WARNING CHAL003 challenge.processDefined: {CHAL003_MESSAGE}"
 
 
 def _source(artifact_id: str = "src-1") -> dict:
@@ -68,7 +74,26 @@ def _sha256(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
-def _write_initial_record(case: dict, tmp_path: Path, content: bytes = b'{"record":"initial"}\n') -> None:
+def _set_marketplace_validator_output(case: dict) -> None:
+    case["verification"]["initialFindings"] = [
+        {
+            "findingId": "fixture-chal003",
+            "code": "CHAL003",
+            "severity": "warning",
+            "path": "challenge.processDefined",
+            "message": CHAL003_MESSAGE,
+            "disposition": "expected-warning",
+            "rationale": "Synthetic fixture preserves the canonical example's expected warning.",
+        }
+    ]
+    case["verification"]["finalErrors"] = []
+    case["verification"]["finalWarnings"] = [CHAL003_RENDERED]
+
+
+def _write_initial_record(case: dict, tmp_path: Path, content: bytes | None = None) -> None:
+    if content is None:
+        content = EXAMPLE.read_bytes()
+        _set_marketplace_validator_output(case)
     (tmp_path / "record-initial.json").write_bytes(content)
     case["recordSnapshots"]["initial"]["recordHash"] = _sha256(content)
 
@@ -280,11 +305,12 @@ def test_snapshot_path_must_be_relative(tmp_path: Path) -> None:
 
 def test_reconciled_snapshot_bytes_are_verified(tmp_path: Path) -> None:
     case = _case()
-    initial = b'{"record":"initial"}\n'
-    reconciled = b'{"record":"reconciled"}\n'
+    initial = EXAMPLE.read_bytes()
+    reconciled = initial + b"\n"
     (tmp_path / "record-initial.json").write_bytes(initial)
     (tmp_path / "record-reconciled.json").write_bytes(reconciled)
     case["recordSnapshots"]["initial"]["recordHash"] = _sha256(initial)
+    _set_marketplace_validator_output(case)
     _mark_reconciled(case, record_hash=_sha256(reconciled))
     validate_case(case, base_dir=tmp_path)
 
