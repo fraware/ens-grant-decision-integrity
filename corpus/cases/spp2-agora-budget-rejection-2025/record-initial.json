@@ -1,0 +1,218 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp2-2025-agora-budget-rejection-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 2 (SPP2)",
+    "roundId": "SPP2-2025",
+    "authority": "ENS DAO through a ranked-choice social selection vote under the amended SPP2 allocation procedure",
+    "programUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "agora-spp2-2025",
+    "applicantName": "Agora",
+    "applicationUri": "https://discuss.ens.domains/t/spp2-agora-application/20443",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP2-2025-EP6.5",
+    "version": "EP6.3 program plus EP6.5 amended selection procedure",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638/1",
+    "sources": [
+      "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "https://docs.ens.domains/dao/proposals/6.5/",
+      "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638/1",
+      "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "eligibility": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "evaluationCriteria": "https://docs.ens.domains/dao/proposals/6.5/",
+      "conflictRules": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "decisionProcedure": "https://docs.ens.domains/dao/proposals/6.5/"
+    },
+    "changeDuringReview": true,
+    "changeSummary": "After applications were submitted and eligibility review had begun, the DAO amended the SPP2 voting and budget-allocation procedure through EP6.5 and MetaGov reopened a limited application edit window before the final selection vote.",
+    "previousVersion": "SPP2 original facilitation under EP6.3",
+    "changeNoticeUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638/1",
+    "priorEvaluationsRerun": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "SPP2-ELIGIBILITY-CONFIRMED",
+        "description": "MetaGov publicly confirmed that Agora met the SPP2 eligibility criteria; the later amended facilitation plan states that all applications advancing to the final vote were eligible.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-APPLICATION",
+          "E-AMENDED-PLAN"
+        ]
+      }
+    ],
+    "rationale": "Agora's application thread contains an explicit MetaGov eligibility confirmation. The reviewed public sources do not establish an exact machine-usable eligibility-check timestamp."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "ens-dao-electorate",
+      "displayName": "ENS DAO SPP2 voting electorate",
+      "kind": "other",
+      "role": "rank and select SPP2 service providers and budget options under the EP6.5 voting procedure",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-ORIGINAL-PLAN",
+      "kind": "forum",
+      "description": "MetaGov's original SPP2 facilitation plan describing program eligibility, application requirements, and facilitation responsibilities.",
+      "uri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-EP65",
+      "kind": "document",
+      "description": "ENS governance documentation for EP6.5, the passed amendment defining Copeland ranking, budget-option handling, and the $4.5 million allocation procedure.",
+      "uri": "https://docs.ens.domains/dao/proposals/6.5/",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-AMENDED-PLAN",
+      "kind": "forum",
+      "description": "MetaGov's amended SPP2 facilitation plan stating that EP6.5 governs the selection vote, all applications in the final vote are eligible, and the application edit window was reopened before voting.",
+      "uri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638/1",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-APPLICATION",
+      "kind": "application",
+      "description": "Agora's public SPP2 application, including $300,000 basic and $400,000 extended one-year scopes, eligibility materials, disclosures, and MetaGov's explicit eligibility confirmation.",
+      "uri": "https://discuss.ens.domains/t/spp2-agora-application/20443",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-VOTE",
+      "kind": "forum",
+      "description": "Archived EP6.10 final selection proposal describing the amended voting method and the distinction between ranking relative to NONE BELOW and budget-option selection.",
+      "uri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-RESULTS",
+      "kind": "other",
+      "description": "Public SPP2 result interface reporting the final Copeland order, Agora Basic at rank 10 and not funded, NONE BELOW at rank 11, and $4.5 million of $4.5 million allocated.",
+      "uri": "https://spp.vote/",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "RANK",
+        "name": "Copeland pairwise ranking with average support as tiebreaker",
+        "score": null,
+        "scoreScale": "ordinal funding-priority rank; Agora Basic finished 10th"
+      },
+      {
+        "criterionId": "CUTOFF",
+        "name": "NONE BELOW approval cutoff and budget allocation under the $4.5M envelope",
+        "score": null,
+        "scoreScale": "procedural cutoff and budget-fit rule, not an applicant merit score"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-ELIGIBLE",
+        "statement": "MetaGov publicly confirmed that Agora met the SPP2 eligibility criteria.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-APPLICATION",
+          "E-AMENDED-PLAN"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "high"
+      },
+      {
+        "findingId": "F-RANK",
+        "statement": "The final SPP2 result interface reports Agora Basic at rank 10 with 26 Copeland wins and average ENS support of 1,490,652, above NONE BELOW at rank 11, but marks Agora Basic not funded.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-RESULTS"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "critical"
+      },
+      {
+        "findingId": "F-BUDGET",
+        "statement": "The final result interface reports the full $4.5 million program budget allocated while Agora Basic is not funded.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-RESULTS",
+          "E-EP65"
+        ],
+        "evaluatorIds": [
+          "ens-dao-electorate"
+        ],
+        "materiality": "critical"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "No scalar applicant-merit score; the public decision used ranked pairwise voting and budget allocation."
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "rejected",
+    "authority": "ENS DAO SPP2 ranked-choice social selection vote under EP6.5",
+    "authorityKind": "dao-vote",
+    "decidedAt": null,
+    "awardedAmount": null,
+    "currency": "USD",
+    "rationale": "Agora passed eligibility and Agora Basic finished above NONE BELOW, but the public final results mark it not funded after the $4.5M program envelope was fully allocated. This retrospective record uses 'rejected' for the terminal no-award funding outcome; it does not characterize Agora as below the electorate's NONE BELOW merit cutoff.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": null,
+    "decisionRule": "Rank budget entries by Copeland pairwise results with average support as tiebreaker, then allocate in rank order subject to two-year eligibility/cap rules and the $4.5M total budget, stopping when the budget is fully allocated or NONE BELOW is reached.",
+    "voteRecordUri": "https://spp.vote/"
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "The reviewed public SPP2 governing and result artifacts do not identify a dedicated post-result factual or procedural correction process for an individual applicant. This is a public-evidence limitation, not a claim that no internal or informal correction channel existed.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T08:27:26Z",
+    "updatedAt": "2026-08-25T08:27:26Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Public-only retrospective reconstruction; this is not a contemporaneous institutional decision record.",
+    "Agora proposed a $300,000 basic one-year scope and a $400,000 extended one-year scope. The final result considered the budget options separately; this record does not collapse them into one requestedAmount field.",
+    "The final result places Agora Basic above NONE BELOW but does not fund it because the published allocation is already $4.5M of $4.5M. The v0.1 status 'rejected' is used for the terminal no-award outcome while preserving the distinct ranking fact.",
+    "governingPolicy.effectiveAt, eligibility.checkedAt, and decision.decidedAt are intentionally null because the reviewed public surfaces do not establish exact source-supported instants with the precision and timezone required by schema v0.1.",
+    "The public process changed after applications and eligibility review began: EP6.5 replaced the voting/allocation method before the final selection vote and a limited edit window was reopened.",
+    "The Agora application disclosed relationships involving ENS delegates/investors. This reconstruction does not convert applicant disclosures into evaluator conflicts without a source-supported program adjudication linking them to the final decision surface.",
+    "No scalar merit score is inferred from the ranked-choice result.",
+    "Reference-only remote sources are not represented as exact byte-preserved captures."
+  ]
+}
