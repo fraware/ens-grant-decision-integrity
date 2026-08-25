@@ -27,6 +27,8 @@ jobs:
       - run: python scripts/test_conformance.py
       - run: python scripts/test_regressions.py
       - run: python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
+      - run: python -m pytest scripts/test_corpus.py
+      - run: python scripts/corpus_metrics.py corpus/case-template.json
 
   phase2:
     runs-on: ubuntu-latest
