@@ -1,0 +1,3 @@
+# Empirical corpus snapshots are authenticated by SHA-256 over exact committed
+# bytes. Force LF so Windows core.autocrlf checkouts cannot break CORP020.
+corpus/**/*.json text eol=lf

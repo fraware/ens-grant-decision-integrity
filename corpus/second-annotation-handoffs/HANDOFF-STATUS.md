@@ -30,13 +30,7 @@ python scripts/second_annotation.py prepare \
   --out corpus/second-annotation-handoffs/spp2-agora-budget-rejection-2025.handoff.json
 ```
 
-Windows note: with `core.autocrlf=true`, working-tree `record-*.json` files may be checked out as CRLF and fail snapshot-hash checks. Before prepare/validate, restore exact LF blob bytes from git, for example:
-
-```bash
-git cat-file blob HEAD:corpus/cases/<case>/record-initial.json
-```
-
-Write those bytes to the working-tree path without newline conversion. Do not rewrite declared record hashes.
+Windows note: `corpus/**/*.json` is forced to LF via `.gitattributes` (`text eol=lf`) so `core.autocrlf=true` checkouts do not break CORP020 snapshot hashes. After pulling this policy, run `git add --renormalize corpus` (or re-clone/checkout) if local working-tree records still show CRLF. Do not rewrite declared record hashes to match CRLF bytes.
 
 ## Human steps (from `corpus/DOUBLE-ANNOTATION.md`)
 
