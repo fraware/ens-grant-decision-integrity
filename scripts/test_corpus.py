@@ -15,13 +15,20 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from corpus_metrics import CorpusCaseError, compute_metrics, validate_case  # noqa: E402
+from source_artifact import build_artifact  # noqa: E402
 
 ROOT = SCRIPT_DIR.parent
 TEMPLATE = json.loads((ROOT / "corpus" / "case-template.json").read_text(encoding="utf-8"))
 
 
 def _source(artifact_id: str = "src-1") -> dict:
-    return {"artifactId": artifact_id, "role": "governing-policy", "availability": "redistributable"}
+    return {
+        "artifactId": artifact_id,
+        "sourceUri": f"https://example.org/{artifact_id}",
+        "role": "governing-policy",
+        "availability": "reference-only",
+        "notes": "Reference-only synthetic source for protocol tests."
+    }
 
 
 def _field(path: str, classification: str, *, source_ids: list[str] | None = None, required: bool = True) -> dict:
@@ -59,6 +66,38 @@ def _case() -> dict:
 
 def _sha256(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
+
+
+def _write_initial_record(case: dict, tmp_path: Path, content: bytes = b'{"record":"initial"}\n') -> None:
+    (tmp_path / "record-initial.json").write_bytes(content)
+    case["recordSnapshots"]["initial"]["recordHash"] = _sha256(content)
+
+
+def _set_redistributable_source(case: dict, tmp_path: Path, *, artifact_id: str = "src-1", source_uri: str | None = None) -> tuple[Path, Path]:
+    source_uri = source_uri or f"https://example.org/{artifact_id}"
+    bytes_path = tmp_path / "source.bin"
+    metadata_path = tmp_path / "source.artifact.json"
+    bytes_path.write_bytes(b"preserved source bytes\n")
+    metadata = build_artifact(
+        artifact_id=artifact_id,
+        source_uri=source_uri,
+        file_path=bytes_path,
+        media_type="application/octet-stream",
+        method="manual-export",
+        tool="test-harness",
+        tool_version="1",
+        captured_at="2026-08-24T12:00:00Z",
+    )
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+    case["sourceArtifacts"] = [{
+        "artifactId": artifact_id,
+        "sourceUri": source_uri,
+        "role": "governing-policy",
+        "availability": "redistributable",
+        "metadataPath": metadata_path.name,
+        "bytesPath": bytes_path.name,
+    }]
+    return metadata_path, bytes_path
 
 
 def _mark_reconciled(case: dict, *, record_hash: str, path: str = "record-reconciled.json") -> None:
@@ -184,9 +223,7 @@ def test_empirical_reconciled_record_rejects_template_zero_hash() -> None:
 
 def test_cli_context_verifies_initial_snapshot_exact_bytes(tmp_path: Path) -> None:
     case = _case()
-    raw = b'{"record":"initial"}\n'
-    (tmp_path / "record-initial.json").write_bytes(raw)
-    case["recordSnapshots"]["initial"]["recordHash"] = _sha256(raw)
+    _write_initial_record(case, tmp_path)
     validate_case(case, base_dir=tmp_path)
 
 
@@ -210,6 +247,14 @@ def test_snapshot_path_cannot_escape_case_directory(tmp_path: Path) -> None:
     assert exc.value.code == "CORP019"
 
 
+def test_snapshot_path_must_be_relative(tmp_path: Path) -> None:
+    case = _case()
+    case["recordSnapshots"]["initial"]["path"] = str((tmp_path / "record-initial.json").resolve())
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case, base_dir=tmp_path)
+    assert exc.value.code == "CORP019"
+
+
 def test_reconciled_snapshot_bytes_are_verified(tmp_path: Path) -> None:
     case = _case()
     initial = b'{"record":"initial"}\n'
@@ -219,6 +264,58 @@ def test_reconciled_snapshot_bytes_are_verified(tmp_path: Path) -> None:
     case["recordSnapshots"]["initial"]["recordHash"] = _sha256(initial)
     _mark_reconciled(case, record_hash=_sha256(reconciled))
     validate_case(case, base_dir=tmp_path)
+
+
+def test_redistributable_source_is_byte_verified(tmp_path: Path) -> None:
+    case = _case()
+    _write_initial_record(case, tmp_path)
+    _set_redistributable_source(case, tmp_path)
+    result = compute_metrics(case, base_dir=tmp_path)
+    assert result["redistributableSourceArtifactsVerified"] == 1
+    assert result["recordSnapshotBytesVerified"] is True
+
+
+def test_redistributable_source_byte_tamper_fails_closed(tmp_path: Path) -> None:
+    case = _case()
+    _write_initial_record(case, tmp_path)
+    _, bytes_path = _set_redistributable_source(case, tmp_path)
+    bytes_path.write_bytes(b"tampered source bytes\n")
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case, base_dir=tmp_path)
+    assert exc.value.code == "CORP021"
+
+
+def test_case_source_id_must_match_source_artifact_metadata(tmp_path: Path) -> None:
+    case = _case()
+    _write_initial_record(case, tmp_path)
+    metadata_path, _ = _set_redistributable_source(case, tmp_path)
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metadata["artifactId"] = "different-id"
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case, base_dir=tmp_path)
+    assert exc.value.code == "CORP022"
+
+
+def test_case_source_uri_must_match_source_artifact_metadata(tmp_path: Path) -> None:
+    case = _case()
+    _write_initial_record(case, tmp_path)
+    metadata_path, _ = _set_redistributable_source(case, tmp_path)
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metadata["sourceUri"] = "https://example.org/other"
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case, base_dir=tmp_path)
+    assert exc.value.code == "CORP023"
+
+
+def test_public_only_case_rejects_authorized_audit_only_source() -> None:
+    case = _case()
+    case["sourceArtifacts"][0]["availability"] = "authorized-audit-only"
+    case["sourceArtifacts"][0]["notes"] = "Protected audit source."
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP024"
 
 
 def test_double_annotation_requires_same_field_set() -> None:
