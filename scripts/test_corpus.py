@@ -27,7 +27,7 @@ def _source(artifact_id: str = "src-1") -> dict:
         "sourceUri": f"https://example.org/{artifact_id}",
         "role": "governing-policy",
         "availability": "reference-only",
-        "notes": "Reference-only synthetic source for protocol tests."
+        "notes": "Reference-only synthetic source for protocol tests.",
     }
 
 
@@ -73,7 +73,13 @@ def _write_initial_record(case: dict, tmp_path: Path, content: bytes = b'{"recor
     case["recordSnapshots"]["initial"]["recordHash"] = _sha256(content)
 
 
-def _set_redistributable_source(case: dict, tmp_path: Path, *, artifact_id: str = "src-1", source_uri: str | None = None) -> tuple[Path, Path]:
+def _set_redistributable_source(
+    case: dict,
+    tmp_path: Path,
+    *,
+    artifact_id: str = "src-1",
+    source_uri: str | None = None,
+) -> tuple[Path, Path]:
     source_uri = source_uri or f"https://example.org/{artifact_id}"
     bytes_path = tmp_path / "source.bin"
     metadata_path = tmp_path / "source.artifact.json"
@@ -161,6 +167,23 @@ def test_unknown_source_reference_fails_closed() -> None:
 def test_direct_source_without_source_reference_is_schema_failure() -> None:
     case = _case()
     case["annotations"][0]["fields"][0]["sourceArtifactIds"] = []
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP002"
+
+
+def test_derived_without_source_reference_is_schema_failure() -> None:
+    case = _case()
+    case["annotations"][0]["fields"][1]["sourceArtifactIds"] = []
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP002"
+
+
+def test_interpretive_without_source_reference_is_schema_failure() -> None:
+    case = _case()
+    field = _field("/evaluation/materialFindings/0", "interpretive")
+    case["annotations"][0]["fields"].append(field)
     with pytest.raises(CorpusCaseError) as exc:
         validate_case(case)
     assert exc.value.code == "CORP002"
@@ -349,6 +372,7 @@ def test_double_annotation_disagreement_changes_agreement_metrics() -> None:
     second["annotationId"] = "ann-2"
     second["annotatorId"] = "reviewer-b"
     second["fields"][2]["classification"] = "interpretive"
+    second["fields"][2]["sourceArtifactIds"] = ["src-1"]
     second["fields"][2]["rationale"] = "Reviewer mapped an ambiguous public statement."
     case["annotations"].append(second)
     case["review"]["doubleAnnotation"] = True
