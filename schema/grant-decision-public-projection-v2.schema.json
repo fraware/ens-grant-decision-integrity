@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "grant-decision-public-projection-v2.schema.json",
+  "title": "ENS GDI Public Projection Record v2",
+  "description": "Public projection output for projection v2. Source integrity is never overwritten; generated integrity lives in projectionIntegrity. Published source fields are carried as additional properties with local structure preserved by the projection engine.",
+  "type": "object",
+  "required": ["recordId", "projectionIntegrity"],
+  "properties": {
+    "recordId": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "string" },
+    "recordType": { "type": "string" },
+    "withheldCommitments": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "category", "algorithm", "commitment", "commitmentDigest"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "category": {
+            "type": "string",
+            "enum": ["privacy", "security", "commercial", "legal", "contractual", "other"]
+          },
+          "algorithm": { "const": "sha256-jcs-path-v2" },
+          "commitment": {
+            "type": "string",
+            "pattern": "^sha256-jcs-path-v2:[0-9a-f]{64}$"
+          },
+          "commitmentDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "explanation": { "type": "string" },
+          "profileRuleId": { "type": "string" }
+        }
+      }
+    },
+    "projectionIntegrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "digest",
+        "sourceRecordDigest",
+        "projectionSpecDigest",
+        "profileId"
+      ],
+      "properties": {
+        "algorithm": { "const": "sha256-jcs-projection-v2" },
+        "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "sourceRecordDigest": {
+          "type": "string",
+          "pattern": "^sha256-jcs:[0-9a-f]{64}$"
+        },
+        "projectionSpecDigest": {
+          "type": "string",
+          "pattern": "^sha256-jcs:[0-9a-f]{64}$"
+        },
+        "profileId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "sourceIntegrityDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["publish-subtree", "withheld-subtree", "drop-by-profile"]
+        },
+        "commitment": {
+          "type": "string",
+          "pattern": "^sha256-jcs-path-v2:[0-9a-f]{64}$"
+        },
+        "profileRuleId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "integrity": {
+      "type": ["object", "null"],
+      "description": "Optional published source integrity; never overwritten by projectionIntegrity."
+    }
+  },
+  "additionalProperties": true
+}

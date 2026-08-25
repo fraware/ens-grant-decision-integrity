@@ -80,6 +80,7 @@ def cmd_commit(args: argparse.Namespace) -> int:
 def cmd_anchor(args: argparse.Namespace) -> int:
     fixture_time_profiles = {
         "rekor-v1-recorded-fixture",
+        "rekor-v2-recorded-fixture",
         "rfc3161-recorded-fixture",
         "ethereum-calldata-fixture",
     }
@@ -89,15 +90,22 @@ def cmd_anchor(args: argparse.Namespace) -> int:
         raise Phase2Error("--tx-hash is only valid for ethereum-calldata-fixture", code="CLI009")
     if args.tsa_cert and args.profile != "rfc3161-recorded-fixture":
         raise Phase2Error("--tsa-cert is only valid for rfc3161-recorded-fixture", code="CLI010")
-    if args.artifact_key and args.profile not in {"rekor-v1", "rekor-v1-recorded-fixture"}:
+    if args.artifact_key and args.profile not in {
+        "rekor-v1",
+        "rekor-v1-recorded-fixture",
+        "rekor-v2",
+        "rekor-v2-recorded-fixture",
+    }:
         raise Phase2Error("--artifact-key is only valid for Rekor profiles", code="CLI011")
 
     envelope = _load_json(args.envelope)
     env_bytes = envelope_bytes(envelope)
     kwargs: dict[str, Any] = {}
-    if args.profile == "rekor-v1-recorded-fixture":
+    if args.trust_policy:
+        kwargs["trust_policy"] = _load_json(args.trust_policy)
+    if args.profile in {"rekor-v1-recorded-fixture", "rekor-v2-recorded-fixture"}:
         if not args.fixture_key:
-            raise Phase2Error("rekor-v1-recorded-fixture requires --fixture-key", code="CLI001")
+            raise Phase2Error(f"{args.profile} requires --fixture-key", code="CLI001")
         kwargs["fixture_private_key_pem"] = Path(args.fixture_key).read_text(encoding="utf-8")
         if args.artifact_key:
             kwargs["artifact_private_key_pem"] = Path(args.artifact_key).read_text(encoding="utf-8")
@@ -173,6 +181,8 @@ def cmd_verify_commitment(args: argparse.Namespace) -> int:
         kwargs["fixture_private_key_pem"] = Path(args.fixture_key).read_text(encoding="utf-8")
     if args.trust_root:
         kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
+    if getattr(args, "trust_policy", None):
+        kwargs["trust_policy"] = _load_json(args.trust_policy)
     adapter = select_adapter(receipt["profileId"], **kwargs)
     claim = adapter.verify(envelope_bytes(envelope), receipt)
     deadline = datetime.fromisoformat(envelope["applicationDeadline"].replace("Z", "+00:00"))
@@ -279,6 +289,8 @@ def cmd_verify_graph(args: argparse.Namespace) -> int:
         kwargs["fixture_private_key_pem"] = Path(args.fixture_key).read_text(encoding="utf-8")
     if args.trust_root:
         kwargs["trust_root_pem"] = Path(args.trust_root).read_text(encoding="utf-8")
+    if getattr(args, "trust_policy", None):
+        kwargs["trust_policy"] = _load_json(args.trust_policy)
     result = verify_graph(_load_json(args.bundle), **kwargs)
     _print_result(result)
     return 0
@@ -304,6 +316,8 @@ def build_parser() -> argparse.ArgumentParser:
         choices=[
             "rekor-v1",
             "rekor-v1-recorded-fixture",
+            "rekor-v2",
+            "rekor-v2-recorded-fixture",
             "rfc3161",
             "rfc3161-recorded-fixture",
             "ethereum",
@@ -313,6 +327,7 @@ def build_parser() -> argparse.ArgumentParser:
     anchor.add_argument("--fixture-key")
     anchor.add_argument("--artifact-key")
     anchor.add_argument("--trust-root")
+    anchor.add_argument("--trust-policy", help="External trust policy JSON (required for rekor-v2 verify/issuance pins).")
     anchor.add_argument("--tsa-cert", help="TSA certificate PEM for rfc3161-recorded-fixture issuance.")
     anchor.add_argument("--tx-hash", help="Transaction hash for ethereum-calldata-fixture.")
     anchor.add_argument("--at", help="RFC 3339 time for recorded-fixture receipts only.")
@@ -326,6 +341,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify_c.add_argument("--salt")
     verify_c.add_argument("--fixture-key")
     verify_c.add_argument("--trust-root")
+    verify_c.add_argument("--trust-policy")
     verify_c.set_defaults(func=cmd_verify_commitment)
 
     reveal = sub.add_parser("reveal", help="Open a commitment with manifest and salt.")
@@ -357,6 +373,7 @@ def build_parser() -> argparse.ArgumentParser:
     graph.add_argument("--bundle", required=True)
     graph.add_argument("--fixture-key")
     graph.add_argument("--trust-root")
+    graph.add_argument("--trust-policy")
     graph.set_defaults(func=cmd_verify_graph)
     return parser
 

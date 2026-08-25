@@ -1,8 +1,9 @@
-"""Sigstore Rekor v1 profile and recorded-fixture profile.
+"""Sigstore Rekor v1 profile and recorded-fixture profile (historical compatibility).
 
-Verification uses a client-pinned trust root. A PEM copied into a receipt is
-not an independent root. Production profile `rekor-v1` pins the Sigstore
-Rekor v1 public key retrieved from the public instance and stored here so a
+Rekor v1 is a maintenance-line compatibility target. Prefer ``rekor-v2`` for new
+production anchoring. Verification uses a client-pinned trust root. A PEM copied
+into a receipt is not an independent root. Production profile `rekor-v1` pins the
+Sigstore Rekor v1 public key retrieved from the public instance and stored here so a
 network substitution of /api/v1/log/publicKey cannot change the root.
 
 `rekor-v1-recorded-fixture` uses a test-log key supplied to the adapter. It

@@ -18,6 +18,8 @@
       "enum": [
         "rekor-v1",
         "rekor-v1-recorded-fixture",
+        "rekor-v2",
+        "rekor-v2-recorded-fixture",
         "rfc3161",
         "rfc3161-recorded-fixture",
         "ethereum",
@@ -57,6 +59,20 @@
         },
         "checkpoint": { "type": "string", "minLength": 1 },
         "uuid": { "type": "string", "minLength": 1 },
+        "logIdentity": { "type": "string", "minLength": 1 },
+        "shard": { "type": "string", "minLength": 1 },
+        "logSubmissionSignature": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["role", "algorithm", "signatureB64", "verifierPublicKeyPemB64", "nonClaim"],
+          "properties": {
+            "role": { "const": "technical-log-submission-only" },
+            "algorithm": { "type": "string", "minLength": 1 },
+            "signatureB64": { "type": "string", "minLength": 1 },
+            "verifierPublicKeyPemB64": { "type": "string", "minLength": 1 },
+            "nonClaim": { "type": "string", "minLength": 1 }
+          }
+        },
         "tsTokenB64": { "type": "string", "minLength": 1 },
         "tsaCertificatePem": { "type": "string", "minLength": 1 },
         "tstInfoDerB64": { "type": "string", "minLength": 1 },
@@ -83,6 +99,26 @@
               "inclusionProof",
               "checkpoint",
               "uuid"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "rekor-v2-offline" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": [
+              "bodyB64",
+              "integratedTime",
+              "logIdHex",
+              "logIdentity",
+              "shard",
+              "signedEntryTimestampB64",
+              "inclusionProof",
+              "checkpoint",
+              "uuid",
+              "logSubmissionSignature"
             ]
           }
         },

@@ -82,6 +82,20 @@ FIXTURE_TRUST_BOUNDARY = (
     "with the fixture. They do not establish inclusion in the public Sigstore Rekor log."
 )
 
+REKOR_V2_TRUST_BOUNDARY = (
+    "Rekor v2 temporal claims depend on a verifier-pinned TrustedRoot-shaped trust "
+    "policy (log identity, shard, and log key validity window), signed entry/checkpoint "
+    "material in the offline receipt, and independent monitoring against split-view. "
+    "Receipt-carried keys never appoint themselves as trusted. Technical "
+    "logSubmissionSignature values do not grant institutional authority."
+)
+
+REKOR_V2_FIXTURE_TRUST_BOUNDARY = (
+    "rekor-v2-recorded-fixture receipts are verified under a test-log key and external "
+    "fixture trust policy. They do not establish inclusion in a production Sigstore "
+    "Rekor v2 log and must not establish production-profile C2."
+)
+
 RFC3161_TRUST_BOUNDARY = (
     "Production RFC 3161 verification is disabled until complete CMS/RFC 3161 trust validation is integrated."
 )
