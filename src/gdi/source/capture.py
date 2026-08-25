@@ -1,7 +1,13 @@
-"""SSRF-safe source capture pipeline.
+"""SSRF-hardened source capture pipeline.
 
-Capture creates preserved bytes + source-artifact metadata. The offline verifier
-(``verify_artifact`` / ``gdi verify-source``) never fetches remote URLs.
+Capture creates immutable content-addressed bytes plus artifact-scoped provenance
+metadata. The offline verifier (``verify_artifact`` / ``gdi verify-source``)
+never fetches remote URLs.
+
+Network capture rejects known non-public destinations before each request and
+after redirects. The standard-library transport may resolve a hostname again at
+connection time, so DNS rebinding between validation and connection is not ruled
+out. Network acquisition is therefore transport evidence, not source authority.
 
 Historical ``reference-only`` corpus sources must not be upgraded to byte-verified
 merely because a later live capture succeeded.
@@ -83,7 +89,7 @@ def assert_safe_url(
     allow_private: bool = False,
     resolver: Callable[[str], list[str]] | None = None,
 ) -> None:
-    """Reject SSRF-prone URLs. Used before each request and after each redirect."""
+    """Reject known SSRF-prone URLs before requests and after redirects."""
     try:
         parsed = urlsplit(url)
     except ValueError as exc:
@@ -128,10 +134,19 @@ def _resolve_host_ips(host: str) -> list[str]:
 
 
 def content_addressed_paths(out_dir: Path, digest_hex: str) -> tuple[Path, Path]:
+    """Return the immutable bytes path and historical leaf metadata location."""
     shard = digest_hex[:2]
     leaf = out_dir / "sha256" / shard / digest_hex
     leaf.mkdir(parents=True, exist_ok=True)
     return leaf / "source.bytes", leaf / "source.artifact.json"
+
+
+def _capture_event_paths(out_dir: Path, artifact_id: str) -> tuple[Path, Path]:
+    """Use an artifact-id digest so untrusted IDs cannot become filesystem paths."""
+    event_key = hashlib.sha256(artifact_id.encode("utf-8")).hexdigest()
+    leaf = out_dir / "captures" / event_key[:2] / event_key
+    leaf.mkdir(parents=True, exist_ok=True)
+    return leaf / "source.artifact.json", leaf / "capture.log.json"
 
 
 def _write_bytes_atomic(path: Path, data: bytes) -> None:
@@ -141,7 +156,22 @@ def _write_bytes_atomic(path: Path, data: bytes) -> None:
     tmp.replace(path)
 
 
+def _write_text_exclusive(path: Path, content: str, *, code: str) -> None:
+    try:
+        with path.open("x", encoding="utf-8") as handle:
+            handle.write(content)
+    except FileExistsError as exc:
+        raise SourceArtifactError(
+            "artifactId already has a stored capture event; choose a new artifactId",
+            code=code,
+        ) from exc
+    except OSError as exc:
+        raise SourceArtifactError(f"cannot persist capture provenance: {exc}", code=code) from exc
+
+
 def _safe_local_file(path: Path, *, root: Path | None = None) -> Path:
+    if path.is_symlink():
+        raise SourceArtifactError("local capture path must not be a symlink", code="CAP009")
     resolved = path.resolve()
     if root is not None:
         root_resolved = root.resolve()
@@ -150,10 +180,10 @@ def _safe_local_file(path: Path, *, root: Path | None = None) -> Path:
         except ValueError as exc:
             raise SourceArtifactError("local capture path escapes allowed root", code="CAP009") from exc
     if not resolved.is_file():
-        raise SourceArtifactError(f"manual-file path is not a regular file: {resolved}", code="CAP010")
-    if resolved.is_symlink():
-        # resolve() already followed; still reject if original was symlink outside root handled above.
-        pass
+        raise SourceArtifactError(
+            f"manual-file path is not a regular file: {resolved}",
+            code="CAP010",
+        )
     return resolved
 
 
@@ -173,7 +203,7 @@ def store_captured_bytes(
     capture_log: dict[str, Any] | None = None,
 ) -> CaptureResult:
     digest_hex = hashlib.sha256(data).hexdigest()
-    bytes_path, artifact_path = content_addressed_paths(out_dir, digest_hex)
+    bytes_path, _legacy_artifact_path = content_addressed_paths(out_dir, digest_hex)
     if bytes_path.exists():
         existing = bytes_path.read_bytes()
         if existing != data:
@@ -183,6 +213,13 @@ def store_captured_bytes(
             )
     else:
         _write_bytes_atomic(bytes_path, data)
+
+    artifact_path, log_path = _capture_event_paths(out_dir, artifact_id)
+    if artifact_path.exists() or log_path.exists():
+        raise SourceArtifactError(
+            "artifactId already has a stored capture event; choose a new artifactId",
+            code="CAP020",
+        )
 
     relative_bytes = str(bytes_path.relative_to(out_dir)).replace("\\", "/")
     artifact = build_artifact(
@@ -200,11 +237,18 @@ def store_captured_bytes(
         capture_notes=capture_notes,
         observations=observations,
     )
-    artifact_path.write_text(json.dumps(artifact, indent=2) + "\n", encoding="utf-8")
     log = capture_log or {}
-    log_path = artifact_path.with_name("capture.log.json")
-    log_path.write_text(json.dumps(log, indent=2) + "\n", encoding="utf-8")
-    # Offline verify immediately.
+    _write_text_exclusive(
+        artifact_path,
+        json.dumps(artifact, indent=2) + "\n",
+        code="CAP020",
+    )
+    try:
+        _write_text_exclusive(log_path, json.dumps(log, indent=2) + "\n", code="CAP020")
+    except SourceArtifactError:
+        artifact_path.unlink(missing_ok=True)
+        raise
+
     verify_artifact(artifact, bytes_path)
     return CaptureResult(
         artifact=artifact,
@@ -281,7 +325,7 @@ def capture_browser_export(
             "browserTool": browser_tool,
             "browserVersion": browser_version,
             "nonClaims": [
-                "Export hash is not a hash of the origin server's raw HTML unless that response was captured separately."
+                "Export hash is not a hash of origin raw HTML unless that response was captured separately."
             ],
         },
     )
@@ -340,7 +384,7 @@ def capture_http(
     opener: Callable[..., Any] | None = None,
     resolver: Callable[[str], list[str]] | None = None,
 ) -> CaptureResult:
-    """Fetch bytes with redirect revalidation and SSRF controls."""
+    """Fetch bytes with redirect revalidation and SSRF-hardening controls."""
     current = source_uri
     redirect_chain: list[dict[str, Any]] = []
     crossed_origin = False
@@ -365,25 +409,27 @@ def capture_http(
                 context = ssl.create_default_context()
                 response = urllib.request.urlopen(request, timeout=timeout_sec, context=context)
         except urllib.error.HTTPError as exc:
-            # Treat 3xx with Location as redirects even via HTTPError in some stacks.
             if 300 <= exc.code < 400 and exc.headers.get("Location"):
                 location = exc.headers["Location"]
                 nxt = urljoin(current, location)
                 prev = urlsplit(current)
                 nxt_p = urlsplit(nxt)
-                if (prev.scheme, prev.netloc) != (nxt_p.scheme, nxt_p.netloc):
-                    crossed_origin = True
+                cross = (prev.scheme, prev.netloc) != (nxt_p.scheme, nxt_p.netloc)
+                crossed_origin = crossed_origin or cross
                 redirect_chain.append(
                     {
                         "from": current,
                         "to": nxt,
                         "status": exc.code,
-                        "crossedOrigin": (prev.scheme, prev.netloc) != (nxt_p.scheme, nxt_p.netloc),
+                        "crossedOrigin": cross,
                     }
                 )
                 current = nxt
                 continue
-            raise SourceArtifactError(f"HTTP capture failed with status {exc.code}", code="CAP012") from exc
+            raise SourceArtifactError(
+                f"HTTP capture failed with status {exc.code}",
+                code="CAP012",
+            ) from exc
         except urllib.error.URLError as exc:
             raise SourceArtifactError(f"HTTP capture network error: {exc}", code="CAP013") from exc
 
@@ -396,20 +442,19 @@ def capture_http(
                 nxt = urljoin(current, location)
                 prev = urlsplit(current)
                 nxt_p = urlsplit(nxt)
-                if (prev.scheme, prev.netloc) != (nxt_p.scheme, nxt_p.netloc):
-                    crossed_origin = True
+                cross = (prev.scheme, prev.netloc) != (nxt_p.scheme, nxt_p.netloc)
+                crossed_origin = crossed_origin or cross
                 redirect_chain.append(
                     {
                         "from": current,
                         "to": nxt,
                         "status": int(status),
-                        "crossedOrigin": (prev.scheme, prev.netloc) != (nxt_p.scheme, nxt_p.netloc),
+                        "crossedOrigin": cross,
                     }
                 )
                 current = nxt
                 continue
 
-            # Re-validate final URL (defense in depth).
             assert_safe_url(
                 current,
                 allow_http=allow_http,
@@ -441,6 +486,7 @@ def capture_http(
             observations = [
                 f"redirectCount={len(redirect_chain)}",
                 f"crossedOrigin={str(crossed_origin).lower()}",
+                "dnsRebindingProtection=not-established",
             ]
             if charset:
                 observations.append(f"declaredCharset={charset}")
@@ -464,6 +510,7 @@ def capture_http(
                 "nonClaims": [
                     "HTTP capture metadata is transport observation, not proof of authority or publication time.",
                     "Redirect destinations are not silently treated as equivalent to the cited policy URI.",
+                    "Hostname validation does not establish immunity to DNS rebinding before connection.",
                 ],
             }
             return store_captured_bytes(
