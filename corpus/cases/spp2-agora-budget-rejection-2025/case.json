@@ -380,11 +380,12 @@
     ]
   },
   "nonClaims": [
-    "This corpus case does not reassess Agora's merit or the substantive wisdom of the SPP2 funding outcome.",
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
     "Ranking above NONE BELOW is preserved as a separate public result and is not represented as proof of a funded award.",
     "The v0.1 status rejected is used as an interpretive terminal no-award mapping; it does not assert that Agora failed the electorate's merit cutoff.",
     "Missing exact timestamps do not prove the historical process lacked those events; they show limits of the reviewed public evidence at schema-v0.1 precision.",
-    "Validator consistency does not establish substantive correctness, fairness, or institutional legitimacy.",
     "Reference-only source URIs in this case are not represented as exact byte-preserved captures."
   ]
 }
