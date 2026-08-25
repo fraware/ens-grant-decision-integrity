@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -42,6 +43,7 @@ def _case() -> dict:
     case["template"] = False
     case["sourceArtifacts"] = [_source()]
     case["recordSnapshots"]["initial"]["recordHash"] = "sha256:" + "11" * 32
+    case["recordSnapshots"]["initial"]["path"] = "record-initial.json"
     case["recordSnapshots"]["initial"]["notes"] = "Synthetic non-template hash for test fixture."
     case["annotations"][0]["annotationId"] = "ann-1"
     case["annotations"][0]["annotatorId"] = "reviewer-a"
@@ -53,6 +55,18 @@ def _case() -> dict:
         _field("/deliveryConditions", "not-applicable"),
     ]
     return case
+
+
+def _sha256(value: bytes) -> str:
+    return "sha256:" + hashlib.sha256(value).hexdigest()
+
+
+def _mark_reconciled(case: dict, *, record_hash: str, path: str = "record-reconciled.json") -> None:
+    case["verification"]["recordChangedAfterReview"] = True
+    case["verification"]["changeRationale"] = "Review corrected an annotation defect."
+    case["recordSnapshots"]["reconciled"] = {"recordHash": record_hash, "path": path}
+    case["review"]["reconciled"] = True
+    case["review"]["reconciliationNotes"] = ["Reconciled after reviewing the initial evidence mapping."]
 
 
 def test_template_is_schema_and_protocol_valid_but_flagged_template() -> None:
@@ -68,7 +82,7 @@ def test_empirical_case_requires_source_artifact_reference() -> None:
     case["annotations"][0]["fields"] = [_field("/challenge/processDefined", "unknown")]
     with pytest.raises(CorpusCaseError) as exc:
         validate_case(case)
-    assert exc.value.code == "CORP014"
+    assert exc.value.code == "CORP002"
 
 
 def test_empirical_case_rejects_template_zero_hash() -> None:
@@ -123,9 +137,7 @@ def test_duplicate_annotation_field_paths_fail_closed() -> None:
 
 def test_changed_record_requires_distinct_reconciled_hash() -> None:
     case = _case()
-    case["verification"]["recordChangedAfterReview"] = True
-    case["verification"]["changeRationale"] = "Review corrected an annotation defect."
-    case["recordSnapshots"]["reconciled"] = copy.deepcopy(case["recordSnapshots"]["initial"])
+    _mark_reconciled(case, record_hash=case["recordSnapshots"]["initial"]["recordHash"])
     with pytest.raises(CorpusCaseError) as exc:
         validate_case(case)
     assert exc.value.code == "CORP011"
@@ -140,14 +152,73 @@ def test_changed_record_requires_reconciled_snapshot_at_schema_level() -> None:
     assert exc.value.code == "CORP002"
 
 
-def test_empirical_reconciled_record_rejects_template_zero_hash() -> None:
+def test_changed_record_requires_reconciled_review_state() -> None:
     case = _case()
     case["verification"]["recordChangedAfterReview"] = True
     case["verification"]["changeRationale"] = "Review corrected an annotation defect."
-    case["recordSnapshots"]["reconciled"] = {"recordHash": "sha256:" + "0" * 64}
+    case["recordSnapshots"]["reconciled"] = {
+        "recordHash": "sha256:" + "22" * 32,
+        "path": "record-reconciled.json",
+    }
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP016"
+
+
+def test_reconciled_review_requires_note() -> None:
+    case = _case()
+    case["review"]["reconciled"] = True
+    case["review"]["reconciliationNotes"] = []
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case)
+    assert exc.value.code == "CORP017"
+
+
+def test_empirical_reconciled_record_rejects_template_zero_hash() -> None:
+    case = _case()
+    _mark_reconciled(case, record_hash="sha256:" + "0" * 64)
     with pytest.raises(CorpusCaseError) as exc:
         validate_case(case)
     assert exc.value.code == "CORP015"
+
+
+def test_cli_context_verifies_initial_snapshot_exact_bytes(tmp_path: Path) -> None:
+    case = _case()
+    raw = b'{"record":"initial"}\n'
+    (tmp_path / "record-initial.json").write_bytes(raw)
+    case["recordSnapshots"]["initial"]["recordHash"] = _sha256(raw)
+    validate_case(case, base_dir=tmp_path)
+
+
+def test_snapshot_byte_tamper_fails_closed(tmp_path: Path) -> None:
+    case = _case()
+    original = b'{"record":"initial"}\n'
+    path = tmp_path / "record-initial.json"
+    path.write_bytes(original)
+    case["recordSnapshots"]["initial"]["recordHash"] = _sha256(original)
+    path.write_bytes(b'{"record":"tampered"}\n')
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case, base_dir=tmp_path)
+    assert exc.value.code == "CORP020"
+
+
+def test_snapshot_path_cannot_escape_case_directory(tmp_path: Path) -> None:
+    case = _case()
+    case["recordSnapshots"]["initial"]["path"] = "../outside.json"
+    with pytest.raises(CorpusCaseError) as exc:
+        validate_case(case, base_dir=tmp_path)
+    assert exc.value.code == "CORP019"
+
+
+def test_reconciled_snapshot_bytes_are_verified(tmp_path: Path) -> None:
+    case = _case()
+    initial = b'{"record":"initial"}\n'
+    reconciled = b'{"record":"reconciled"}\n'
+    (tmp_path / "record-initial.json").write_bytes(initial)
+    (tmp_path / "record-reconciled.json").write_bytes(reconciled)
+    case["recordSnapshots"]["initial"]["recordHash"] = _sha256(initial)
+    _mark_reconciled(case, record_hash=_sha256(reconciled))
+    validate_case(case, base_dir=tmp_path)
 
 
 def test_double_annotation_requires_same_field_set() -> None:
