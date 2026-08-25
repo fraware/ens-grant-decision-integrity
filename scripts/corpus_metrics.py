@@ -10,6 +10,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from source_artifact import SourceArtifactError, verify_artifact
+
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "corpus" / "schema" / "case.schema.json"
 REQUIRED_NONCLAIMS = {
@@ -51,6 +53,22 @@ def _unique(values: list[str], *, label: str, code: str) -> None:
         raise CorpusCaseError(f"{label} must be unique", code=code)
 
 
+def _resolve_case_path(base_dir: Path, raw_path: str, *, label: str) -> Path:
+    path = Path(raw_path)
+    if path.is_absolute():
+        raise CorpusCaseError(f"{label} path must be relative to the case directory: {raw_path}", code="CORP019")
+    base = base_dir.resolve()
+    candidate = (base / path).resolve()
+    try:
+        candidate.relative_to(base)
+    except ValueError as exc:
+        raise CorpusCaseError(
+            f"{label} path escapes the case directory: {raw_path}",
+            code="CORP019",
+        ) from exc
+    return candidate
+
+
 def _hash_file(path: Path) -> str:
     try:
         handle = path.open("rb")
@@ -67,14 +85,7 @@ def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) ->
     raw_path = snapshot.get("path")
     if not isinstance(raw_path, str) or not raw_path:
         raise CorpusCaseError(f"empirical {label} snapshot must declare a path", code="CORP018")
-    candidate = (base_dir / raw_path).resolve()
-    try:
-        candidate.relative_to(base_dir.resolve())
-    except ValueError as exc:
-        raise CorpusCaseError(
-            f"empirical {label} snapshot path escapes the case directory: {raw_path}",
-            code="CORP019",
-        ) from exc
+    candidate = _resolve_case_path(base_dir, raw_path, label=f"{label} snapshot")
     observed = _hash_file(candidate)
     if observed != snapshot["recordHash"]:
         raise CorpusCaseError(
@@ -83,13 +94,62 @@ def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) ->
         )
 
 
-def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> None:
+def _verify_redistributable_sources(case: dict[str, Any], *, base_dir: Path) -> int:
+    verified_count = 0
+    for source in case["sourceArtifacts"]:
+        if source["availability"] != "redistributable":
+            continue
+        metadata_path = _resolve_case_path(base_dir, source["metadataPath"], label=f"source {source['artifactId']} metadata")
+        bytes_path = _resolve_case_path(base_dir, source["bytesPath"], label=f"source {source['artifactId']} bytes")
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise CorpusCaseError(
+                f"cannot load source-artifact metadata for {source['artifactId']}: {exc}",
+                code="CORP021",
+            ) from exc
+        if not isinstance(metadata, dict):
+            raise CorpusCaseError(
+                f"source-artifact metadata for {source['artifactId']} must be a JSON object",
+                code="CORP021",
+            )
+        try:
+            verified = verify_artifact(metadata, bytes_path)
+        except SourceArtifactError as exc:
+            raise CorpusCaseError(
+                f"source-artifact verification failed for {source['artifactId']} ({exc.code}): {exc}",
+                code="CORP021",
+            ) from exc
+        if verified.artifact_id != source["artifactId"]:
+            raise CorpusCaseError(
+                f"case source id {source['artifactId']} does not match source-artifact metadata id {verified.artifact_id}",
+                code="CORP022",
+            )
+        if verified.metadata["sourceUri"] != source["sourceUri"]:
+            raise CorpusCaseError(
+                f"case source URI for {source['artifactId']} does not match source-artifact metadata sourceUri",
+                code="CORP023",
+            )
+        verified_count += 1
+    return verified_count
+
+
+def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> int:
     _schema_validate(case)
 
     source_ids = [item["artifactId"] for item in case["sourceArtifacts"]]
     _unique(source_ids, label="source artifact ids", code="CORP003")
     known_sources = set(source_ids)
 
+    if case["sourceAccess"] == "public-only" and any(
+        item["availability"] == "authorized-audit-only" for item in case["sourceArtifacts"]
+    ):
+        raise CorpusCaseError(
+            "public-only corpus cases cannot declare authorized-audit-only source artifacts",
+            code="CORP024",
+        )
+
+    verified_redistributable = 0
     if not case["template"]:
         if not source_ids:
             raise CorpusCaseError(
@@ -103,6 +163,7 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> None
             )
         if base_dir is not None:
             _verify_snapshot(case["recordSnapshots"]["initial"], base_dir=base_dir, label="initial")
+            verified_redistributable = _verify_redistributable_sources(case, base_dir=base_dir)
 
     annotations = case["annotations"]
     _unique([item["annotationId"] for item in annotations], label="annotation ids", code="CORP004")
@@ -170,6 +231,8 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> None
                 code="CORP015",
             )
         if not case["template"] and base_dir is not None:
+            if "path" not in reconciled:
+                raise CorpusCaseError("empirical reconciled snapshot must declare a path", code="CORP018")
             _verify_snapshot(reconciled, base_dir=base_dir, label="reconciled")
 
     if case["review"]["reconciled"] and not case["review"]["reconciliationNotes"]:
@@ -181,6 +244,8 @@ def validate_case(case: dict[str, Any], *, base_dir: Path | None = None) -> None
     if not REQUIRED_NONCLAIMS.issubset(set(case["nonClaims"])):
         missing = sorted(REQUIRED_NONCLAIMS - set(case["nonClaims"]))
         raise CorpusCaseError(f"required corpus non-claims are missing: {missing}", code="CORP012")
+
+    return verified_redistributable
 
 
 def _safe_rate(numerator: int, denominator: int) -> float | None:
@@ -230,13 +295,15 @@ def _agreement(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
 
 
 def compute_metrics(case: dict[str, Any], *, base_dir: Path | None = None) -> dict[str, Any]:
-    validate_case(case, base_dir=base_dir)
+    verified_redistributable = validate_case(case, base_dir=base_dir)
     finding_counts = Counter(item["disposition"] for item in case["verification"]["initialFindings"])
     result: dict[str, Any] = {
         "ok": True,
         "caseId": case["caseId"],
         "template": case["template"],
         "sourceArtifactCount": len(case["sourceArtifacts"]),
+        "redistributableSourceArtifactsVerified": verified_redistributable if base_dir is not None else None,
+        "recordSnapshotBytesVerified": bool(base_dir is not None and not case["template"]),
         "annotations": [_annotation_metrics(annotation) for annotation in case["annotations"]],
         "findingDispositionCounts": dict(sorted(finding_counts.items())),
         "initialFindingCount": len(case["verification"]["initialFindings"]),
@@ -244,7 +311,8 @@ def compute_metrics(case: dict[str, Any], *, base_dir: Path | None = None) -> di
         "nonClaims": [
             "These are descriptive reconstructability and agreement metrics, not merit or fairness scores.",
             "A low unknown rate does not establish that source evidence is true or complete.",
-            "Agreement between annotators does not establish that either annotation is correct."
+            "Agreement between annotators does not establish that either annotation is correct.",
+            "Reference-only and authorized-audit-only sources are not represented as byte-verified by this public case verifier."
         ],
     }
     if case["review"]["doubleAnnotation"]:
