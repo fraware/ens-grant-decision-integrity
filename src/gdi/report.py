@@ -8,7 +8,7 @@ from gdi import __version__
 
 
 HARD_NON_CLAIMS = [
-    "ok=true means required selected checks completed without failure; it does not mean all possible claims are true.",
+    "ok=true means every required selected check reached pass or warning without failure; it does not mean all possible claims are true.",
     "Hashes, anchors, and signatures are not institutional funding authority.",
     "Allocation is not payment, receipt, or settlement.",
     "Annotation agreement is not correctness, fairness, or legitimacy.",
@@ -71,6 +71,14 @@ def add_check(
         report["warnings"].append(f"{check_id}: {details or {}}")
     elif status in {"not-run", "unsupported", "not-applicable"}:
         report["unverified"].append(f"{check_id}:{status}")
+        if required:
+            report["ok"] = False
+            report["failures"].append(
+                f"{check_id}: required check did not complete ({status}); {details or {}}"
+            )
+    else:
+        report["ok"] = False
+        report["failures"].append(f"{check_id}: unknown check status {status!r}")
 
 
 def finalize(report: dict[str, Any]) -> dict[str, Any]:
