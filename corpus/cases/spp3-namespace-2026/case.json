@@ -1,0 +1,373 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp3-2026-namespace-award",
+  "title": "SPP3 Namespace award — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "approved-award",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected before examining validator outcome because the Namespace SPP3 decision simultaneously exercises approved-award, merit-decision, committee-quorum, recusal/conflict, delivery-accountability, public/private-separation, policy/timeline ambiguity, and incomplete-public-record strata.",
+    "exclusionBoundary": "This case represents the Namespace award within SPP3. It does not reconstruct other cohort members, declined applications, private individual scoring records, interview transcripts, KYC records, Award Notice contents, or application content that was not successfully retrieved.",
+    "strata": [
+      "merit-decision",
+      "approved-award",
+      "committee-quorum",
+      "recusal-or-conflict",
+      "policy-change-or-ambiguity",
+      "delivery-or-milestone",
+      "public-private-separation",
+      "incomplete-public-record"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-AUTH",
+      "sourceUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. This case does not claim an exact byte-preserved capture of the remote page."
+    },
+    {
+      "artifactId": "SRC-RUBRIC",
+      "sourceUri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. This case does not claim an exact byte-preserved capture of the remote page."
+    },
+    {
+      "artifactId": "SRC-COHORT",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. It contains the committee recommendation, aggregate scores, recusal disclosure, later process notes, and links to selected applications."
+    },
+    {
+      "artifactId": "SRC-VOTE",
+      "sourceUri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public governance proposal mirror reviewed during reconstruction. It reports the proposal as executed and displays the vote-end time, vote totals, and quorum. This case does not treat the mirror as an independent cryptographic proof of execution."
+    },
+    {
+      "artifactId": "SRC-APPLICATION-URI",
+      "sourceUri": "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafybeiee73y2jwinefaszeng3frn47wmqini562qtcibzgnh42cnqiu2la",
+      "role": "evidence",
+      "availability": "reference-only",
+      "notes": "Application URI linked by the cohort recommendation. Retrieval was unsuccessful during this reconstruction, so no field is classified as reconstructable from application contents and no application-content fact is inferred."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:04dd888a9d0c136d607a8903138ca2e402fcc2950f9cf33a8edb6a501aa87dd5",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. Two null historical timestamps are intentional unknowns and are preserved as validator findings rather than replaced with invented dates."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "namespace-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 8.4,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH"]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH"],
+          "rationale": "The public sources name the cycle SPP3 but do not publish a formal round identifier; SPP3-2026 is a reconstruction identifier."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-VOTE"],
+          "rationale": "The authorization separates committee recommendation from final DAO ratification; the record maps that architecture into program.authority."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT"],
+          "rationale": "The public cohort identifies Namespace by provider name, not a formal application ID; namespace-spp3-2026 is a reconstruction identifier."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT"]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT", "SRC-APPLICATION-URI"]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"],
+          "rationale": "ENS-SPP3-2026 is a reconstruction identifier binding the ratified authorization and published rubric."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"],
+          "rationale": "The source set has no single machine-readable policy version; the record names the specific public authorization-plus-rubric combination."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH"]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"],
+          "rationale": "The mapping assigns each decision surface to the public artifact that contains the controlling text; the source documents do not themselves use the GDI surface taxonomy."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC", "SRC-COHORT"],
+          "rationale": "The authorization allowed timeline adjustments and public artifacts later report differing submission-close dates. The record does not classify the pre-review timeline change as an in-review policy change, while the ambiguity is retained in review notes."
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"],
+          "rationale": "The rubric states only applications passing the hard eligibility screen are scored; the cohort reports Namespace among the scored applications."
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"],
+          "rationale": "Public evidence supports an aggregate pass of the hard screen but does not support gate-by-gate Namespace results or an exact check timestamp, so the record uses one aggregate rule instead of inventing individual gate outcomes."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-COHORT"],
+          "rationale": "Named seats come from the authorization. Participation is derived from the cohort statement that every qualifying application was evaluated by every Member unless recused, together with the Namespace-specific recusal and Chair substitution disclosure."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT"],
+          "rationale": "The source explicitly records a Namespace evaluation and vote recusal and separately specifies Chair score substitution for the evaluation surface."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC", "SRC-COHORT", "SRC-VOTE", "SRC-APPLICATION-URI"],
+          "rationale": "Public artifacts are mapped into the decision-record evidence taxonomy without asserting byte-preserved capture."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"]
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT"],
+          "rationale": "Published aggregate scores are represented as supported facts, while the committee's award rationale remains classified as judgment."
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT"]
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-VOTE"]
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-VOTE"]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-VOTE"],
+          "rationale": "The public process is mapped to dao-vote because final cohort ratification was an on-chain executable DAO vote, distinct from committee recommendation."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-VOTE"]
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-COHORT", "SRC-VOTE"]
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT", "SRC-VOTE"],
+          "rationale": "The record combines the published committee rationale with the observed executed cohort outcome without treating the committee judgment as the DAO's independent reasoning."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-COHORT"],
+          "rationale": "The public program terms establish reporting and stream-continuation obligations, while provider-specific milestone details remain outside the successfully retrieved public source set."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-COHORT", "SRC-APPLICATION-URI"],
+          "rationale": "The reconstructed artifact contains only public information. This classification does not imply that all underlying committee records, interviews, or scoring documents were public."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC", "SRC-COHORT", "SRC-VOTE"],
+          "rationale": "This repository case is a public retrospective record assembled exclusively from public-source references."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata generated when the record file was created, not a historical process fact to recover from source evidence."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed for the original process; exact byte identity is provided by the corpus snapshot hash instead."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The reviewed public artifacts establish that Namespace was scored after the eligibility screen but do not establish the exact eligibility-check timestamp required by schema v0.1. The null is retained instead of inventing a timestamp.",
+        "sourceArtifactIds": ["SRC-RUBRIC", "SRC-COHORT"]
+      },
+      {
+        "findingId": "INIT-SCHEMA-POLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The reviewed sources establish authorization and later rubric publication, but this reconstruction does not have an exact, source-supported effective timestamp for the governing policy combination represented here. The null is retained instead of fabricating one.",
+        "sourceArtifactIds": ["SRC-AUTH", "SRC-RUBRIC"]
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "What exact timestamp should a retrospective public-only record use for governingPolicy.effectiveAt when authorization and rubric publication occur on different public surfaces and the ratification time is not reconstructed to an exact source-supported instant?",
+      "When exactly was Namespace's eligibility screen completed? The public cohort material establishes that it passed into scoring but not the exact checkedAt time required by schema v0.1.",
+      "What underlying relationship or fact caused sovereignsignal.eth's Namespace conflict-of-interest recusal? The reviewed public cohort source discloses the recusal but not the underlying conflict facts.",
+      "Were any substantive disagreements recorded in internal scoring or cohort deliberation? Individual scoring records remain internal, so disagreements cannot be reconstructed from the reviewed public evidence.",
+      "Did a dedicated applicant-facing factual or procedural correction process exist privately after the cohort decision? The reviewed public governing and cohort artifacts do not identify one, but absence from the public record is not evidence that no internal process existed.",
+      "The May 14 timeline states submissions close June 9, while the later cohort process narrative states submissions closed June 4. The case preserves the inconsistency instead of selecting one date without further evidence.",
+      "The linked Namespace application was not successfully retrieved during reconstruction; provider-specific application claims and milestone details therefore remain outside this case.",
+      "Because the decision-record validator returns structural findings before semantic conformance findings, semantic checks such as the adjudicated-decision challenge requirement are not emitted while the two required timestamp fields remain structurally invalid. This is validator behavior, not evidence that those semantic obligations are satisfied."
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures.",
+    "The public governance mirror is used as a reconstruction source and is not represented as an independent cryptographic proof of the on-chain outcome."
+  ]
+}
