@@ -15,7 +15,7 @@ from gdi.claims import ClaimRegistryError, lookup
 from gdi.core.conformance import validate_record
 from gdi.exit_codes import INTERNAL_ERROR, OK, USAGE_ERROR
 from gdi.report import render_text
-from gdi.source.artifact import SourceArtifactError, verify_artifact
+from gdi.source.artifact import SourceArtifactError, main as source_main, verify_artifact
 from gdi.trust.policy import TrustPolicyError, load_trust_policy
 
 
@@ -47,9 +47,30 @@ def build_parser() -> argparse.ArgumentParser:
     verify_record = sub.add_parser("verify-record", help="validate a decision record")
     verify_record.add_argument("record", type=Path)
 
-    verify_source = sub.add_parser("verify-source", help="verify source artifact bytes")
+    verify_source = sub.add_parser("verify-source", help="verify source artifact bytes (offline)")
     verify_source.add_argument("--metadata", type=Path, required=True)
     verify_source.add_argument("--file", type=Path, required=True)
+
+    source_cmd = sub.add_parser("source", help="source-artifact build/capture/verify")
+    source_cmd.add_argument("source_args", nargs=argparse.REMAINDER)
+
+    project = sub.add_parser("project", help="project confidential record to public form")
+    project.add_argument("--confidential", type=Path, required=True)
+    project.add_argument("--spec", type=Path, required=True)
+    project.add_argument("--out", type=Path, required=True)
+    project.add_argument("--force", action="store_true")
+    project.add_argument("--canonical", action="store_true")
+
+    verify_projection = sub.add_parser("verify-projection", help="verify a public projection offline")
+    verify_projection.add_argument("--confidential", type=Path, required=True)
+    verify_projection.add_argument("--spec", type=Path, required=True)
+    verify_projection.add_argument("--public", type=Path, required=True)
+
+    verify_withheld = sub.add_parser("verify-withheld", help="reopen a withheld commitment")
+    verify_withheld.add_argument("--public", type=Path, required=True)
+    verify_withheld.add_argument("--path", required=True)
+    verify_withheld.add_argument("--revealed-subtree", type=Path, required=True)
+    verify_withheld.add_argument("--confidential", type=Path)
 
     claims = sub.add_parser("claims", help="look up a claim registry entry")
     claims.add_argument("--id", required=True)
@@ -70,6 +91,15 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _run_projection_cli(argv: list[str]) -> int:
+    projection_src = Path(__file__).resolve().parents[2] / "projection" / "src"
+    if str(projection_src) not in sys.path:
+        sys.path.insert(0, str(projection_src))
+    from cli import main as projection_main  # type: ignore[import-not-found]
+
+    return int(projection_main(argv))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -86,6 +116,55 @@ def main(argv: list[str] | None = None) -> int:
             verified = verify_artifact(metadata, args.file)
             _print_json({"ok": True, "artifactId": verified.artifact_id})
             return OK
+
+        if args.command == "source":
+            source_argv = list(args.source_args)
+            if source_argv and source_argv[0] == "--":
+                source_argv = source_argv[1:]
+            return int(source_main(source_argv))
+
+        if args.command == "project":
+            cli_argv = [
+                "project",
+                "--confidential",
+                str(args.confidential),
+                "--spec",
+                str(args.spec),
+                "--out",
+                str(args.out),
+            ]
+            if args.force:
+                cli_argv.append("--force")
+            if args.canonical:
+                cli_argv.append("--canonical")
+            return _run_projection_cli(cli_argv)
+
+        if args.command == "verify-projection":
+            return _run_projection_cli(
+                [
+                    "verify-projection",
+                    "--confidential",
+                    str(args.confidential),
+                    "--spec",
+                    str(args.spec),
+                    "--public",
+                    str(args.public),
+                ]
+            )
+
+        if args.command == "verify-withheld":
+            cli_argv = [
+                "verify-withheld",
+                "--public",
+                str(args.public),
+                "--path",
+                args.path,
+                "--revealed-subtree",
+                str(args.revealed_subtree),
+            ]
+            if args.confidential:
+                cli_argv.extend(["--confidential", str(args.confidential)])
+            return _run_projection_cli(cli_argv)
 
         if args.command == "claims":
             _print_json(lookup(args.id))
@@ -121,9 +200,7 @@ def main(argv: list[str] | None = None) -> int:
                 text = path.read_text(encoding="utf-8")
                 sys.stdout.write(text if text.endswith("\n") else text + "\n")
                 return OK
-            ids = sorted(
-                p.stem for p in root.glob("*.json") if p.name != "profile.schema.json"
-            )
+            ids = sorted(p.stem for p in root.glob("*.json") if p.name != "profile.schema.json")
             if args.format == "json":
                 _print_json({"profiles": ids})
             else:

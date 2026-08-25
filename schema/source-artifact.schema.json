@@ -16,35 +16,98 @@
     "capture"
   ],
   "properties": {
-    "artifactVersion": {"const": "1"},
-    "artifactId": {"type": "string", "minLength": 1, "maxLength": 128},
-    "sourceUri": {"type": "string", "format": "uri"},
-    "resolvedUri": {"type": "string", "format": "uri"},
-    "capturedAt": {"type": "string", "format": "date-time"},
-    "httpStatus": {"type": "integer", "minimum": 100, "maximum": 599},
-    "mediaType": {"type": "string", "minLength": 1},
-    "byteLength": {"type": "integer", "minimum": 0},
-    "contentHash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-    "storedPath": {"type": "string", "minLength": 1},
-    "archiveUri": {"type": "string", "format": "uri"},
-    "contentEncoding": {"type": "string", "minLength": 1},
+    "artifactVersion": {
+      "const": "1"
+    },
+    "artifactId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "sourceUri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "resolvedUri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "httpStatus": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 599
+    },
+    "mediaType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "byteLength": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "storedPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "archiveUri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "contentEncoding": {
+      "type": "string",
+      "minLength": 1
+    },
     "capture": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["method", "tool", "toolVersion"],
+      "required": [
+        "method",
+        "tool",
+        "toolVersion"
+      ],
       "properties": {
         "method": {
           "type": "string",
-          "enum": ["http", "manual-export", "api", "repository", "onchain", "other"]
+          "enum": [
+            "http",
+            "manual-export",
+            "manual-file",
+            "browser-export",
+            "git-blob",
+            "api",
+            "repository",
+            "onchain",
+            "other"
+          ]
         },
-        "tool": {"type": "string", "minLength": 1},
-        "toolVersion": {"type": "string", "minLength": 1},
-        "notes": {"type": "string", "minLength": 1}
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "toolVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "observations": {
       "type": "array",
-      "items": {"type": "string", "minLength": 1}
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   }
 }
