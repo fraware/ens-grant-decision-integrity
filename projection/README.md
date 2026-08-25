@@ -54,6 +54,8 @@ From `projection/src/project.py`:
 
 ## Spec domain and limits
 
+### Projection v1
+
 Projection specs use domain string `ens-gdi/public-projection/v1` and `specVersion` `"1"`. The projection digest is SHA-256 over RFC 8785 JCS bytes of a projection envelope that binds domain, spec version, record id, public record before generated integrity metadata is attached, and withheld digests.
 
 Reference limits for v1:
@@ -65,19 +67,25 @@ Reference limits for v1:
 - redaction categories are `privacy`, `security`, `commercial`, `legal`, `contractual`, `other`;
 - allowlisted fields must exist on the confidential record;
 - projection does not mutate the confidential input;
-- v1 reserves the public record's `integrity` namespace for generated projection-integrity metadata. A confidential source record must therefore have `integrity: null` (or no meaningful integrity object); a non-null source `integrity` value raises `PROJ013` rather than being silently overwritten. A future projection version should separate source-integrity disposition from generated projection integrity explicitly.
+- v1 reserves the public record's `integrity` namespace for generated projection-integrity metadata. A confidential source record must therefore have `integrity: null` (or no meaningful integrity object); a non-null source `integrity` value raises `PROJ013` rather than being silently overwritten.
 
-Error codes: `PROJ001` (path not found), `PROJ003` (unknown category), `PROJ004` (unsupported spec version), `PROJ005` (domain mismatch), `PROJ006` (empty allowlist), `PROJ007` (missing allowlisted field), `PROJ008` (nested redaction path), `PROJ009` (duplicate allowlist field), `PROJ010` (duplicate redaction path), `PROJ011` (silent top-level omission), `PROJ012` (publish/withhold overlap), `PROJ013` (non-null source integrity would be overwritten).
+Error codes (v1): `PROJ001` (path not found), `PROJ003` (unknown category), `PROJ004` (unsupported spec version), `PROJ005` (domain mismatch), `PROJ006` (empty allowlist), `PROJ007` (missing allowlisted field), `PROJ008` (nested redaction path), `PROJ009` (duplicate allowlist field), `PROJ010` (duplicate redaction path), `PROJ011` (silent top-level omission), `PROJ012` (publish/withhold overlap), `PROJ013` (non-null source integrity would be overwritten).
+
+### Projection v2
+
+Projection v2 (`projection/src/project_v2.py`, `schema/projection-spec-v2.schema.json`) uses domain `ens-gdi/public-projection/v2` and `specVersion` `"2"`. Rules use RFC 6901 JSON Pointer paths with explicit publish/withhold dispositions. Arrays are atomic: per-index array addressing is rejected. Low-entropy withheld values remain subject to equality leakage under deterministic commitments; that limitation must stay documented and is not solved by switching to v2.
+
+Example spec: `projection/examples/tier-a-projection-spec-v2.json`.
 
 ## Trust boundary
 
 A projection pass establishes:
 
 - deterministic mapping from the supplied confidential input to the public output under the declared spec;
-- explicit top-level disposition: no supplied top-level field disappears silently;
-- SHA-256 commitments over withheld top-level subtrees listed in `withheldCommitments`.
+- explicit disposition so supplied source material does not disappear silently under the selected engine's rules;
+- SHA-256 commitments over withheld material listed in `withheldCommitments`.
 
-It does **not** establish that the confidential input is complete, that redaction policy was substantively correct or followed outside this object, Merkle or ZK selective disclosure, or that withheld material matches the commitments without separate reveal verification.
+It does **not** establish that the confidential input is complete, that redaction policy was substantively correct or followed outside this object, Merkle or ZK selective disclosure, dictionary-attack resistance for low-entropy withheld fields, or that withheld material matches the commitments without separate reveal verification.
 
 ## Related documents
 
