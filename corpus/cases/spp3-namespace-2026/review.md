@@ -30,8 +30,14 @@ The public artifacts also do not establish the underlying facts causing the Name
 
 The May 14 public timeline lists provider submissions closing June 9. The later cohort process narrative says submissions closed June 4. This case does not silently choose one as authoritative. The discrepancy is preserved as a policy/timeline ambiguity for later adjudication.
 
+## Annotation timing
+
+`annotations[0].elapsedMinutes = 8.4` measures the timed structured annotation pass that mapped the already-reviewed source set into the corpus field classifications and record structure. It does **not** include the earlier source-discovery and source-reading work. It must therefore not be interpreted as total case-reconstruction effort. A future burden study should time source acquisition, source review, record construction, annotation, reconciliation, and independent review separately rather than treating this field as end-to-end labor.
+
 ## Validator interpretation
 
-The exact initial record hash is `sha256:04dd888a9d0c136d607a8903138ca2e402fcc2950f9cf33a8edb6a501aa87dd5`. The corpus verifier must re-hash those bytes and bind `verification.initialFindings` to the actual decision-record validator output. Because structural schema findings short-circuit semantic conformance in the current validator, semantic requirements that would otherwise be evaluated are not represented as having passed. In particular, the absence of a `CHAL002` finding in this structurally invalid record is not evidence that the public challenge/correction representation is adequate.
+The exact initial record hash is `sha256:04dd888a9d0c136d607a8903138ca2e402fcc2950f9cf33a8edb6a501aa87dd5`. Hosted validation for the first PR head that included this case re-hashed those bytes and successfully bound `verification.initialFindings` and final findings to the actual decision-record validator output. The empirical case remains structurally invalid by design: both recorded findings are unresolved required timestamps. Successful corpus validation means the byte/findings/case contract is internally consistent; it does not mean the historical decision record passed the decision-record schema.
+
+Because structural schema findings short-circuit semantic conformance in the current validator, semantic requirements that would otherwise be evaluated are not represented as having passed. In particular, the absence of a `CHAL002` finding in this structurally invalid record is not evidence that the public challenge/correction representation is adequate.
 
 No reconciliation has been performed. The initial record remains the final record for this case, preserving the two unresolved structural findings.
