@@ -26,7 +26,7 @@ The Charter remains a draft proposal until ENS governance adopts it. Byte identi
 
 1. Author a versioned evaluator manifest before applications close.
 2. Commit with RFC 8785 JCS and a domain-separated salted digest.
-3. Anchor the public envelope only with a production-supported profile whose trust boundary the program has explicitly accepted. The reference client retains `rekor-v1` as a historical compatibility profile. Production `rfc3161` currently fails closed; `rekor-v1-recorded-fixture`, `rfc3161-recorded-fixture`, and `ethereum-calldata-fixture` are test profiles and do not establish production C2 evidence. Live Ethereum anchoring is not implemented.
+3. Anchor the public envelope only with a production-supported profile whose trust boundary the program has explicitly accepted. The reference client retains `rekor-v1` as a historical compatibility profile. Rekor v2 live online issuance is fail-closed until an official client integration is pinned. Production `rfc3161` currently fails closed; `rekor-v1-recorded-fixture`, `rekor-v2-recorded-fixture`, `rfc3161-recorded-fixture`, and `ethereum-calldata-fixture` are test profiles and do not establish production C2 evidence. Live Ethereum anchoring is not implemented.
 4. Map outputs into the v0.1 `evaluatorManifest` block using verified anchor time for `committedAt`.
 5. Attest and materialize replay evidence only when the program accepts the operational cost. Current replay is canonical artifact recomputation, not implementation re-execution and not a fairness proof.
 
@@ -37,11 +37,11 @@ See `phase2/README.md`, `phase2/ADMIN-BURDEN.md`, and `phase2/CLAIM-MATRIX.md`.
 ## 4. Public records and confidentiality
 
 1. Maintain a confidential canonical record with full evidence linkage.
-2. Apply a versioned projection spec (`projection/`) to publish a public record with `withheldCommitments` for redacted top-level fields.
+2. Apply a versioned projection spec (`projection/`) to publish a public record with `withheldCommitments` for redacted fields (v1 top-level paths or v2 RFC 6901 dispositions).
 3. Store public records at a durable URI referenced from `integrity.sourceUri` when appropriate.
 4. Do not claim Merkle or ZK selective disclosure; see `phase2/DEFERRED.md`.
 
-Projection v1 requires explicit top-level disposition: a supplied top-level source field must be published or withheld, and source integrity metadata must not be silently overwritten. These checks do not establish that the confidential source record is complete or that a redaction decision was substantively correct.
+Projection requires explicit disposition under the selected engine: silent omission fails closed, and source integrity metadata must not be silently overwritten where the engine reserves that namespace. These checks do not establish that the confidential source record is complete or that a redaction decision was substantively correct.
 
 ## 5. Structured authority
 
