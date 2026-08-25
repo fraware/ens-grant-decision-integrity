@@ -29,6 +29,7 @@ jobs:
       - run: python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
       - run: python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py
       - run: python scripts/corpus_metrics.py corpus/case-template.json
+      - run: python scripts/validate_corpus_cases.py
 
   phase2:
     runs-on: ubuntu-latest
