@@ -1,11 +1,17 @@
-"""Projection package wrap — implementation lives under projection/src."""
+"""Projection package compatibility wrap.
+
+Projection v1/v2 source remains schema-versioned under ``projection/src`` in the
+repository. Release wheels carry the same files as immutable package data and
+this module resolves either layout without relying on the current working tree.
+"""
 
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 
-_PROJECTION_SRC = Path(__file__).resolve().parents[2] / "projection" / "src"
+from gdi.resources import resource_path
+
+_PROJECTION_SRC = resource_path("projection", "src")
 if str(_PROJECTION_SRC) not in sys.path:
     sys.path.insert(0, str(_PROJECTION_SRC))
 
