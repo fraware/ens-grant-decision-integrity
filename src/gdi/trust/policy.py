@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from gdi.resources import ResourceError, resource_path
+from gdi.resources import resource_path
 
 
 class TrustPolicyError(Exception):
@@ -41,8 +41,11 @@ def load_trust_policy(path: Path) -> tuple[dict[str, Any], str]:
         schema_path = resource_path("schema", "trust-policy.schema.json")
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(schema).validate(policy)
-    except (ResourceError, Exception) as exc:  # type: ignore[misc]
-        raise TrustPolicyError(f"trust policy failed schema validation: {exc}", code="TRUST004") from exc
+    except Exception as exc:  # noqa: BLE001
+        raise TrustPolicyError(
+            f"trust policy failed schema validation: {exc}",
+            code="TRUST004",
+        ) from exc
     return policy, digest
 
 
