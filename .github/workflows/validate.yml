@@ -44,6 +44,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r phase2/requirements.txt
+      - run: python -m pip install -e .
       - run: python -m pytest phase2/tests
 
   schema-02:
