@@ -435,6 +435,9 @@
     ]
   },
   "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
     "This corpus case does not identify or attempt to identify the eligibility-disqualified applicant.",
     "The committee's published eligibility judgment is recorded as a historical source claim and is not independently endorsed or re-adjudicated by this case.",
     "Missing public applicant identity, timestamps, or gate outcomes do not prove the historical process lacked those facts or records internally.",
