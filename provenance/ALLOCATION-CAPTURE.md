@@ -49,6 +49,8 @@ The repository may report that a proposition is **not evidenced in the captured 
 
 `simocracy-status-2026-08-24.json` records the public funding page as observed on August 24: five proposal rounds totaling $219, with the first three rounds labeled `ratified` and the August 3 and August 4 rounds labeled `provisional`. That snapshot is decision-status evidence only. It contains no payment, transfer, receipt, or settlement evidence.
 
+`provenance/pre-friday-checkpoint-2026-08-25.json` freezes the actual pre-event repository SHA (`757d35e2de7e113787d66166d736b9c740adaa3c` as of this checkpoint file), leaves `simocracy-status-2026-08-24.json` and `simocracy-funding.json` unchanged, and marks post-event Friday capture as **blocked until an authoritative artifact exists after 2026-08-28**. Do not invent a `simocracy-status-2026-08-28.json` (or any stronger financial state) before that artifact exists.
+
 ## Claim boundary
 
 A funding-state record establishes only what the cited source supports. It does not establish the correctness of the funding decision, completion of work, endorsement of this repository, payment, receipt, or settlement unless those propositions have their own evidence.
