@@ -17,6 +17,7 @@ REQUIRED_NONCLAIMS = {
     "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
 }
 CATEGORIES = ("direct-source", "derived", "interpretive", "unknown", "not-applicable")
+ZERO_HASH = "sha256:" + "0" * 64
 
 
 class CorpusCaseError(Exception):
@@ -55,6 +56,18 @@ def validate_case(case: dict[str, Any]) -> None:
     source_ids = [item["artifactId"] for item in case["sourceArtifacts"]]
     _unique(source_ids, label="source artifact ids", code="CORP003")
     known_sources = set(source_ids)
+
+    if not case["template"]:
+        if not source_ids:
+            raise CorpusCaseError(
+                "an empirical corpus case must declare at least one source artifact or reference-only source record",
+                code="CORP014",
+            )
+        if case["recordSnapshots"]["initial"]["recordHash"] == ZERO_HASH:
+            raise CorpusCaseError(
+                "an empirical corpus case cannot use the template zero hash for its initial record",
+                code="CORP015",
+            )
 
     annotations = case["annotations"]
     _unique([item["annotationId"] for item in annotations], label="annotation ids", code="CORP004")
@@ -109,6 +122,11 @@ def validate_case(case: dict[str, Any]) -> None:
                 "recordChangedAfterReview is true but initial and reconciled record hashes are identical",
                 code="CORP011",
             )
+        if not case["template"] and reconciled_hash == ZERO_HASH:
+            raise CorpusCaseError(
+                "an empirical reconciled record cannot use the template zero hash",
+                code="CORP015",
+            )
 
     if not REQUIRED_NONCLAIMS.issubset(set(case["nonClaims"])):
         missing = sorted(REQUIRED_NONCLAIMS - set(case["nonClaims"]))
@@ -157,7 +175,7 @@ def _agreement(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         "comparedFieldCount": n,
         "rawClassificationAgreement": round(observed, 6) if n else None,
         "cohenKappa": kappa,
-        "note": "Agreement metrics describe annotation consistency; they do not establish annotation correctness.",
+        "note": "Agreement metrics describe annotation consistency; they do not establish annotation correctness. Cohen's kappa is undefined when expected agreement is 1."
     }
 
 
