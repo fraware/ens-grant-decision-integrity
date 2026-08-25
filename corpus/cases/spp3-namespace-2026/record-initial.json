@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp3-2026-namespace-award-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 3 (SPP3)",
+    "roundId": "SPP3-2026",
+    "authority": "ENS DAO, following a named SPP3 committee recommendation ratified by on-chain executable vote",
+    "programUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "namespace-spp3-2026",
+    "applicantName": "Namespace",
+    "applicationUri": "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafybeiee73y2jwinefaszeng3frn47wmqini562qtcibzgnh42cnqiu2la",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP3-2026",
+    "version": "public-authorization-plus-published-rubric",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+    "sources": [
+      "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "eligibility": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "evaluationCriteria": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "conflictRules": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "decisionProcedure": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086"
+    },
+    "changeDuringReview": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "PUBLIC-HARD-SCREEN-AGGREGATE",
+        "description": "The public cohort record states that one application failed the eligibility gate and the remaining 25 were scored; Namespace appears among the scored and selected providers. This record therefore represents only the aggregate fact that Namespace passed the published pre-score hard screen, without asserting gate-by-gate results or a check timestamp.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-COHORT"
+        ]
+      }
+    ],
+    "rationale": "Eligibility status is derived from the public process statement that only applications passing the hard screen were scored and from Namespace appearing in the published scored cohort. The exact eligibility-check time was not identified in reviewed public sources."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "spp3-committee",
+      "displayName": "SPP3 Committee (collective published assessment)",
+      "kind": "committee",
+      "role": "collective evaluator and cohort recommender",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    },
+    {
+      "evaluatorId": "coltron.eth",
+      "displayName": "coltron.eth",
+      "kind": "human",
+      "role": "Chair; substitute scorer for Namespace following a member recusal",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    },
+    {
+      "evaluatorId": "sovereignsignal.eth",
+      "displayName": "sovereignsignal.eth",
+      "kind": "human",
+      "role": "Committee Member",
+      "participated": false,
+      "recused": true,
+      "recusalReason": "The public cohort record discloses a conflict-of-interest recusal for Namespace; the underlying conflict facts are not stated in the reviewed public sources."
+    },
+    {
+      "evaluatorId": "austingriffith.eth",
+      "displayName": "austingriffith.eth",
+      "kind": "human",
+      "role": "Committee Member",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    },
+    {
+      "evaluatorId": "abdullahumar.eth",
+      "displayName": "abdullahumar.eth",
+      "kind": "human",
+      "role": "Committee Member",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    },
+    {
+      "evaluatorId": "gregskril.eth",
+      "displayName": "gregskril.eth",
+      "kind": "human",
+      "role": "ENS Labs Technical Representative and voting Committee Member",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [
+    {
+      "conflictId": "COI-NAMESPACE-SCORING",
+      "subjectId": "sovereignsignal.eth",
+      "description": "The public cohort record states that sovereignsignal.eth was recused from Namespace evaluation under the program conflict-of-interest rules.",
+      "status": "recused",
+      "resolution": "The Chair's independently prepared scores replaced the recused scoring input for Namespace, preserving four scoring inputs.",
+      "affectedDecisionSurfaces": [
+        "evaluation-scoring"
+      ],
+      "substitutionUsed": true,
+      "substituteEvaluatorId": "coltron.eth"
+    },
+    {
+      "conflictId": "COI-NAMESPACE-COMMITTEE-VOTE",
+      "subjectId": "sovereignsignal.eth",
+      "description": "The public cohort record states that sovereignsignal.eth was recused from the Namespace committee vote.",
+      "status": "recused",
+      "resolution": "The member did not participate in the Namespace committee vote. The reviewed public sources do not establish that a substitute voter was used.",
+      "affectedDecisionSurfaces": [
+        "committee-cohort-vote"
+      ],
+      "substitutionUsed": false,
+      "substituteEvaluatorId": null
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceId": "E-AUTH",
+      "kind": "forum",
+      "description": "SPP3 program authorization and committee model, including objectives, authority separation, quorum, voting, conflict rules, evaluation floor, and provider obligations.",
+      "uri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-RUBRIC",
+      "kind": "forum",
+      "description": "Published SPP3 submission timeline, hard eligibility screen, and weighted evaluation rubric.",
+      "uri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-COHORT",
+      "kind": "forum",
+      "description": "Published SPP3 cohort recommendation, Namespace award and rationale, aggregate scores, recusal disclosure, process notes, and delivery prerequisites.",
+      "uri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-VOTE",
+      "kind": "onchain",
+      "description": "Public proposal mirror reporting the SPP3 cohort recommendation as executed, including vote totals, quorum display, and vote end time.",
+      "uri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-APPLICATION-URI",
+      "kind": "application",
+      "description": "Namespace application URI linked by the public cohort recommendation. The content was not successfully retrieved during this reconstruction, and no application-content claim in this record depends on it.",
+      "uri": "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafybeiee73y2jwinefaszeng3frn47wmqini562qtcibzgnh42cnqiu2la",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "C1",
+        "name": "Prior Delivery History",
+        "weight": 0.25,
+        "score": 4.1,
+        "scoreScale": "1-5; published committee mean",
+        "findingIds": [
+          "F-C1"
+        ]
+      },
+      {
+        "criterionId": "C2",
+        "name": "Scope Clarity",
+        "weight": 0.15,
+        "score": 3.4,
+        "scoreScale": "1-5; published committee mean",
+        "findingIds": [
+          "F-C2"
+        ]
+      },
+      {
+        "criterionId": "C3",
+        "name": "Milestone Structure",
+        "weight": 0.15,
+        "score": 3.3,
+        "scoreScale": "1-5; published committee mean",
+        "findingIds": [
+          "F-C3"
+        ]
+      },
+      {
+        "criterionId": "C4",
+        "name": "Adoption, Revenue, and Ecosystem Utility",
+        "weight": 0.4,
+        "score": 3.5,
+        "scoreScale": "1-5; published committee mean",
+        "findingIds": [
+          "F-C4"
+        ]
+      },
+      {
+        "criterionId": "D1",
+        "name": "Discretion: Team and Budget Fit",
+        "weight": 0.05,
+        "score": null,
+        "scoreScale": "1-5; public cohort assessment excludes this component from the published weighted subtotal"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-C1",
+        "statement": "The published committee assessment reports Namespace C1 Prior Delivery mean score as 4.1.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "medium"
+      },
+      {
+        "findingId": "F-C2",
+        "statement": "The published committee assessment reports Namespace C2 Scope Clarity mean score as 3.4.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "medium"
+      },
+      {
+        "findingId": "F-C3",
+        "statement": "The published committee assessment reports Namespace C3 Milestone Structure mean score as 3.3.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "medium"
+      },
+      {
+        "findingId": "F-C4",
+        "statement": "The published committee assessment reports Namespace C4 Adoption, Revenue, and Ecosystem Utility mean score as 3.5.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "medium"
+      },
+      {
+        "findingId": "F-WEIGHTED",
+        "statement": "The published committee assessment reports Namespace weighted subtotal as 3.43, with the 5% discretionary component excluded and the subtotal therefore out of 4.75.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "high"
+      },
+      {
+        "findingId": "F-AWARD-RATIONALE",
+        "statement": "The committee recommended a $500,000 Namespace award based on its subname infrastructure role, prior delivery, ENSv2 migration work, continued tooling maintenance, and business-development scope, while noting milestone dependency on ENSv2 mainnet timing.",
+        "classification": "judgment",
+        "evidenceIds": [
+          "E-COHORT"
+        ],
+        "evaluatorIds": [
+          "spp3-committee"
+        ],
+        "materiality": "critical"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": 3.43,
+    "aggregateScale": "published weighted subtotal out of 4.75; 5% discretionary component excluded"
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "approved",
+    "authority": "ENS DAO on-chain executable vote",
+    "authorityKind": "dao-vote",
+    "decidedAt": "2026-07-16T03:31:00Z",
+    "awardedAmount": 500000,
+    "currency": "USD",
+    "rationale": "The executed cohort proposal ratified the four selected SPP3 providers. Namespace was allocated $500,000 following the committee recommendation and published assessment.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": "130.99% displayed by the public proposal mirror",
+    "decisionRule": null,
+    "voteRecordUri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879"
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "The reviewed public governing and cohort artifacts did not identify a dedicated post-decision factual or procedural correction path for this provider-selection decision. This is a public-evidence statement, not a claim that no private or internal process existed.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [
+    {
+      "conditionId": "SPP3-DELIVERY-REPORTING",
+      "description": "Operate under the negotiated SPP3 Award Notice and maintain the required reporting cadence during the funded cycle; continued engagement and reporting are the public program conditions for stream continuation.",
+      "targetDate": null,
+      "reviewWindow": "Quarterly reporting across the 12-month SPP3 cycle",
+      "verificationMethod": "Published or institutionally reviewed quarterly reporting and committee/Foundation oversight under the SPP3 terms and Award Notice.",
+      "verifier": "SPP3 committee and ENS Foundation, according to the public program terms and provider Award Notice",
+      "dependencies": [
+        "Successful KYC checkpoint and signed Award Notice before stream activation"
+      ],
+      "paymentAmount": null,
+      "currency": "USD",
+      "status": "pending",
+      "evidenceIds": [
+        "E-AUTH",
+        "E-COHORT"
+      ],
+      "consequence": "The public program terms permit stream suspension or termination for abandonment, reporting failure, or other defined breaches, subject to notice/response terms in the agreement."
+    }
+  ],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T07:25:08Z",
+    "updatedAt": "2026-08-25T07:25:08Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Public-only retrospective reconstruction; this is not a contemporaneous institutional decision record.",
+    "governingPolicy.effectiveAt and eligibility.checkedAt are intentionally null because exact timestamps were not established from the reviewed public sources. The resulting schema findings are preserved rather than repaired with invented dates.",
+    "The public cohort report states that individual scoring records remain internal working documents. Aggregate committee scores are represented; no undisclosed individual score is inferred.",
+    "The public cohort report discloses sovereignsignal.eth's recusal from Namespace evaluation and vote. It states that the Chair's scores replace the recused scoring input; it does not state that a substitute voter replaced the recused member in the committee vote, so those surfaces are represented separately.",
+    "The linked Namespace application URI was not successfully retrieved during reconstruction. No applicant-content claim in this record is inferred from inaccessible content.",
+    "The public timeline artifacts are not silently reconciled: the May 14 timeline lists submissions closing June 9, while the later cohort process narrative says submissions closed June 4."
+  ]
+}
