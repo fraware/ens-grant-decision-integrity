@@ -49,13 +49,13 @@ The file hash proves identity of the supplied bytes only. It does not prove that
 
 Each material field is classified as:
 
-- `direct-source` — directly represented by a cited source record;
-- `derived` — mechanically derived from directly represented information; document the derivation;
-- `interpretive` — requires a documented mapping judgment;
+- `direct-source` — directly represented by cited source evidence;
+- `derived` — mechanically derived from cited source evidence; document the derivation;
+- `interpretive` — requires a documented mapping judgment over cited source evidence;
 - `unknown` — insufficient evidence;
 - `not-applicable` — outside the represented process/profile; document why.
 
-`direct-source` requires at least one declared case source ID. That linkage does not by itself mean the source bytes were publicly preserved; availability is reported separately. `unknown` is an admissible result. Missing public evidence is not proof that the underlying procedure did not exist.
+Every field counted as reconstructable (`direct-source`, `derived`, or `interpretive`) requires at least one declared case source ID. Derived and interpretive fields also require a rationale. A source linkage does not by itself mean the source bytes were publicly preserved or verified; source availability and byte-verification status are reported separately. `unknown` is an admissible result. Missing public evidence is not proof that the underlying procedure did not exist.
 
 ## Metrics
 
