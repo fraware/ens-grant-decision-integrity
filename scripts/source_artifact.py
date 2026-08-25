@@ -11,14 +11,17 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schema" / "source-artifact.schema.json"
 HASH_PREFIX = "sha256:"
+URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*$")
 
 
 class SourceArtifactError(Exception):
@@ -52,6 +55,29 @@ def _hash_file(path: Path) -> tuple[str, int]:
     return HASH_PREFIX + digest.hexdigest(), size
 
 
+def _validate_offset_datetime(value: Any, field: str) -> None:
+    if not isinstance(value, str):
+        raise SourceArtifactError(f"{field} must be a date-time string", code="SRC002")
+    candidate = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(candidate)
+    except ValueError as exc:
+        raise SourceArtifactError(f"{field} must be a valid RFC 3339-style date-time", code="SRC002") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise SourceArtifactError(f"{field} must include a UTC designator or numeric offset", code="SRC002")
+
+
+def _validate_uri(value: Any, field: str) -> None:
+    if not isinstance(value, str) or not value or any(character.isspace() for character in value):
+        raise SourceArtifactError(f"{field} must be a non-empty URI without whitespace", code="SRC002")
+    try:
+        parsed = urlsplit(value)
+    except ValueError as exc:
+        raise SourceArtifactError(f"{field} must be a valid URI", code="SRC002") from exc
+    if not parsed.scheme or not URI_SCHEME_RE.fullmatch(parsed.scheme):
+        raise SourceArtifactError(f"{field} must include a valid URI scheme", code="SRC002")
+
+
 def validate_source_artifact(value: dict[str, Any]) -> None:
     import jsonschema
 
@@ -72,6 +98,14 @@ def validate_source_artifact(value: dict[str, Any]) -> None:
             f"source-artifact schema failure at {path}: {first.message}",
             code="SRC002",
         )
+
+    # Do not rely on optional jsonschema format-checking dependencies for critical
+    # provenance fields. Enforce the minimum URI/date-time contract explicitly.
+    _validate_offset_datetime(value.get("capturedAt"), "capturedAt")
+    _validate_uri(value.get("sourceUri"), "sourceUri")
+    for field in ("resolvedUri", "archiveUri"):
+        if field in value:
+            _validate_uri(value[field], field)
 
 
 def build_artifact(
