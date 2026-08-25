@@ -43,6 +43,11 @@
       "recordHash": "sha256:57fda92519f688b69628092dc295f82725c5ffb4f4b4195e0718907e9fe34ca0",
       "path": "record-initial.json",
       "notes": "Exact bytes of the first public-only reconstruction. Applicant identity and three exact historical instants remain intentionally null because the reviewed official sources do not establish them; these are preserved as structural validator findings rather than filled with labels or publication timestamps."
+    },
+    "reconciled": {
+      "recordHash": "sha256:8942eb1990dedf6d1f941a74310c7ef5056df4c5d6bb95d9c97d0ac3bf8c168d",
+      "path": "record-reconciled.json",
+      "notes": "Exact UTF-8 bytes after disclosure serialization corrections only: removed unsupported publicRecordUri and protectedRecordLocator; set redactions to []; set timestamps.updatedAt to the reconciliation time. The four source-null fields are unchanged."
     }
   },
   "annotations": [
@@ -387,6 +392,28 @@
         ]
       },
       {
+        "findingId": "INIT-SCHEMA-DISCLOSURE-ADDITIONAL",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "disclosure",
+        "message": "Additional properties are not allowed ('protectedRecordLocator', 'publicRecordUri' were unexpected)",
+        "disposition": "annotation-defect",
+        "rationale": "These properties are not permitted by schema v0.1. They were reconstruction serialization defects, not evidence of a historical process gap. Corrected in record-reconciled.json by removing both properties.",
+        "sourceArtifactIds": []
+      },
+      {
+        "findingId": "INIT-SCHEMA-DISCLOSURE-REDACTIONS",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "disclosure.redactions.0",
+        "message": "'The public cohort recommendation does not disclose the identity or application URI of the eligibility-disqualified applicant.' is not of type 'object'",
+        "disposition": "annotation-defect",
+        "rationale": "v0.1 requires structured redaction objects. The initial reconstruction placed a free-text note in redactions[0]. Missing public applicant identity is already represented by the null applicantName field; inventing a redaction event is not justified. Corrected in record-reconciled.json by setting redactions to [].",
+        "sourceArtifactIds": [
+          "SRC-COHORT"
+        ]
+      },
+      {
         "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
         "code": "SCHEMA",
         "severity": "error",
@@ -413,19 +440,26 @@
         ]
       }
     ],
-    "recordChangedAfterReview": false,
+    "recordChangedAfterReview": true,
     "finalErrors": [
       "ERROR SCHEMA application.applicantName: None is not of type 'string'",
       "ERROR SCHEMA decision.decidedAt: None is not of type 'string'",
       "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
       "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
     ],
-    "finalWarnings": []
+    "finalWarnings": [],
+    "changeRationale": "Reconciliation corrected two reconstruction serialization defects in disclosure (unsupported publicRecordUri/protectedRecordLocator properties, and a string redactions[0] where v0.1 requires a structured redaction object). Those defects are annotation/reconstruction format errors, not historical process gaps. The four source-null fields (application.applicantName, governingPolicy.effectiveAt, eligibility.checkedAt, decision.decidedAt) remain unresolved because the reviewed public sources do not establish them; they were not filled with placeholders."
   },
   "review": {
     "doubleAnnotation": false,
-    "reconciled": false,
-    "reconciliationNotes": [],
+    "reconciled": true,
+    "reconciliationNotes": [
+      "disclosure.publicRecordUri removed: unsupported by schema v0.1; was a reconstruction serialization defect, not a historical fact.",
+      "disclosure.protectedRecordLocator removed: unsupported by schema v0.1; was a reconstruction serialization defect, not a historical fact.",
+      "disclosure.redactions changed from a one-element string array to []: v0.1 requires structured redaction objects, and the reviewed sources do not establish a deliberate institutional redaction event for applicant identity.",
+      "timestamps.updatedAt set to 2026-08-25T15:46:00Z as reconstruction metadata for this reconciliation; timestamps.createdAt preserved.",
+      "application.applicantName, governingPolicy.effectiveAt, eligibility.checkedAt, and decision.decidedAt remain null; no placeholders were invented."
+    ],
     "residualQuestions": [
       "Should a future record profile permit an explicitly unknown or protected applicant identity when an authoritative aggregate decision event is public but the applicant is not named?",
       "Does an anonymous aggregate hard-screen disclosure belong as a first-class decision-record case, or should it be represented through a separate aggregate/process-observation object until applicant identity can be bound?",
