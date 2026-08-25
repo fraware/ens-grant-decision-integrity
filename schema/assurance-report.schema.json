@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ens-gdi.local/schema/assurance-report.schema.json",
+  "title": "ENS GDI Assurance Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reportVersion",
+    "verifier",
+    "subject",
+    "profileSet",
+    "checks",
+    "establishedClaims",
+    "warnings",
+    "failures",
+    "unverified",
+    "trustAssumptions",
+    "nonClaims",
+    "ok"
+  ],
+  "properties": {
+    "reportVersion": {"type": "string", "const": "1"},
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"},
+        "repositoryCommit": {"type": ["string", "null"]}
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundleId", "manifestDigestSha256"],
+      "properties": {
+        "bundleId": {"type": "string"},
+        "manifestDigestSha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "bundleClass": {"type": "string", "enum": ["public", "protected"]}
+      }
+    },
+    "profileSet": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "trustPolicy": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "policyId": {"type": "string"},
+        "policyDigestSha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["checkId", "status", "claimIds", "evidence"],
+        "properties": {
+          "checkId": {"type": "string"},
+          "status": {
+            "type": "string",
+            "enum": ["pass", "fail", "warning", "not-applicable", "not-run", "unsupported"]
+          },
+          "claimIds": {"type": "array", "items": {"type": "string"}},
+          "evidence": {"type": "array", "items": {"type": "string"}},
+          "details": {"type": "object"}
+        }
+      }
+    },
+    "establishedClaims": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "failures": {"type": "array", "items": {"type": "string"}},
+    "unverified": {"type": "array", "items": {"type": "string"}},
+    "trustAssumptions": {"type": "array", "items": {"type": "string"}},
+    "nonClaims": {"type": "array", "items": {"type": "string"}},
+    "ok": {"type": "boolean"}
+  }
+}

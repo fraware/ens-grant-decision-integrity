@@ -1,0 +1,811 @@
+{
+  "registryVersion": "1",
+  "claims": [
+    {
+      "claimId": "CORE.SCHEMA.STRUCTURE",
+      "claimVersion": "1",
+      "title": "Decision-record schema structure",
+      "proposition": "The selected decision record satisfies the selected schema profile's structural rules that were executed.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1",
+        "grant-decision-record/0.2"
+      ],
+      "requiredChecks": [
+        "core.schema"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "truth or completeness of cited evidence",
+        "quality of substantive judgment",
+        "institutional legitimacy"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORE.CONFORMANCE.CROSS_FIELD",
+      "claimVersion": "1",
+      "title": "Declared cross-field consistency",
+      "proposition": "The selected decision record satisfies the v0.1 semantic conformance rules that were executed.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1"
+      ],
+      "requiredChecks": [
+        "core.conformance"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "truth or completeness of cited evidence",
+        "quality of substantive judgment",
+        "institutional legitimacy"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORE.AUTHORITY.HUMAN_SURFACE",
+      "claimVersion": "1",
+      "title": "Human or collective authority surface",
+      "proposition": "Non-pending decisions identify a permitted human/committee/DAO authority kind under the selected profile rules that were executed.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1"
+      ],
+      "requiredChecks": [
+        "core.conformance"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that automation approved funding",
+        "institutional legitimacy outside the declared surface"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORE.EVIDENCE.REFERENCE_RESOLUTION",
+      "claimVersion": "1",
+      "title": "Evidence reference resolution",
+      "proposition": "Referenced evidence, evaluator, conflict, and delivery identifiers resolve within the decision record under the executed conformance rules.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1"
+      ],
+      "requiredChecks": [
+        "core.conformance"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "truth of cited evidence bytes or URIs",
+        "completeness of the underlying evidence set"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORE.CONFLICT.RECUSAL_CONSISTENCY",
+      "claimVersion": "1",
+      "title": "Conflict and recusal consistency",
+      "proposition": "Declared conflicts, recusals, and substitutions are internally consistent under the executed conformance rules.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1"
+      ],
+      "requiredChecks": [
+        "core.conformance"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "completeness of undisclosed conflicts",
+        "correctness of conflict judgments"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORE.CHALLENGE.LIFECYCLE",
+      "claimVersion": "1",
+      "title": "Challenge lifecycle consistency",
+      "proposition": "Challenge fields are internally consistent under the executed conformance rules.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1"
+      ],
+      "requiredChecks": [
+        "core.conformance"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that a challenge process was adequate or used",
+        "absence of private correction routes"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORE.DELIVERY.CONDITION_CONSISTENCY",
+      "claimVersion": "1",
+      "title": "Delivery-condition consistency",
+      "proposition": "Delivery conditions required by the decision status are present and reference-consistent under the executed conformance rules.",
+      "module": "core-conformance",
+      "profileVersions": [
+        "grant-decision-record/0.1"
+      ],
+      "requiredChecks": [
+        "core.conformance"
+      ],
+      "requiredEvidence": [
+        "decision-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "delivery completion",
+        "payment or settlement"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "SOURCE.BYTES.MATCH_METADATA",
+      "claimVersion": "1",
+      "title": "Source bytes match metadata",
+      "proposition": "Exact supplied source bytes match the declared content hash and length in the source-artifact metadata.",
+      "module": "source-artifacts",
+      "profileVersions": [
+        "source-artifact/1"
+      ],
+      "requiredChecks": [
+        "source.bytes"
+      ],
+      "requiredEvidence": [
+        "source-artifact-metadata",
+        "source-bytes"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "truth or ownership of the source",
+        "adoption of the source by a program",
+        "independent capture-time authenticity beyond the supplied metadata"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "SOURCE.POLICY_PIN.MATCH",
+      "claimVersion": "1",
+      "title": "Policy pin matches byte-verified artifact",
+      "proposition": "A policy pin matches an exact byte-verified source artifact by URI and hash under the executed pin checks.",
+      "module": "source-artifacts",
+      "profileVersions": [
+        "grant-decision-record/0.2",
+        "source-artifact/1"
+      ],
+      "requiredChecks": [
+        "source.policy-pins"
+      ],
+      "requiredEvidence": [
+        "decision-record",
+        "source-artifact-metadata",
+        "source-bytes"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that the pinned policy is the only applicable policy",
+        "institutional adoption"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "PHASE2.C1.MANIFEST_BINDING",
+      "claimVersion": "1",
+      "title": "Manifest binding (C1)",
+      "proposition": "Revealed manifest and salt reopen the commitment digest in the supplied envelope, and the manifest's programId, roundId, and applicationDeadline match that envelope.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3"
+      ],
+      "requiredChecks": [
+        "phase2.c1"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "anchor validity, temporal precedence, execution, operator honesty, or evaluator correctness"
+      ],
+      "status": "active",
+      "aliases": [
+        "C1"
+      ]
+    },
+    {
+      "claimId": "PHASE2.C2.TEMPORAL_PRECEDENCE",
+      "claimVersion": "1",
+      "title": "Temporal precedence (C2)",
+      "proposition": "Selected anchor profile places the envelope before the application deadline.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3"
+      ],
+      "requiredChecks": [
+        "phase2.c2"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle"
+      ],
+      "trustAssumptions": [
+        "selected-anchor-profile-trust-root"
+      ],
+      "doesNotEstablish": [
+        "universal time; the named profile's trust root and monitoring assumptions apply"
+      ],
+      "status": "active",
+      "aliases": [
+        "C2"
+      ]
+    },
+    {
+      "claimId": "PHASE2.C3.ROUND_ENVELOPE_BINDING",
+      "claimVersion": "1",
+      "title": "Round-envelope binding (C3)",
+      "proposition": "The verified anchor binds the public envelope's programId, roundId, applicationDeadline, commitment algorithm, and commitment digest as one anchored object.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3"
+      ],
+      "requiredChecks": [
+        "phase2.c3"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle"
+      ],
+      "trustAssumptions": [
+        "selected-anchor-profile-trust-root"
+      ],
+      "doesNotEstablish": [
+        "that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check"
+      ],
+      "status": "active",
+      "aliases": [
+        "C3"
+      ]
+    },
+    {
+      "claimId": "PHASE2.C4.RUN_ATTRIBUTION",
+      "claimVersion": "1",
+      "title": "Run attribution (C4)",
+      "proposition": "Signer asserts this run used the bound commitment, input snapshots, environment, and output digest.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3"
+      ],
+      "requiredChecks": [
+        "phase2.c4"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that the signer actually used that configuration or that the output is sound",
+        "that the signing key is authorized by an external operator policy (see C4A)"
+      ],
+      "status": "active",
+      "aliases": [
+        "C4"
+      ],
+      "notes": "C4 remains signature attribution to the supplied key. Authorization is C4A."
+    },
+    {
+      "claimId": "PHASE2.C4A.AUTHORIZED_SIGNER",
+      "claimVersion": "1",
+      "title": "Authorized run signer (C4A)",
+      "proposition": "The verified run signature key/identity is authorized by the external verifier trust policy for the declared operator role within the policy validity window.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3",
+        "trust-policy/1"
+      ],
+      "requiredChecks": [
+        "phase2.c4a"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle",
+        "external-trust-policy"
+      ],
+      "trustAssumptions": [
+        "external-trust-policy"
+      ],
+      "doesNotEstablish": [
+        "operator honesty or that the committed configuration was used",
+        "institutional funding authority",
+        "C4 signature attribution when no signature is present"
+      ],
+      "status": "active",
+      "aliases": [
+        "C4A"
+      ],
+      "notes": "New claim; does not silently strengthen historical C4."
+    },
+    {
+      "claimId": "PHASE2.C5.REPLAY_EVIDENCE",
+      "claimVersion": "1",
+      "title": "Replay evidence (C5)",
+      "proposition": "Accepted replay evidence records per-layer exact-match, diverged, or not-replayable outcomes from canonical artifact recomputation.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3"
+      ],
+      "requiredChecks": [
+        "phase2.c5"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "re-execution of the recorded implementation unless separately demonstrated; fairness, legitimacy, hosted-model identity over time, or substantive merit"
+      ],
+      "status": "active",
+      "aliases": [
+        "C5"
+      ]
+    },
+    {
+      "claimId": "PHASE2.C6.HUMAN_AUTHORITY_SEPARATION",
+      "claimVersion": "1",
+      "title": "Human authority separation (C6)",
+      "proposition": "No Phase II object populated decision.authorityKind.",
+      "module": "phase2",
+      "profileVersions": [
+        "phase2/bundle-2",
+        "phase2/bundle-3"
+      ],
+      "requiredChecks": [
+        "phase2.c6"
+      ],
+      "requiredEvidence": [
+        "phase2-evidence-bundle"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "institutional approval, committee adoption, or funding authority"
+      ],
+      "status": "active",
+      "aliases": [
+        "C6"
+      ]
+    },
+    {
+      "claimId": "PROJ.SPEC.STRUCTURE",
+      "claimVersion": "1",
+      "title": "Projection spec structure",
+      "proposition": "The projection specification is structurally valid under the selected projection profile.",
+      "module": "projection",
+      "profileVersions": [
+        "ens-gdi/public-projection/v1",
+        "ens-gdi/public-projection/v2"
+      ],
+      "requiredChecks": [
+        "projection.spec"
+      ],
+      "requiredEvidence": [
+        "projection-spec"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that the projection policy is socially adequate",
+        "source-record correctness"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "PROJ.EXEC.DETERMINISTIC",
+      "claimVersion": "1",
+      "title": "Deterministic projection execution",
+      "proposition": "Projection execution is deterministic for the supplied confidential source and projection specification under the selected profile.",
+      "module": "projection",
+      "profileVersions": [
+        "ens-gdi/public-projection/v1",
+        "ens-gdi/public-projection/v2"
+      ],
+      "requiredChecks": [
+        "projection.execute"
+      ],
+      "requiredEvidence": [
+        "confidential-record",
+        "projection-spec",
+        "public-projection"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "adequacy of disclosure policy",
+        "absence of dictionary attacks on low-entropy withheld fields"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "PROJ.COVERAGE.COMPLETE",
+      "claimVersion": "1",
+      "title": "Projection coverage completeness",
+      "proposition": "Every covered source field has a disposition under the selected projection version.",
+      "module": "projection",
+      "profileVersions": [
+        "ens-gdi/public-projection/v1",
+        "ens-gdi/public-projection/v2"
+      ],
+      "requiredChecks": [
+        "projection.coverage"
+      ],
+      "requiredEvidence": [
+        "confidential-record",
+        "projection-spec"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that withheld material is unknowable",
+        "merit or fairness"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "PROJ.WITHHELD.COMMITMENT",
+      "claimVersion": "1",
+      "title": "Withheld subtree commitment",
+      "proposition": "Withheld commitments match the supplied confidential subtrees when those subtrees are available for verification under the selected projection version.",
+      "module": "projection",
+      "profileVersions": [
+        "ens-gdi/public-projection/v2"
+      ],
+      "requiredChecks": [
+        "projection.withheld"
+      ],
+      "requiredEvidence": [
+        "confidential-record",
+        "projection-spec",
+        "public-projection"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "secrecy against dictionary attack for low-entropy fields",
+        "source authenticity"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "PROJ.INTEGRITY.BIND",
+      "claimVersion": "1",
+      "title": "Projection integrity binding",
+      "proposition": "Projection integrity binds the exact specified inputs and outputs under its versioned construction and does not overwrite source integrity.",
+      "module": "projection",
+      "profileVersions": [
+        "ens-gdi/public-projection/v2"
+      ],
+      "requiredChecks": [
+        "projection.integrity"
+      ],
+      "requiredEvidence": [
+        "confidential-record",
+        "projection-spec",
+        "public-projection"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "source-record integrity when separately declared",
+        "institutional approval of the projection policy"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORPUS.CASE.CONTRACT",
+      "claimVersion": "1",
+      "title": "Corpus case contract",
+      "proposition": "The corpus case object is structurally valid under the corpus case schema and protocol rules that were executed.",
+      "module": "corpus",
+      "profileVersions": [
+        "corpus-case/1"
+      ],
+      "requiredChecks": [
+        "corpus.case"
+      ],
+      "requiredEvidence": [
+        "corpus-case"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "source truth",
+        "annotator correctness",
+        "representativeness"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORPUS.SNAPSHOT.BYTES",
+      "claimVersion": "1",
+      "title": "Corpus snapshot byte binding",
+      "proposition": "Exact record snapshot bytes match the declared SHA-256 hashes.",
+      "module": "corpus",
+      "profileVersions": [
+        "corpus-case/1"
+      ],
+      "requiredChecks": [
+        "corpus.snapshot-bytes"
+      ],
+      "requiredEvidence": [
+        "corpus-case",
+        "decision-record-snapshot"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "historical completeness",
+        "merit"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORPUS.FINDINGS.EXACT",
+      "claimVersion": "1",
+      "title": "Corpus validator finding binding",
+      "proposition": "Exact validator findings match the initial and final decision-record bytes under the corpus binding protocol.",
+      "module": "corpus",
+      "profileVersions": [
+        "corpus-case/1"
+      ],
+      "requiredChecks": [
+        "corpus.findings"
+      ],
+      "requiredEvidence": [
+        "corpus-case",
+        "decision-record-snapshot"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that unresolved findings are process gaps",
+        "fairness"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORPUS.SOURCE.REDISTRIBUTABLE_ONLY",
+      "claimVersion": "1",
+      "title": "Redistributable source byte verification",
+      "proposition": "Source-artifact byte verification is claimed only for redistributable supplied bytes.",
+      "module": "corpus",
+      "profileVersions": [
+        "corpus-case/1"
+      ],
+      "requiredChecks": [
+        "corpus.sources"
+      ],
+      "requiredEvidence": [
+        "corpus-case"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that reference-only URIs are false",
+        "authorized-audit completeness"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORPUS.METRICS.ARITHMETIC",
+      "claimVersion": "1",
+      "title": "Corpus metrics arithmetic",
+      "proposition": "Reported corpus metrics are arithmetically correct for the supplied case annotations and findings.",
+      "module": "corpus",
+      "profileVersions": [
+        "corpus-case/1"
+      ],
+      "requiredChecks": [
+        "corpus.metrics"
+      ],
+      "requiredEvidence": [
+        "corpus-case"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "agreement equals correctness",
+        "study readiness equals representativeness"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "CORPUS.STUDY.GATES",
+      "claimVersion": "1",
+      "title": "Study-status machine gates",
+      "proposition": "Study-status machine gates are computed correctly against the predeclared study plan.",
+      "module": "corpus",
+      "profileVersions": [
+        "corpus-study-plan/1"
+      ],
+      "requiredChecks": [
+        "corpus.study-status"
+      ],
+      "requiredEvidence": [
+        "study-plan",
+        "corpus-cases"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that uncovered strata have no evidence anywhere",
+        "that ready-for-final-review means the research is complete"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "FUNDING.STATUS.SNAPSHOT",
+      "claimVersion": "1",
+      "title": "Funding decision-status snapshot",
+      "proposition": "A dated decision-status snapshot matches the cited artifact set under the funding provenance rules that were executed.",
+      "module": "funding",
+      "profileVersions": [
+        "funding-provenance/1"
+      ],
+      "requiredChecks": [
+        "funding.status-snapshot"
+      ],
+      "requiredEvidence": [
+        "funding-status-snapshot"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "payment",
+        "transfer",
+        "receipt",
+        "settlement",
+        "work completion"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "FUNDING.FINANCIAL.SEPARATE_EVIDENCE",
+      "claimVersion": "1",
+      "title": "Financial evidence requires its own source",
+      "proposition": "Financial-evidence fields are populated only when their own evidence is supplied; allocation alone does not establish payment, receipt, or settlement.",
+      "module": "funding",
+      "profileVersions": [
+        "funding-provenance/1"
+      ],
+      "requiredChecks": [
+        "funding.financial-evidence"
+      ],
+      "requiredEvidence": [
+        "funding-status-snapshot"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that unpaid means the event never occurred elsewhere"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "RELEASE.COMMIT.IDENTITY",
+      "claimVersion": "1",
+      "title": "Release commit identity",
+      "proposition": "The release artifact set identifies an exact repository commit.",
+      "module": "release",
+      "profileVersions": [
+        "release-integrity/1"
+      ],
+      "requiredChecks": [
+        "release.commit"
+      ],
+      "requiredEvidence": [
+        "release-manifest"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "byte-reproducible builds unless independently demonstrated"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "RELEASE.CHECKS.CORRESPOND",
+      "claimVersion": "1",
+      "title": "Release checks correspond to commit",
+      "proposition": "Required validation checks correspond to the exact published commit under the release integrity procedure that was executed.",
+      "module": "release",
+      "profileVersions": [
+        "release-integrity/1"
+      ],
+      "requiredChecks": [
+        "release.checks"
+      ],
+      "requiredEvidence": [
+        "release-manifest",
+        "ci-run-record"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "substantive correctness of the software",
+        "institutional endorsement"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "RELEASE.ARCHIVE.DIGEST",
+      "claimVersion": "1",
+      "title": "Attached archive digest",
+      "proposition": "The attached release archive digest matches the attached bytes under the release integrity procedure that was executed.",
+      "module": "release",
+      "profileVersions": [
+        "release-integrity/1"
+      ],
+      "requiredChecks": [
+        "release.archive-digest"
+      ],
+      "requiredEvidence": [
+        "release-archive",
+        "sha256-manifest"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "that downstream mirrors remain unmodified forever"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "RELEASE.SBOM.PIPELINE",
+      "claimVersion": "1",
+      "title": "SBOM pipeline claim boundary",
+      "proposition": "SBOM and attestation artifacts claim only what the build pipeline establishes for the exact published assets.",
+      "module": "release",
+      "profileVersions": [
+        "release-integrity/1"
+      ],
+      "requiredChecks": [
+        "release.sbom"
+      ],
+      "requiredEvidence": [
+        "sbom"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "absence of all vulnerabilities",
+        "runtime supply-chain integrity after download"
+      ],
+      "status": "active"
+    },
+    {
+      "claimId": "TRUST.POLICY.EXTERNAL",
+      "claimVersion": "1",
+      "title": "External trust policy binding",
+      "proposition": "Trust-dependent checks used an externally supplied trust policy whose digest is recorded; the bundle did not appoint its own trust roots.",
+      "module": "trust",
+      "profileVersions": [
+        "trust-policy/1"
+      ],
+      "requiredChecks": [
+        "trust.policy"
+      ],
+      "requiredEvidence": [
+        "external-trust-policy"
+      ],
+      "trustAssumptions": [],
+      "doesNotEstablish": [
+        "correctness of the operator's trust choices",
+        "universal public trust"
+      ],
+      "status": "active"
+    }
+  ]
+}

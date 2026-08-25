@@ -14,3 +14,6 @@ venv/
 # Internal handoff and planning documents
 *.docx
 _dossier*
+
+# Local editable install metadata
+src/*.egg-info/

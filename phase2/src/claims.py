@@ -11,6 +11,7 @@ C1_ID = "C1"
 C2_ID = "C2"
 C3_ID = "C3"
 C4_ID = "C4"
+C4A_ID = "C4A"
 C5_ID = "C5"
 C6_ID = "C6"
 
@@ -29,6 +30,10 @@ C4_ESTABLISHED = (
     "Signer asserts this run used the bound commitment, input snapshots, "
     "environment, and output digest."
 )
+C4A_ESTABLISHED = (
+    "The verified run signature key/identity is authorized by the external verifier "
+    "trust policy for the declared operator role within the policy validity window."
+)
 C5_ESTABLISHED = (
     "Accepted replay evidence records per-layer exact-match, diverged, or not-replayable outcomes "
     "from canonical artifact recomputation."
@@ -42,7 +47,14 @@ C2_DOES_NOT = "universal time; the named profile's trust root and monitoring ass
 C3_DOES_NOT = (
     "that an unopened manifest contains matching round fields; successful reveal or authorized audit is required for that check"
 )
-C4_DOES_NOT = "that the signer actually used that configuration or that the output is sound"
+C4_DOES_NOT = (
+    "that the signer actually used that configuration or that the output is sound; "
+    "that the signing key is authorized by an external operator policy (see C4A)"
+)
+C4A_DOES_NOT = (
+    "operator honesty or that the committed configuration was used; "
+    "institutional funding authority; C4 signature attribution when no signature is present"
+)
 C5_DOES_NOT = (
     "re-execution of the recorded implementation unless separately demonstrated; fairness, "
     "legitimacy, hosted-model identity over time, or substantive merit"
@@ -104,6 +116,7 @@ CLAIM_BY_ID: dict[str, str] = {
     C2_ID: C2_ESTABLISHED,
     C3_ID: C3_ESTABLISHED,
     C4_ID: C4_ESTABLISHED,
+    C4A_ID: C4A_ESTABLISHED,
     C5_ID: C5_ESTABLISHED,
     C6_ID: C6_ESTABLISHED,
 }

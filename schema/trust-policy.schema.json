@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ens-gdi.local/schema/trust-policy.schema.json",
+  "title": "ENS GDI External Trust Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["trustPolicyVersion", "policyId", "validFor", "anchors", "runSigners"],
+  "properties": {
+    "trustPolicyVersion": {"type": "string", "const": "1"},
+    "policyId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "policyDigestSha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Optional self-description; verifiers MUST compute the digest over the policy bytes they were given and MUST NOT trust a digest merely because it appears inside the policy."
+    },
+    "validFor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start"],
+      "properties": {
+        "start": {"type": "string", "format": "date-time"},
+        "end": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "anchors": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rekor-v1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {"type": "string", "enum": ["historical-compatibility", "disabled"]},
+            "notes": {"type": "string"}
+          }
+        },
+        "rekor-v2": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tufRootPath"],
+          "properties": {
+            "tufRootPath": {"type": "string", "minLength": 1},
+            "operatorAllowlist": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1}
+            },
+            "notes": {"type": "string"}
+          }
+        },
+        "rfc3161": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {"type": "string", "enum": ["fail-closed", "enabled"]},
+            "rootCertificates": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1}
+            },
+            "acceptedPolicyOids": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "notes": {"type": "string"}
+          }
+        }
+      }
+    },
+    "runSigners": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["signerId", "keyId", "validFor", "roles"],
+        "properties": {
+          "signerId": {"type": "string", "minLength": 1},
+          "keyId": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "publicKeyPemPath": {"type": "string", "minLength": 1},
+          "validFor": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start"],
+            "properties": {
+              "start": {"type": "string", "format": "date-time"},
+              "end": {"type": ["string", "null"], "format": "date-time"}
+            }
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": ["evaluator-run-attestor", "anchor-submission-signer", "other-technical"]
+            }
+          }
+        }
+      }
+    },
+    "nonClaims": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
