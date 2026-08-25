@@ -29,6 +29,12 @@
     "doubleAnnotationRule": "Cases selected for double annotation are encoded independently before reconciliation using the same material field set.",
     "unknownRule": "Insufficient public evidence remains unknown. Missing public evidence is not evidence that a private or internal procedure did not exist."
   },
+  "validatorBinding": {
+    "initialSnapshotRule": "For a real case, re-hash the exact initial record bytes, parse that exact file, run the repository decision-record validator, and require verification.initialFindings to match its complete output by severity, code, path, and message.",
+    "finalSnapshotRule": "Run the validator on the reconciled record when review changes the record; otherwise use the initial record. verification.finalErrors and verification.finalWarnings must match the final validator output exactly in validator order.",
+    "schemaFailureRule": "A structurally invalid initial record remains admissible empirical evidence when its exact schema findings are preserved; records must not be repaired before the initial validator state is captured.",
+    "failClosedRule": "Omitted validator findings, invented findings, finding text/path mismatches, invalid record JSON, or final-output mismatches invalidate the corpus case verification step."
+  },
   "primaryMetrics": [
     "required-field reconstructability rate",
     "required-field direct-source rate",
