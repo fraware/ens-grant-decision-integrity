@@ -2,11 +2,11 @@
 
 A versioned draft Charter and machine-readable decision-record profile for making material ENS grant and service-provider decisions reconstructable.
 
-The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding decisions **allocated** a cumulative **$219** to that proposal. The repository's current provenance snapshot records those amounts as allocation decisions and does not record payment or receipt evidence. v0.1 implements the first $200 work item described in that proposal: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 added optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
+The project originated in the Simocracy proposal **“No Black-Box Grants: Ratify the Rules Before SPP Is Absorbed.”** Five ENS Governance funding rounds assigned a cumulative **$219** to that proposal. A dated public-status snapshot for 2026-08-24 records the first three relevant rounds as `ratified` and the August 3 and August 4 rounds as `provisional`. The repository does not treat those decision states as payment, transfer, receipt, or settlement evidence. v0.1 implements the first $200 work item described in the originating proposal: a Grants Charter and a machine-readable decision-record schema. v0.2 added Phase II evaluator-manifest commitment and anchoring. v0.3 added optional schema 0.2 extensions, deterministic public projection, and alternate anchor fixture profiles.
 
 **Releases:** [v0.3.2](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.2) (latest) · [v0.3.1](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.1) · [v0.3.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.3.0) · [v0.2.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.2.0) · [v0.1.0](https://github.com/fraware/ens-grant-decision-integrity/releases/tag/v0.1.0)
 
-The latest tagged release remains v0.3.2. Development after that tag is treated as unreleased until a new reviewed tag is created; do not attribute unreleased hardening behavior to v0.3.2.
+The latest tagged release remains v0.3.2. Development after that tag is unreleased until a new reviewed tag is created; do not attribute unreleased hardening behavior to v0.3.2.
 
 ## What this repository provides
 
@@ -21,7 +21,7 @@ The profile records enough information for a third party to reconstruct the proc
 - delivery conditions for funded awards;
 - minimum provenance when AI materially informs a recommendation.
 
-JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, and deterministic confidential-to-public projection.
+JSON Schema validates record structure. A separate conformance validator checks cross-field relations that JSON Schema alone cannot express. Additive modules cover evaluator-manifest commitment (Phase II), optional schema 0.2 pinning and authority identity, deterministic confidential-to-public projection, and exact-byte source-artifact verification for policy-pin evidence.
 
 ## Repository layout
 
@@ -31,8 +31,12 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `schema/grant-decision-record.schema.json` | JSON Schema Draft 2020-12 record format (default `schemaVersion` `"0.1"`) |
 | `schema/grant-decision-record-0.2.schema.json` | Optional schema 0.2 extensions (`policyPinning`, `authorityIdentity`) |
 | `schema/grant-decision-public-projection-0.2.schema.json` | Relaxed schema for projected public records with `withheldCommitments` |
+| `schema/source-artifact.schema.json` | Metadata contract binding an exact source URI to preserved raw bytes |
 | `CONFORMANCE.md` | Cross-field conformance rules, severity model, and rule-ID index |
 | `scripts/conformance.py` | Semantic conformance validator |
+| `scripts/source_artifact.py` | Build/verify SHA-256 metadata over exact preserved source bytes |
+| `scripts/verify_policy_pins.py` | Verify schema 0.2 policy pins against byte-verified source artifacts |
+| `SOURCE-ARTIFACTS.md` | Source-capture assurance chain, CLI, and non-claims |
 | `phase2/` | Evaluator-manifest commitment, anchoring, run attestation, replay evidence, and versioned evidence bundles |
 | `projection/` | Deterministic confidential-to-public record projection |
 | `examples/` | Fictional worked examples (non-evaluative) |
@@ -45,7 +49,9 @@ JSON Schema validates record structure. A separate conformance validator checks 
 | `CONTRIBUTING.md` | Contribution preferences and pre-change validation |
 | `SECURITY.md` | Sensitive-disclosure reporting |
 | `CITATION.cff` | Citation metadata for the latest tagged release |
-| `provenance/simocracy-funding.json` | Recorded Simocracy allocation provenance ($219 allocated; payment/receipt tracked separately) |
+| `provenance/simocracy-funding.json` | Recorded historical allocation amounts and source identifiers |
+| `provenance/simocracy-status-2026-08-24.json` | Dated platform decision-status snapshot; financial evidence kept separate |
+| `provenance/ALLOCATION-CAPTURE.md` | Friday/post-event provenance procedure without status conflation |
 
 ## Quickstart
 
@@ -59,7 +65,7 @@ python scripts/test_conformance.py
 python scripts/test_regressions.py
 ```
 
-The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including Phase II, schema 0.2, and projection suites.
+The Marketplace example is intentionally pending. It should produce no conformance errors and one warning, `CHAL003`, which records that the reviewed public process artifacts do not identify a post-decision route for correcting factual or procedural errors. See `VALIDATION.md` for the full contract, including source-artifact, Phase II, schema 0.2, and projection suites.
 
 ## Phase II (evaluator provenance)
 
@@ -89,8 +95,6 @@ Optional schema `0.2` extensions do not mutate v0.1 behavior:
 - `phase2/src/anchors/rfc3161.py` — reserved production RFC 3161 profile plus recorded test fixture; production `rfc3161` currently fails closed until standards-conformant CMS/RFC 3161 verification is implemented
 - `phase2/src/anchors/ethereum.py` — Ethereum calldata fixture profile (`ethereum-calldata-fixture`); live mainnet anchoring is not implemented
 - `examples/tier-a-simplified-grant.example.json` — fictional Tier A approved grant with pinning and structured authority
-- `ADOPTION.md` — adoption pathway for ENS programs
-- `methodology/GRANT-DECISION-INTEGRITY.md` — draft twelve-step review methodology
 
 ```bash
 python scripts/conformance.py examples/tier-a-simplified-grant.example.json
@@ -101,11 +105,23 @@ python projection/src/cli.py --confidential examples/tier-a-simplified-grant.exa
 
 Cryptographic selective disclosure remains deferred; see `phase2/DEFERRED.md`.
 
+## Source artifacts and policy pins
+
+Schema 0.2 can declare `policyPinning` content hashes. The source-artifact module supplies the missing operational check from that declaration to exact preserved bytes:
+
+```bash
+python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
+python scripts/source_artifact.py verify --metadata policy.artifact.json --file policy.bytes
+python scripts/verify_policy_pins.py --record record.json --artifact policy.artifact.json policy.bytes
+```
+
+The source verifier re-hashes the supplied raw bytes and checks byte length and SHA-256. The policy-pin verifier then requires exact URI and hash equality against a byte-verified artifact. It does not retrieve the source, normalize it, authenticate source ownership, decide whether the source was institutionally adopted, or prove that the bytes existed at `capturedAt` or `policyPinning.pinnedAt`. Decision-surface semantics remain in the record and the conformance layer. See `SOURCE-ARTIFACTS.md`.
+
 ## What validators prove and do not prove
 
-**Prove:** record structure and declared cross-field consistency under the selected profile; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec.
+**Prove:** record structure and declared cross-field consistency under the selected profile; exact byte identity for a supplied source artifact when the source-artifact verifier succeeds; exact policy-pin URI/hash linkage to a byte-verified artifact when the policy-pin verifier succeeds; Phase II graph claims bounded by `phase2/CLAIM-MATRIX.md` when a version-compatible bundle is present; deterministic projection from the supplied confidential input under a declared projection spec.
 
-**Do not prove:** truth of cited evidence; quality of substantive judgment; institutional adoption of the Charter; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment or receipt of Simocracy allocations.
+**Do not prove:** truth or completeness of cited evidence; source ownership or institutional adoption; quality of substantive judgment; legitimacy of the governing policy; independently verifiable existence of an AI manifest commitment without verifying a supported anchor profile; execution or re-execution of a committed evaluator implementation unless a separate execution protocol establishes that fact; funding authority; payment, transfer, receipt, or settlement of Simocracy allocations.
 
 ## AI provenance boundary
 
@@ -132,7 +148,8 @@ This project governs the integrity of the decision record. It does not determine
 | Phase II versions | manifest/envelope/anchor/run predicate v1; replay report v1 historical and v2 current; evidence bundle v1 historical and v2 current |
 | Charter status | Draft governance proposal — not adopted ENS policy |
 | Methodology status | Draft — not a frozen ENS standard |
-| Funding provenance | $219 allocated across five Simocracy decisions; no payment or receipt evidence recorded in the current provenance snapshot |
+| Simocracy decision-status snapshot | $219 across five relevant rounds; 3 ratified and 2 provisional as observed 2026-08-24 |
+| Financial evidence | no payment, transfer, receipt, or settlement evidence recorded in the dated 2026-08-24 snapshot |
 | Endorsement | Does not claim endorsement by ENS DAO, the ENS Foundation, or the SPP3 committee |
 
 For adoption guidance, see `ADOPTION.md`. For security-sensitive reports, see `SECURITY.md`.
@@ -143,3 +160,4 @@ For adoption guidance, see `ADOPTION.md`. For security-sensitive reports, see `S
 - Marketplace RFP submission timeline and rubric: https://discuss.ens.domains/t/marketplace-rfp-submission-timeline-and-artifacts/22309
 - SPP3 program authorization and committee model: https://discuss.ens.domains/t/social-spp3-program-authorization-and-committee-model/22086
 - ENS AI grant/SPP screening experiment: https://discuss.ens.domains/t/ai-for-grant-spp-evaluation-screening/21939
+- Simocracy funding status surface: https://www.simocracy.org/funding
