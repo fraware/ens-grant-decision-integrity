@@ -1,0 +1,391 @@
+{
+  "caseVersion": "1",
+  "caseId": "ens-spp2-2025-agora-budget-rejection",
+  "title": "SPP2 Agora budget-constrained no-award — public-only retrospective reconstruction",
+  "template": false,
+  "historical": true,
+  "sourceAccess": "public-only",
+  "selection": {
+    "decisionClass": "other",
+    "selectionMethod": "predeclared-stratum",
+    "inclusionRationale": "Selected after the first two SPP3 cases because it exercises a materially different decision mechanism: an eligible applicant ranks above the final NONE BELOW cutoff but receives no funding under a fixed-budget ranked-choice allocation. The case stress-tests policy-change representation, merit-versus-budget outcome separation, and reconstructability of a no-award decision without recasting the vote as a scalar merit score.",
+    "exclusionBoundary": "This case reconstructs Agora's SPP2 eligibility and final no-award selection outcome. It does not rescore Agora, reconstruct every delegate ballot, infer a scalar merit score, adjudicate the applicant's investor disclosures as conflicts absent source-supported recusals, or represent either the basic and extended budget options as separate applications.",
+    "strata": [
+      "merit-decision",
+      "policy-change-or-ambiguity",
+      "incomplete-public-record",
+      "other"
+    ]
+  },
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-ORIGINAL-PLAN",
+      "sourceUri": "https://discuss.ens.domains/t/metagov-s-facilitation-plan-for-spp2/20340",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public forum source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-EP65",
+      "sourceUri": "https://docs.ens.domains/dao/proposals/6.5/",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public ENS governance documentation for the passed EP6.5 amendment. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-AMENDED-PLAN",
+      "sourceUri": "https://discuss.ens.domains/t/6-5-amendment-metagovs-facilitation-plan-for-spp2/20638/1",
+      "role": "governing-policy",
+      "availability": "reference-only",
+      "notes": "Public MetaGov amendment/facilitation source reviewed during reconstruction. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-APPLICATION",
+      "sourceUri": "https://discuss.ens.domains/t/spp2-agora-application/20443",
+      "role": "evidence",
+      "availability": "reference-only",
+      "notes": "Public Agora application and MetaGov eligibility confirmation. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-VOTE",
+      "sourceUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public archived final selection proposal describing the voting method. No exact byte-preserved capture is claimed."
+    },
+    {
+      "artifactId": "SRC-RESULTS",
+      "sourceUri": "https://spp.vote/",
+      "role": "decision",
+      "availability": "reference-only",
+      "notes": "Public result interface reporting the final SPP2 ranking, allocation state, and funded/not-funded labels. This case does not claim exact byte preservation or independently recompute the full election from raw ballots."
+    }
+  ],
+  "recordSnapshots": {
+    "initial": {
+      "recordHash": "sha256:ba89fa6237c90a5c0adaf72776fc8b830738a4ba12524ec0814efbf176c1ed15",
+      "path": "record-initial.json",
+      "notes": "Exact bytes of the first public-only reconstruction. Three unsupported exact historical instants remain null and are preserved as validator findings rather than replaced with inferred timestamps."
+    }
+  },
+  "annotations": [
+    {
+      "annotationId": "agora-primary-annotation-v1",
+      "annotatorId": "primary-reconstruction-a",
+      "independent": true,
+      "elapsedMinutes": 3.5,
+      "fields": [
+        {
+          "path": "/program/name",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-VOTE"]
+        },
+        {
+          "path": "/program/roundId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN"],
+          "rationale": "The public program is named SPP2; SPP2-2025 is a reconstruction identifier for the 2025 season."
+        },
+        {
+          "path": "/program/authority",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-EP65", "SRC-VOTE"],
+          "rationale": "The source set establishes a DAO-wide ranked-choice selection vote; the record maps this institutional surface into program.authority."
+        },
+        {
+          "path": "/application/applicationId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-APPLICATION"],
+          "rationale": "The public application identifies Agora but does not publish a formal application identifier; agora-spp2-2025 is a reconstruction identifier."
+        },
+        {
+          "path": "/application/applicantName",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-APPLICATION", "SRC-VOTE"]
+        },
+        {
+          "path": "/application/applicationUri",
+          "requiredForProfile": false,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-APPLICATION"]
+        },
+        {
+          "path": "/governingPolicy/policyId",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65", "SRC-AMENDED-PLAN"],
+          "rationale": "ENS-SPP2-2025-EP6.5 is a reconstruction identifier for the original SPP2 program plus the passed EP6.5 selection amendment."
+        },
+        {
+          "path": "/governingPolicy/version",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65"],
+          "rationale": "The public rule set spans an original facilitation plan and a later amendment rather than one machine-readable policy version."
+        },
+        {
+          "path": "/governingPolicy/effectiveAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/governingPolicy/publicRulesUri",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-AMENDED-PLAN"]
+        },
+        {
+          "path": "/governingPolicy/sources",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65", "SRC-AMENDED-PLAN", "SRC-VOTE"]
+        },
+        {
+          "path": "/governingPolicy/surfaceSources",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65", "SRC-AMENDED-PLAN"],
+          "rationale": "The reconstruction assigns each GDI decision surface to the public SPP2 source containing the relevant rule."
+        },
+        {
+          "path": "/governingPolicy/changeDuringReview",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-APPLICATION", "SRC-EP65", "SRC-AMENDED-PLAN"],
+          "rationale": "Agora was submitted and explicitly found eligible before the amendment process concluded; EP6.5 then changed the selection algorithm and reopened a limited edit window before the final vote."
+        },
+        {
+          "path": "/eligibility/status",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-APPLICATION", "SRC-AMENDED-PLAN"]
+        },
+        {
+          "path": "/eligibility/checkedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/eligibility/rules",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-APPLICATION", "SRC-AMENDED-PLAN"],
+          "rationale": "The record represents the source-supported aggregate eligibility confirmation without manufacturing gate-by-gate check timestamps."
+        },
+        {
+          "path": "/evaluators",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-EP65", "SRC-VOTE", "SRC-RESULTS"],
+          "rationale": "The final decision is represented as the ENS DAO voting electorate because the selection was a DAO-wide ranked-choice vote, not a committee score."
+        },
+        {
+          "path": "/conflicts",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-APPLICATION"],
+          "rationale": "Agora disclosed investor relationships involving delegates, but the reviewed sources do not establish a program conflict adjudication tying a named evaluator to a recusal or substitution on the final vote; the record therefore does not invent one."
+        },
+        {
+          "path": "/evidence",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65", "SRC-AMENDED-PLAN", "SRC-APPLICATION", "SRC-VOTE", "SRC-RESULTS"],
+          "rationale": "Public source references are mapped into the decision-record evidence taxonomy without asserting byte preservation."
+        },
+        {
+          "path": "/evaluation/criteria",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-EP65", "SRC-VOTE"],
+          "rationale": "SPP2 used Copeland ranking, a NONE BELOW cutoff, and budget allocation rather than a scalar merits rubric; the record maps those decision mechanisms into evaluation.criteria."
+        },
+        {
+          "path": "/evaluation/materialFindings",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-APPLICATION", "SRC-RESULTS"]
+        },
+        {
+          "path": "/evaluation/disagreements",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/evaluation/aggregateScore",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "The final public mechanism produces a ranking and allocation outcome, not one scalar applicant-merit score."
+        },
+        {
+          "path": "/decision/status",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-EP65", "SRC-RESULTS"],
+          "rationale": "The public result marks Agora not funded. v0.1 uses rejected as the nearest terminal no-award funding outcome, while the record separately preserves that Agora ranked above NONE BELOW."
+        },
+        {
+          "path": "/decision/authority",
+          "requiredForProfile": true,
+          "classification": "direct-source",
+          "sourceArtifactIds": ["SRC-VOTE", "SRC-RESULTS"]
+        },
+        {
+          "path": "/decision/authorityKind",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-VOTE"],
+          "rationale": "The DAO-wide social selection vote maps to the v0.1 dao-vote authority category."
+        },
+        {
+          "path": "/decision/decidedAt",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/decision/awardedAmount",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "The public result marks Agora not funded, so no award amount is represented."
+        },
+        {
+          "path": "/decision/rationale",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-EP65", "SRC-RESULTS"],
+          "rationale": "The rationale combines the published rank, the exhausted $4.5M envelope, and the EP6.5 stop/allocation rules without treating rank-above-cutoff as a funded award."
+        },
+        {
+          "path": "/challenge/processDefined",
+          "requiredForProfile": true,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/deliveryConditions",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "The public final result marks Agora not funded, so provider delivery conditions are not instantiated for this no-award outcome."
+        },
+        {
+          "path": "/disclosure/classification",
+          "requiredForProfile": true,
+          "classification": "interpretive",
+          "sourceArtifactIds": ["SRC-APPLICATION", "SRC-VOTE", "SRC-RESULTS"],
+          "rationale": "This checked-in retrospective record contains only public-source information; it does not imply every historical working artifact was public."
+        },
+        {
+          "path": "/disclosure/publicRecord",
+          "requiredForProfile": true,
+          "classification": "derived",
+          "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65", "SRC-AMENDED-PLAN", "SRC-APPLICATION", "SRC-VOTE", "SRC-RESULTS"],
+          "rationale": "This corpus case is constructed only from public references."
+        },
+        {
+          "path": "/timestamps/createdAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata, not a historical SPP2 process fact."
+        },
+        {
+          "path": "/timestamps/updatedAt",
+          "requiredForProfile": true,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "This is reconstruction metadata, not a historical SPP2 process fact."
+        },
+        {
+          "path": "/evaluatorManifest",
+          "requiredForProfile": false,
+          "classification": "unknown",
+          "sourceArtifactIds": []
+        },
+        {
+          "path": "/integrity",
+          "requiredForProfile": false,
+          "classification": "not-applicable",
+          "sourceArtifactIds": [],
+          "rationale": "No historical record-level integrity object is claimed; exact record-byte identity is supplied by the corpus snapshot hash."
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "initialFindings": [
+      {
+        "findingId": "INIT-SCHEMA-DECIDEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "decision.decidedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The public result surfaces identify the vote conclusion date and displayed clock time, but the reviewed evidence does not independently establish the exact timezone/instant required by schema v0.1. The null is retained instead of upgrading a displayed time into an exact timestamp.",
+        "sourceArtifactIds": ["SRC-VOTE", "SRC-RESULTS"]
+      },
+      {
+        "findingId": "INIT-SCHEMA-ELIGIBILITY-CHECKEDAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "eligibility.checkedAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "Agora's public application contains an explicit MetaGov eligibility confirmation and the amended plan states that all final-vote applications were eligible, but the reviewed sources do not establish the exact eligibility-check instant required by schema v0.1.",
+        "sourceArtifactIds": ["SRC-APPLICATION", "SRC-AMENDED-PLAN"]
+      },
+      {
+        "findingId": "INIT-SCHEMA-POLICY-EFFECTIVEAT",
+        "code": "SCHEMA",
+        "severity": "error",
+        "path": "governingPolicy.effectiveAt",
+        "message": "None is not of type 'string'",
+        "disposition": "unresolved",
+        "rationale": "The governing rule set combines the original SPP2 plan with a later EP6.5 amendment and amended facilitation plan. The reviewed sources establish that EP6.5 passed and governed the final vote but do not provide one exact machine-usable effective timestamp for the combined policy representation.",
+        "sourceArtifactIds": ["SRC-ORIGINAL-PLAN", "SRC-EP65", "SRC-AMENDED-PLAN"]
+      }
+    ],
+    "recordChangedAfterReview": false,
+    "finalErrors": [
+      "ERROR SCHEMA decision.decidedAt: None is not of type 'string'",
+      "ERROR SCHEMA eligibility.checkedAt: None is not of type 'string'",
+      "ERROR SCHEMA governingPolicy.effectiveAt: None is not of type 'string'"
+    ],
+    "finalWarnings": []
+  },
+  "review": {
+    "doubleAnnotation": false,
+    "reconciled": false,
+    "reconciliationNotes": [],
+    "residualQuestions": [
+      "Should a future decision model distinguish electorate approval relative to a cutoff from the final funding disposition when a candidate ranks above NONE BELOW but receives no allocation because the program envelope is exhausted?",
+      "Should fixed-envelope allocation outcomes be represented as rejected, approved-but-unfunded, or through a separate allocation/disposition surface instead of overloading decision.status?",
+      "What exact timestamp should govern governingPolicy.effectiveAt when a program is amended after applications and eligibility review begin but before the final selection vote?",
+      "What exact instant should be used for Agora's eligibility.checkedAt? The public record explicitly confirms eligibility but the current reconstruction does not elevate a rendered forum time into a timezone-qualified timestamp.",
+      "Can the exact SPP2 vote-close instant be recovered from an authoritative machine source and bound to decision.decidedAt without relying on a UI-rendered local/unspecified clock time?",
+      "The amendment changed the voting algorithm after application submission and eligibility confirmation. The record sets priorEvaluationsRerun=false because the public amendment describes the change as applying to the final selection mechanism, not as a rerun of completed eligibility checks; further source evidence could refine that representation.",
+      "Agora disclosed investor relationships involving ENS delegates. The reviewed public sources do not establish a formal conflict adjudication, recusal, or substitution tied to the final election, so none is inferred.",
+      "Because the current record is structurally invalid on three missing exact timestamps, semantic conformance is short-circuited; absence of semantic findings is not evidence that challenge, policy-change, or decision semantics passed."
+    ]
+  },
+  "nonClaims": [
+    "This corpus case does not reassess applicant merit.",
+    "Missing public evidence does not prove a private or internal procedure did not exist.",
+    "Validator success does not establish substantive correctness, fairness, or institutional legitimacy.",
+    "Ranking above NONE BELOW is preserved as a separate public result and is not represented as proof of a funded award.",
+    "The v0.1 status rejected is used as an interpretive terminal no-award mapping; it does not assert that Agora failed the electorate's merit cutoff.",
+    "Missing exact timestamps do not prove the historical process lacked those events; they show limits of the reviewed public evidence at schema-v0.1 precision.",
+    "Reference-only source URIs in this case are not represented as exact byte-preserved captures."
+  ]
+}
