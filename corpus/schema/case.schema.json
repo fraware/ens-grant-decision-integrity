@@ -81,9 +81,13 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["artifactId", "role", "availability"],
+        "required": ["artifactId", "sourceUri", "role", "availability"],
         "properties": {
           "artifactId": {"type": "string", "minLength": 1, "maxLength": 128},
+          "sourceUri": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:[^\\s]+$"
+          },
           "role": {
             "type": "string",
             "enum": ["governing-policy", "decision", "evidence", "challenge", "delivery", "other"]
@@ -93,8 +97,25 @@
             "enum": ["redistributable", "reference-only", "authorized-audit-only"]
           },
           "metadataPath": {"type": "string", "minLength": 1},
+          "bytesPath": {"type": "string", "minLength": 1},
           "notes": {"type": "string", "minLength": 1}
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"availability": {"const": "redistributable"}},
+              "required": ["availability"]
+            },
+            "then": {"required": ["metadataPath", "bytesPath"]}
+          },
+          {
+            "if": {
+              "properties": {"availability": {"enum": ["reference-only", "authorized-audit-only"]}},
+              "required": ["availability"]
+            },
+            "then": {"required": ["notes"]}
+          }
+        ]
       }
     },
     "recordSnapshots": {
