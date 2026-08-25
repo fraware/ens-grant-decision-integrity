@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "0.1",
+  "recordId": "ens-spp2-2025-unruggable-q4-delivery-retrospective",
+  "recordType": "service-provider-decision",
+  "program": {
+    "name": "ENS Service Provider Program, Season 2 (SPP2)",
+    "roundId": "SPP2-2025",
+    "authority": "ENS DAO funded service-provider relationship with public quarterly delivery reporting",
+    "programUri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+    "budgetCurrency": "USD"
+  },
+  "application": {
+    "applicationId": "unruggable-spp2-2025-q4-report",
+    "applicantName": "Unruggable",
+    "applicationUri": "https://discuss.ens.domains/t/unruggable-update-and-spp2-q4-2025-quarterly-report/22093",
+    "currency": "USD"
+  },
+  "governingPolicy": {
+    "policyId": "ENS-SPP2-2025-DELIVERY-REPORTING",
+    "version": "SPP2 funded-provider quarterly reporting practice as evidenced by public reports category and EP6.13 stream terms",
+    "effectiveAt": null,
+    "publicRulesUri": "https://discuss.ens.domains/c/service-provider-program/reports/80",
+    "sources": [
+      "https://discuss.ens.domains/c/service-provider-program/reports/80",
+      "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971"
+    ],
+    "surfaceSources": {
+      "mandate": "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971",
+      "eligibility": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "evaluationCriteria": "https://discuss.ens.domains/t/unruggable-update-and-spp2-q4-2025-quarterly-report/22093",
+      "conflictRules": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "decisionProcedure": "https://discuss.ens.domains/c/service-provider-program/reports/80"
+    },
+    "changeDuringReview": false
+  },
+  "eligibility": {
+    "status": "eligible",
+    "checkedAt": null,
+    "rules": [
+      {
+        "ruleId": "FUNDED-SPP2-PROVIDER",
+        "description": "EP6.13 lists Unruggable among funded SPP2 providers; the Q4 report is published in the Service Provider Program reports category.",
+        "result": "pass",
+        "evidenceIds": [
+          "E-IMPLEMENTATION",
+          "E-REPORT"
+        ]
+      }
+    ],
+    "rationale": "Delivery reporting presupposes the funded SPP2 relationship documented in EP6.13. Exact original eligibility-check timestamp is not re-established here."
+  },
+  "evaluators": [
+    {
+      "evaluatorId": "spp-public-reporting-audience",
+      "displayName": "ENS DAO / public SPP reporting audience",
+      "kind": "other",
+      "role": "receive and review published quarterly provider reports",
+      "participated": true,
+      "recused": false,
+      "recusalReason": null
+    }
+  ],
+  "conflicts": [],
+  "evidence": [
+    {
+      "evidenceId": "E-REPORT",
+      "kind": "forum",
+      "description": "Unruggable SPP2 Q4 2025 quarterly report describing interoperability and AI-agent identity research delivery.",
+      "uri": "https://discuss.ens.domains/t/unruggable-update-and-spp2-q4-2025-quarterly-report/22093",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-VOTE",
+      "kind": "forum",
+      "description": "SPP2 selection proposal providing program context for Unruggable's funded role.",
+      "uri": "https://discuss.ens.domains/t/6-10-social-select-providers-for-service-provider-program-season-ii/20741",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-IMPLEMENTATION",
+      "kind": "forum",
+      "description": "EP6.13 listing Unruggable at $400,000 one-year allocation.",
+      "uri": "https://discuss.ens.domains/t/ep-6-13-executable-service-provider-program-season-2-implementation/20971",
+      "disclosure": "public"
+    },
+    {
+      "evidenceId": "E-REPORTS-CATEGORY",
+      "kind": "forum",
+      "description": "Public SPP reports category for provider quarterly updates.",
+      "uri": "https://discuss.ens.domains/c/service-provider-program/reports/80",
+      "disclosure": "public"
+    }
+  ],
+  "evaluation": {
+    "criteria": [
+      {
+        "criterionId": "Q4-DELIVERY-NARRATIVE",
+        "name": "Published quarterly delivery narrative against funded SPP2 scope",
+        "score": null,
+        "scoreScale": "qualitative public self-report; no independent numeric score published in reviewed sources"
+      }
+    ],
+    "materialFindings": [
+      {
+        "findingId": "F-Q4-INTEROP",
+        "statement": "The Q4 2025 report states Unruggable worked with Wonderland and the Ethereum Foundation on ERC-7930 and ERC-7828 and shipped related on.eth / ENSIP-24 chain-registry work.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-REPORT"
+        ],
+        "evaluatorIds": [
+          "spp-public-reporting-audience"
+        ],
+        "materiality": "high"
+      },
+      {
+        "findingId": "F-Q4-AI-RESEARCH",
+        "statement": "The Q4 2025 report states Unruggable contributed to ERC-8004 Trustless Agents and related ENS AI-agent identity standards work as funded research/delivery, not as historical AI assistance in evaluating SPP applicants.",
+        "classification": "supported-fact",
+        "evidenceIds": [
+          "E-REPORT"
+        ],
+        "evaluatorIds": [
+          "spp-public-reporting-audience"
+        ],
+        "materiality": "medium"
+      }
+    ],
+    "disagreements": [],
+    "aggregateScore": null,
+    "aggregateScale": "No published independent delivery score for this quarter in the reviewed sources."
+  },
+  "evaluatorManifest": null,
+  "decision": {
+    "status": "approved",
+    "authority": "Continuing SPP2 funded relationship evidenced by EP6.13 allocation and public Q4 delivery report; no new award decision is claimed for Q4",
+    "authorityKind": "dao-vote",
+    "decidedAt": null,
+    "awardedAmount": 400000,
+    "currency": "USD",
+    "rationale": "This case reconstructs post-award delivery reporting for an already-funded SPP2 provider. The $400,000 figure is the EP6.13 annual allocation, not a new Q4 award. authorityKind remains dao-vote because the funding relationship originates in the DAO selection/implementation votes; no new Q4 award vote is claimed. No stream-pause or termination is invented.",
+    "aiRecommendationOverridden": false,
+    "aiOverrideRationale": null,
+    "quorum": null,
+    "decisionRule": null,
+    "voteRecordUri": null
+  },
+  "challenge": {
+    "status": "not-open",
+    "deadline": null,
+    "scope": "Reviewed public report artifacts do not identify a formal challenge process against the Q4 self-report.",
+    "processDefined": false,
+    "processUri": null,
+    "submissionUri": null,
+    "resolution": null
+  },
+  "deliveryConditions": [
+    {
+      "conditionId": "SPP2-UNRUGGABLE-Q4-REPORT",
+      "description": "Publish a Q4 2025 quarterly delivery update describing progress on funded interoperability and related work.",
+      "targetDate": null,
+      "reviewWindow": "Q4 2025 reporting window as evidenced by the published report thread",
+      "verificationMethod": "Public forum quarterly report; not independent audit of every claimed deliverable.",
+      "verifier": "ENS DAO / public SPP reporting audience",
+      "dependencies": [
+        "Prior EP6.13 funded stream for Unruggable"
+      ],
+      "paymentAmount": null,
+      "currency": "USD",
+      "status": "met",
+      "evidenceIds": [
+        "E-REPORT",
+        "E-REPORTS-CATEGORY"
+      ],
+      "consequence": "This reconstruction records publication of the report; it does not invent stream-pause consequences for unmet milestones."
+    }
+  ],
+  "disclosure": {
+    "classification": "public",
+    "publicRecord": true,
+    "redactions": []
+  },
+  "timestamps": {
+    "createdAt": "2026-08-25T18:30:00Z",
+    "updatedAt": "2026-08-25T18:30:00Z"
+  },
+  "integrity": null,
+  "notes": [
+    "Unit of analysis is post-award delivery reporting, not the original selection vote.",
+    "AI-agent identity research in the report is funded work product, not evidence of AI-assisted applicant evaluation.",
+    "Provider self-report is not converted into independent verification of every claimed deliverable.",
+    "decision.decidedAt for the original award is not re-litigated here and remains null.",
+    "Reference-only remote sources are not represented as exact byte-preserved captures."
+  ]
+}
