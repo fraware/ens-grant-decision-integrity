@@ -1,0 +1,40 @@
+{
+  "trustPolicyVersion": "1",
+  "policyId": "gdi-test-fixture-policy",
+  "validFor": {
+    "start": "2026-01-01T00:00:00Z",
+    "end": null
+  },
+  "anchors": {
+    "rekor-v1": {
+      "mode": "historical-compatibility",
+      "notes": "Historical verify only; fixtures do not establish production C2."
+    },
+    "rekor-v2": {
+      "tufRootPath": "tests/fixtures/trust/placeholder-tuf-root.json",
+      "operatorAllowlist": ["sigstore.dev"],
+      "notes": "Fixture path for schema/tests; production operators must supply a real TrustedRoot."
+    },
+    "rfc3161": {
+      "mode": "fail-closed",
+      "rootCertificates": [],
+      "acceptedPolicyOids": [],
+      "notes": "Production RFC 3161 remains fail-closed."
+    }
+  },
+  "runSigners": [
+    {
+      "signerId": "fixture-evaluator-operator-1",
+      "keyId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "validFor": {
+        "start": "2026-01-01T00:00:00Z",
+        "end": "2027-01-01T00:00:00Z"
+      },
+      "roles": ["evaluator-run-attestor"]
+    }
+  ],
+  "nonClaims": [
+    "This fixture policy is for tests only and must never be treated as production trust.",
+    "Bundles cannot satisfy their own authorization by embedding this policy."
+  ]
+}

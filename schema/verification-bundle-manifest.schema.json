@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ens-gdi.local/schema/verification-bundle-manifest.schema.json",
+  "title": "ENS GDI Verification Bundle Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bundleManifestVersion", "bundleId", "bundleClass", "record"],
+  "properties": {
+    "bundleManifestVersion": {"type": "string", "const": "1"},
+    "bundleId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "bundleClass": {"type": "string", "enum": ["public", "protected"]},
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "schemaProfile"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "schemaProfile": {"type": "string", "minLength": 1}
+      }
+    },
+    "sourceArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metadataPath", "bytesPath", "required"],
+        "properties": {
+          "metadataPath": {"type": "string", "minLength": 1},
+          "bytesPath": {"type": "string", "minLength": 1},
+          "metadataSha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "bytesSha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "phase2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "required"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "required": {"type": "boolean"}
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["specPath", "publicRecordPath", "required"],
+      "properties": {
+        "specPath": {"type": "string", "minLength": 1},
+        "publicRecordPath": {"type": "string", "minLength": 1},
+        "confidentialRecordPath": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"}
+      }
+    },
+    "funding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "statusSnapshotPath": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"}
+      }
+    },
+    "releaseContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repositoryCommit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "profileSet": {"type": "string", "minLength": 1}
+      }
+    },
+    "trustPolicyReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional reference only. The verifier MUST load trust policy from an external path; this reference cannot satisfy trust by itself.",
+      "properties": {
+        "policyId": {"type": "string"},
+        "expectedDigestSha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "nonClaims": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

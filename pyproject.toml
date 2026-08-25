@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ens-gdi"
+version = "0.4.0"
+description = "ENS Grant Decision Integrity unified verifier"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "ENS GDI contributors" }]
+dependencies = [
+  "jsonschema==4.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.1.1",
+]
+phase2 = [
+  # Installed from phase2/requirements.txt in CI; listed here for documentation only.
+]
+
+[project.scripts]
+gdi = "gdi.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+gdi = ["py.typed"]

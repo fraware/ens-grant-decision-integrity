@@ -22,15 +22,19 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip install -e .
       - run: python scripts/validate.py
       - run: python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
       - run: python scripts/test_conformance.py
       - run: python scripts/test_regressions.py
       - run: python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
-      - run: python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py scripts/test_study_status.py scripts/test_second_annotation.py
+      - run: python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py scripts/test_study_status.py scripts/test_second_annotation.py scripts/test_corpus_adversarial_ws01.py
+      - run: python -m pytest scripts/test_claims_registry.py scripts/test_gdi_bundle.py
       - run: python scripts/corpus_metrics.py corpus/case-template.json
       - run: python scripts/validate_corpus_cases.py
       - run: python scripts/study_status.py
+      - run: gdi claims --id C2
+      - run: gdi trust-policy tests/fixtures/trust/test-trust-policy.json
 
   phase2:
     runs-on: ubuntu-latest
@@ -40,6 +44,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r phase2/requirements.txt
+      - run: python -m pip install -e .
       - run: python -m pytest phase2/tests
 
   schema-02:
@@ -50,5 +55,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt -r phase2/requirements.txt
+      - run: python -m pip install -e .
       - run: python -m pytest scripts/test_schema_02.py
       - run: python -m pytest projection/tests
