@@ -106,7 +106,7 @@ A successful source-artifact check establishes byte identity only for the suppli
 
 ## Retrospective corpus contract (additive)
 
-The corpus infrastructure tests empirical-study bookkeeping, not historical applicant merit:
+The corpus infrastructure tests empirical-study bookkeeping, reconstructability, and traceability—not historical applicant merit:
 
 ```bash
 python -m pytest scripts/test_corpus.py
@@ -116,19 +116,25 @@ python scripts/corpus_metrics.py corpus/case-template.json
 Expected results:
 
 - `corpus/schema/case.schema.json` validates case structure and keeps the checked-in template explicitly marked `template: true`;
+- empirical cases require at least one traceable source record, a non-placeholder initial record hash, and a relative path to the exact initial record bytes;
+- record snapshot paths are constrained to the case directory; absolute and path-escape references fail closed;
+- the corpus CLI re-hashes exact initial record bytes and, when a record changes after review, exact reconciled record bytes; declared/observed digest mismatch fails closed;
+- redistributable source entries require `sourceUri`, source-artifact metadata, and preserved bytes; the corpus CLI re-runs source-artifact byte verification and requires case artifact ID and source URI to match the verified metadata;
+- reference-only and authorized-audit-only source records are traceable but are not represented as publicly byte-verified;
+- a `public-only` case cannot declare an `authorized-audit-only` source;
 - source-artifact, annotation, finding, and annotator identifiers are unique where the protocol requires uniqueness;
-- annotation source references resolve to declared case source artifacts;
+- annotation source references resolve to declared case source records;
 - `direct-source` classifications require source references; derived, interpretive, and not-applicable classifications require rationale where specified;
 - unknown required fields remain in the denominator and are not counted as reconstructable;
-- a case claiming `recordChangedAfterReview=true` must preserve a reconciled record snapshot, a non-empty change rationale, and a hash distinct from the initial record;
+- a case claiming `recordChangedAfterReview=true` must preserve a reconciled record snapshot, a non-empty change rationale, a hash distinct from the initial record, `review.reconciled=true`, and reconciliation notes;
 - double annotation requires exactly two independent annotation sets over the same material field paths;
-- raw classification agreement and Cohen's kappa are calculated only for the valid double-annotation contract;
+- raw classification agreement and Cohen's kappa are calculated only for the valid double-annotation contract; kappa is undefined when expected agreement is 1;
 - the standard merit, missing-public-evidence, and validator-success non-claims cannot be silently removed;
 - the template validates but is not counted as an empirical case.
 
 The predeclared `corpus/study-plan.json` defines a heterogeneous 8–12 case stress-test, not a statistically representative population estimate. Case selection must cover the declared strata before considering validator outcomes. AI-assisted cases are conditional on actual historical evidence of material AI use.
 
-Corpus metrics establish only descriptive bookkeeping/arithmetic over a valid case. They do not establish that annotations are correct, sources are true or complete, the sample is representative, or the historical decision was substantively sound.
+Corpus validation can establish consistency of the case contract, equality between declared and observed bytes for the specific record/source artifacts it actually verifies, and arithmetic of descriptive metrics. It does not establish that annotations are correct, reference-only sources match unpreserved historical bytes, sources are true or complete, the sample is representative, or the historical decision was substantively sound.
 
 ## Phase II contract (additive)
 
@@ -221,6 +227,7 @@ Validation establishes structural and declared cross-field consistency and the n
 - the quality of substantive judgment;
 - the legitimacy of the governing policy;
 - representativeness of the retrospective corpus;
+- byte identity of reference-only or authorized-audit-only corpus sources that were not actually supplied to the verifier;
 - correctness of an annotation merely because two annotators agree;
 - independently verifiable source capture time from `capturedAt` metadata alone;
 - independently verifiable existence of an AI manifest commitment at the declared time unless a supported anchor profile is actually verified;
