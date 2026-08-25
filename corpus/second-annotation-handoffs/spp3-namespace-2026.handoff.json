@@ -1,0 +1,482 @@
+{
+  "annotationSubmission": {
+    "annotationId": null,
+    "annotatorId": null,
+    "elapsedMinutes": null,
+    "fields": [
+      {
+        "classification": null,
+        "path": "/program/name",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/program/roundId",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/program/authority",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/application/applicationId",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/application/applicantName",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/application/applicationUri",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/policyId",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/version",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/effectiveAt",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/publicRulesUri",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/sources",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/surfaceSources",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/governingPolicy/changeDuringReview",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/eligibility/status",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/eligibility/checkedAt",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/eligibility/rules",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evaluators",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/conflicts",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evidence",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evaluation/criteria",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evaluation/materialFindings",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evaluation/disagreements",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evaluation/aggregateScore",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/decision/status",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/decision/authority",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/decision/authorityKind",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/decision/decidedAt",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/decision/awardedAmount",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/decision/rationale",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/challenge/processDefined",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/deliveryConditions",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/disclosure/classification",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/disclosure/publicRecord",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/timestamps/createdAt",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/timestamps/updatedAt",
+        "rationale": null,
+        "requiredForProfile": true,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/evaluatorManifest",
+        "rationale": null,
+        "requiredForProfile": false,
+        "sourceArtifactIds": []
+      },
+      {
+        "classification": null,
+        "path": "/integrity",
+        "rationale": null,
+        "requiredForProfile": false,
+        "sourceArtifactIds": []
+      }
+    ],
+    "independent": true
+  },
+  "caseId": "ens-spp3-2026-namespace-award",
+  "classificationDefinitions": {
+    "derived": "The field is mechanically derived from cited source evidence; record the derivation in rationale.",
+    "direct-source": "The field is directly represented by cited source evidence.",
+    "interpretive": "The field requires a documented mapping judgment over cited source evidence.",
+    "not-applicable": "The field is outside the represented process/profile; explain why in rationale.",
+    "unknown": "The supplied source set is insufficient to reconstruct the field."
+  },
+  "handoffVersion": "1",
+  "independenceInstructions": [
+    "Work from the supplied source inventory and material field list without consulting the primary annotation, reconstructed decision record, validator findings, reconciliation notes, or previously computed corpus metrics.",
+    "Use unknown when the supplied evidence is insufficient. Do not infer private or undocumented facts to complete the record.",
+    "Do not reassess applicant merit or substitute a preferred substantive funding judgment.",
+    "Record elapsed annotation time and use source artifact IDs exactly as supplied.",
+    "Set independent=true only if the annotation was produced without access to the withheld primary reconstruction materials before submission."
+  ],
+  "initialRecordHash": "sha256:04dd888a9d0c136d607a8903138ca2e402fcc2950f9cf33a8edb6a501aa87dd5",
+  "materialFields": [
+    {
+      "path": "/program/name",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/program/roundId",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/program/authority",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/application/applicationId",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/application/applicantName",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/application/applicationUri",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/policyId",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/version",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/effectiveAt",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/publicRulesUri",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/sources",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/surfaceSources",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/governingPolicy/changeDuringReview",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/eligibility/status",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/eligibility/checkedAt",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/eligibility/rules",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evaluators",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/conflicts",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evidence",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evaluation/criteria",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evaluation/materialFindings",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evaluation/disagreements",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evaluation/aggregateScore",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/decision/status",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/decision/authority",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/decision/authorityKind",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/decision/decidedAt",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/decision/awardedAmount",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/decision/rationale",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/challenge/processDefined",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/deliveryConditions",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/disclosure/classification",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/disclosure/publicRecord",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/timestamps/createdAt",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/timestamps/updatedAt",
+      "requiredForProfile": true
+    },
+    {
+      "path": "/evaluatorManifest",
+      "requiredForProfile": false
+    },
+    {
+      "path": "/integrity",
+      "requiredForProfile": false
+    }
+  ],
+  "nonClaims": [
+    "This handoff reduces direct exposure to the primary reconstruction; it does not prove that a human annotator remained independent.",
+    "Public sources may reveal the historical outcome. Independence here means independent encoding from the supplied sources, not blindness to source facts.",
+    "Agreement between annotations does not establish source truth, substantive correctness, fairness, merit, or institutional legitimacy."
+  ],
+  "sourceAccess": "public-only",
+  "sourceArtifacts": [
+    {
+      "artifactId": "SRC-AUTH",
+      "availability": "reference-only",
+      "role": "governing-policy",
+      "sourceUri": "https://discuss.ens.domains/t/6-42-social-spp3-program-authorization-and-committee-model/22086"
+    },
+    {
+      "artifactId": "SRC-RUBRIC",
+      "availability": "reference-only",
+      "role": "governing-policy",
+      "sourceUri": "https://discuss.ens.domains/t/spp3-submission-timeline-and-artifacts/22124"
+    },
+    {
+      "artifactId": "SRC-COHORT",
+      "availability": "reference-only",
+      "role": "decision",
+      "sourceUri": "https://discuss.ens.domains/t/ep-6-49-spp3-cohort-recommendation/22237"
+    },
+    {
+      "artifactId": "SRC-VOTE",
+      "availability": "reference-only",
+      "role": "decision",
+      "sourceUri": "https://dao.ens.gregskril.com/proposal/30153206728472299340257495645753485226870528642942223493225654414745632348879"
+    },
+    {
+      "artifactId": "SRC-APPLICATION-URI",
+      "availability": "reference-only",
+      "role": "evidence",
+      "sourceUri": "https://bronze-accused-porpoise-217.mypinata.cloud/ipfs/bafybeiee73y2jwinefaszeng3frn47wmqini562qtcibzgnh42cnqiu2la"
+    }
+  ],
+  "withheldFromHandoff": [
+    "primary annotation classifications and rationales",
+    "primary reconstructed decision-record values",
+    "validator findings and finding dispositions",
+    "case selection rationale and strata labels",
+    "case review and reconciliation notes",
+    "computed corpus metrics and agreement results"
+  ]
+}
