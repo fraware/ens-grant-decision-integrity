@@ -27,25 +27,35 @@ A real case directory should contain, where lawful and applicable:
 - `case.json` — study metadata conforming to `schema/case.schema.json`;
 - `sources/` — preserved source bytes when redistribution is lawful;
 - `source-artifacts/` — exact-byte source-artifact metadata;
-- `record-initial.json` — record before adjudication/reconciliation;
-- `record-reconciled.json` — only if review changes the record;
+- `record-initial.json` — exact initial record bytes before adjudication/reconciliation;
+- `record-reconciled.json` — exact reconciled record bytes only if review changes the record;
 - `projection/` — projection spec/output when relevant;
 - `phase2/` — only when historically justified;
 - `review.md` — residual gaps and case-specific interpretation notes.
 
-Protected applicant material must not be added to the public repository merely to improve completeness. Reference-only or authorized-audit-only source entries can remain metadata references without redistributing protected bytes.
+Every source entry carries an exact `sourceUri`. A `redistributable` source also declares relative `metadataPath` and `bytesPath`; the corpus CLI re-runs `source_artifact.py` verification and requires the case artifact ID and source URI to match the verified metadata. `reference-only` and `authorized-audit-only` entries require an explanatory note and are not represented as publicly byte-verified.
+
+A `public-only` case cannot contain an `authorized-audit-only` source. Protected applicant material must not be added to the public repository merely to improve completeness.
+
+## Record snapshot identity
+
+`recordHash` is `sha256:<hex>` over the exact file bytes identified by the snapshot's relative `path`. It is not a JCS or semantic-content hash. The case CLI resolves the path inside the case directory, rejects absolute/path-escape references, re-hashes the file, and compares it with the declared digest.
+
+Real cases cannot use the template zero hash. If review changes a record, both initial and reconciled bytes remain addressable, their hashes must differ, `review.reconciled` must be true, and reconciliation notes plus a change rationale are retained.
+
+The file hash proves identity of the supplied bytes only. It does not prove that the annotation was correct or that the file contains every fact that existed historically.
 
 ## Annotation classes
 
 Each material field is classified as:
 
-- `direct-source` — directly represented by a cited source artifact;
+- `direct-source` — directly represented by a cited source record;
 - `derived` — mechanically derived from directly represented information; document the derivation;
 - `interpretive` — requires a documented mapping judgment;
 - `unknown` — insufficient evidence;
 - `not-applicable` — outside the represented process/profile; document why.
 
-`unknown` is an admissible result. Missing public evidence is not proof that the underlying procedure did not exist.
+`direct-source` requires at least one declared case source ID. That linkage does not by itself mean the source bytes were publicly preserved; availability is reported separately. `unknown` is an admissible result. Missing public evidence is not proof that the underlying procedure did not exist.
 
 ## Metrics
 
@@ -55,16 +65,16 @@ Run:
 python scripts/corpus_metrics.py corpus/path/to/case.json
 ```
 
-For each annotation, the tool reports required-field reconstructability, direct-source and unknown rates, interpretive share, elapsed minutes, source-artifact count, and finding dispositions. For exactly two independent annotations over the same field set, it also reports raw classification agreement and Cohen's kappa.
+For real cases the CLI verifies declared record-snapshot bytes and any redistributable source artifacts before emitting metrics. It reports source counts, byte-verification counts, required-field reconstructability, direct-source and unknown rates, interpretive share, elapsed minutes, and finding dispositions. For exactly two independent annotations over the same material field set, it also reports raw classification agreement and Cohen's kappa.
 
-Kappa is descriptive agreement evidence, not proof that either annotation is substantively correct. Small-case results must not be generalized as population estimates.
+Kappa is descriptive agreement evidence, not proof that either annotation is substantively correct. It is undefined when expected agreement is 1. Small-case results must not be generalized as population estimates.
 
 ## Anti-circularity
 
-Validator success is not the outcome variable. Preserve the initial record hash and initial findings. If review changes a record, preserve a reconciled hash and a non-empty rationale. Findings are classified after review as confirmed process gaps, annotation defects, model defects, expected warnings, unresolved, or other.
+Validator success is not the outcome variable. Preserve the initial record bytes/hash and initial findings. If review changes a record, preserve reconciled bytes/hash and a non-empty rationale. Findings are classified after review as confirmed process gaps, annotation defects, model defects, expected warnings, unresolved, or other.
 
 A case that cannot be completed from available artifacts remains informative. Do not infer undocumented facts to turn it green.
 
 ## Merit and legitimacy boundary
 
-The corpus evaluates reconstructability, claim discipline, and operational burden. It does not rescore historical applicants, certify the quality of substantive judgment, or determine institutional legitimacy.
+The corpus evaluates reconstructability, claim discipline, and operational burden. It does not rescore historical applicants, certify the quality of substantive judgment, prove source truth, or determine institutional legitimacy.
