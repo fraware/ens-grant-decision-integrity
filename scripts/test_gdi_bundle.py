@@ -6,6 +6,7 @@ import hashlib
 import json
 import shutil
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,11 @@ sys.path.insert(0, str(ROOT / "src"))
 from gdi.bundle import BundleError, verify_bundle  # noqa: E402
 from gdi.exit_codes import EVIDENCE_FAILURE, OK, USAGE_ERROR  # noqa: E402
 from gdi.report import add_check, empty_report  # noqa: E402
+from gdi.trust.policy import (  # noqa: E402
+    TrustPolicyError,
+    load_trust_policy,
+    signer_authorized,
+)
 
 
 def _sha256(path: Path) -> str:
@@ -48,6 +54,20 @@ def _minimal_bundle(tmp_path: Path) -> Path:
     return bundle
 
 
+def _trust_policy() -> dict:
+    return json.loads(
+        (ROOT / "tests" / "fixtures" / "trust" / "test-trust-policy.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+def _write_policy(tmp_path: Path, policy: dict) -> Path:
+    path = tmp_path / "trust-policy.json"
+    path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 def test_verify_bundle_minimal_public_offline(tmp_path: Path) -> None:
     bundle = _minimal_bundle(tmp_path)
     policy = ROOT / "tests" / "fixtures" / "trust" / "test-trust-policy.json"
@@ -56,6 +76,45 @@ def test_verify_bundle_minimal_public_offline(tmp_path: Path) -> None:
     assert report["ok"] is True
     assert "CORE.SCHEMA.STRUCTURE" in report["establishedClaims"]
     assert report["trustPolicy"]["policyId"] == "gdi-test-fixture-policy"
+
+
+def test_trust_policy_rejects_invalid_datetime_format(tmp_path: Path) -> None:
+    policy = _trust_policy()
+    policy["validFor"]["start"] = "not-a-date"
+    with pytest.raises(TrustPolicyError) as exc:
+        load_trust_policy(_write_policy(tmp_path, policy))
+    assert exc.value.code == "TRUST004"
+
+
+def test_trust_policy_rejects_nonpositive_validity_interval(tmp_path: Path) -> None:
+    policy = _trust_policy()
+    policy["validFor"] = {
+        "start": "2026-01-02T00:00:00Z",
+        "end": "2026-01-01T00:00:00Z",
+    }
+    with pytest.raises(TrustPolicyError) as exc:
+        load_trust_policy(_write_policy(tmp_path, policy))
+    assert exc.value.code == "TRUST008"
+
+
+def test_signer_authorization_respects_global_policy_validity(tmp_path: Path) -> None:
+    policy = _trust_policy()
+    policy["validFor"]["end"] = "2026-06-01T00:00:00Z"
+    loaded, _digest = load_trust_policy(_write_policy(tmp_path, policy))
+    key_id = loaded["runSigners"][0]["keyId"]
+
+    assert signer_authorized(
+        loaded,
+        key_id=key_id,
+        role="evaluator-run-attestor",
+        at=datetime(2026, 5, 1, tzinfo=UTC),
+    )
+    assert not signer_authorized(
+        loaded,
+        key_id=key_id,
+        role="evaluator-run-attestor",
+        at=datetime(2026, 7, 1, tzinfo=UTC),
+    )
 
 
 def test_required_not_run_can_never_leave_report_ok() -> None:
