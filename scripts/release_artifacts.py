@@ -21,6 +21,7 @@ VALIDATION_NAME = "release-validation.json"
 SBOM_NAME = "sbom.cdx.json"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SAFE_TAG_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+ASSET_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 REQUIRED_RELEASE_JOBS = {
     "conformance",
     "phase2",
@@ -137,6 +138,28 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
         ):
             raise ReleaseArtifactError(
                 "release-eligible evidence requires studyStatus.readyForFinalReview=true"
+            )
+
+
+def _validate_asset_name(name: Any, *, label: str) -> str:
+    if not isinstance(name, str) or ASSET_NAME_RE.fullmatch(name) is None:
+        raise ReleaseArtifactError(f"{label} contains an unsafe asset filename: {name!r}")
+    if name in {".", ".."} or Path(name).name != name:
+        raise ReleaseArtifactError(f"{label} contains an unsafe asset filename: {name!r}")
+    return name
+
+
+def _assert_flat_regular_directory(out_dir: Path) -> None:
+    if out_dir.is_symlink() or not out_dir.is_dir():
+        raise ReleaseArtifactError("release directory must be a real directory, not a symlink")
+    for entry in out_dir.iterdir():
+        if entry.is_symlink():
+            raise ReleaseArtifactError(
+                f"release directory must not contain symbolic links: {entry.name}"
+            )
+        if not entry.is_file():
+            raise ReleaseArtifactError(
+                f"release directory must contain only flat regular files: {entry.name}"
             )
 
 
@@ -285,6 +308,7 @@ def write_checksum_manifest(out_dir: Path, *, payloads: list[Path]) -> Path:
 
 
 def verify_directory(out_dir: Path) -> dict[str, Any]:
+    _assert_flat_regular_directory(out_dir)
     manifest_path = out_dir / MANIFEST_NAME
     checksum_path = out_dir / CHECKSUM_NAME
     manifest = _load_json(manifest_path, label="release manifest")
@@ -300,11 +324,11 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
     for item in artifacts:
         if not isinstance(item, dict):
             raise ReleaseArtifactError("release manifest artifact entries must be objects")
-        name = item.get("name")
+        name = _validate_asset_name(item.get("name"), label="release manifest")
         digest = item.get("sha256")
         size = item.get("size")
-        if not isinstance(name, str) or not name or name in expected:
-            raise ReleaseArtifactError(f"invalid or duplicate manifest artifact name: {name!r}")
+        if name in expected:
+            raise ReleaseArtifactError(f"duplicate manifest artifact name: {name!r}")
         if name in {MANIFEST_NAME, CHECKSUM_NAME}:
             raise ReleaseArtifactError(
                 f"manifest artifact cannot self-reference control file: {name}"
@@ -330,10 +354,11 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
     checksum_lines = checksum_path.read_text(encoding="utf-8").splitlines()
     parsed: dict[str, str] = {}
     for line in checksum_lines:
-        match = re.fullmatch(r"([0-9a-f]{64})  ([^/\\]+)", line)
+        match = re.fullmatch(r"([0-9a-f]{64})  (.+)", line)
         if match is None:
             raise ReleaseArtifactError(f"invalid checksum-manifest line: {line!r}")
-        digest, name = match.groups()
+        digest, raw_name = match.groups()
+        name = _validate_asset_name(raw_name, label="checksum manifest")
         if name in parsed:
             raise ReleaseArtifactError(f"duplicate checksum entry: {name}")
         parsed[name] = digest
@@ -349,7 +374,7 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
             raise ReleaseArtifactError(f"checksum verification failed for {name}")
 
     permitted = checksum_scope | {CHECKSUM_NAME}
-    observed = {path.name for path in out_dir.iterdir() if path.is_file()}
+    observed = {path.name for path in out_dir.iterdir()}
     if observed != permitted:
         raise ReleaseArtifactError(
             f"release directory contains missing or extra files: expected={sorted(permitted)} "
@@ -378,6 +403,8 @@ def assemble(
     _validate_evidence(evidence, commit=commit)
 
     if out_dir.exists():
+        if out_dir.is_symlink() or not out_dir.is_dir():
+            raise ReleaseArtifactError("output path must be a real directory")
         if any(out_dir.iterdir()):
             raise ReleaseArtifactError(f"output directory must be empty: {out_dir}")
     else:
