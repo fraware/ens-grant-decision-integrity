@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -56,7 +56,7 @@ def signer_authorized(
     role: str,
     at: datetime | None = None,
 ) -> bool:
-    when = at or datetime.now(timezone.utc)
+    when = at or datetime.now(UTC)
     for signer in policy.get("runSigners", []):
         if signer.get("keyId") != key_id:
             continue
