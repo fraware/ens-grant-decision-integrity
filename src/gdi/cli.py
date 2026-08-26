@@ -20,6 +20,7 @@ from gdi.exit_codes import (
     UNSUPPORTED,
     USAGE_ERROR,
 )
+from gdi.jsonutil import load_path_strict
 from gdi.phase2 import phase2_error_type, verify_graph_bundle
 from gdi.report import render_text
 from gdi.resources import ResourceError, resource_path
@@ -37,6 +38,20 @@ def _profiles_dir() -> Path:
     if env:
         return Path(env)
     return resource_path("profiles")
+
+
+def _load_object(path: Path, *, label: str) -> dict[str, Any]:
+    value = load_path_strict(path)
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be a JSON object")
+    return value
+
+
+def _strict_validate_paths(*paths: Path | None) -> None:
+    """Reject ambiguous JSON before delegating to legacy packaged engines."""
+    for path in paths:
+        if path is not None:
+            load_path_strict(path)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -118,9 +133,7 @@ def _load_phase2_inputs(
     trust_policy_path: Path | None,
     trust_root_path: Path | None,
 ) -> tuple[dict[str, Any], dict[str, Any] | None, str | None]:
-    raw = json.loads(bundle_path.read_text(encoding="utf-8"))
-    if not isinstance(raw, dict):
-        raise ValueError("Phase II evidence bundle must be a JSON object")
+    raw = _load_object(bundle_path, label="Phase II evidence bundle")
     policy = None
     if trust_policy_path is not None:
         policy, _digest = load_trust_policy(trust_policy_path)
@@ -130,12 +143,24 @@ def _load_phase2_inputs(
     return raw, policy, trust_root
 
 
+def _strict_validate_source_subcommand(source_argv: list[str]) -> None:
+    """Prevalidate JSON metadata for the supported nested source verifier path."""
+    if not source_argv or source_argv[0] != "verify":
+        return
+    if "--metadata" not in source_argv:
+        return
+    index = source_argv.index("--metadata")
+    if index + 1 >= len(source_argv):
+        return
+    load_path_strict(Path(source_argv[index + 1]))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
         if args.command == "verify-record":
-            record = json.loads(args.record.read_text(encoding="utf-8"))
+            record = _load_object(args.record, label="decision record")
             findings = validate_record(record)
             for finding in findings:
                 print(finding.render())
@@ -143,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
             return EVIDENCE_FAILURE if has_errors else OK
 
         if args.command == "verify-source":
-            metadata = json.loads(args.metadata.read_text(encoding="utf-8"))
+            metadata = _load_object(args.metadata, label="source-artifact metadata")
             verified = source_artifact.verify_artifact(metadata, args.file)
             _print_json({"ok": True, "artifactId": verified.artifact_id})
             return OK
@@ -152,9 +177,11 @@ def main(argv: list[str] | None = None) -> int:
             source_argv = list(args.source_args)
             if source_argv and source_argv[0] == "--":
                 source_argv = source_argv[1:]
+            _strict_validate_source_subcommand(source_argv)
             return int(source_artifact.main(source_argv))
 
         if args.command == "project":
+            _strict_validate_paths(args.confidential, args.spec)
             cli_argv = [
                 "project",
                 "--confidential",
@@ -171,6 +198,7 @@ def main(argv: list[str] | None = None) -> int:
             return _run_projection_cli(cli_argv)
 
         if args.command == "verify-projection":
+            _strict_validate_paths(args.confidential, args.spec, args.public)
             return _run_projection_cli(
                 [
                     "verify-projection",
@@ -184,6 +212,7 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         if args.command == "verify-withheld":
+            _strict_validate_paths(args.public, args.revealed_subtree, args.confidential)
             cli_argv = [
                 "verify-withheld",
                 "--public",
