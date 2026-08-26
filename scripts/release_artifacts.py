@@ -631,7 +631,9 @@ def _validate_github_records(
     if not isinstance(release_steps, list):
         raise ReleaseArtifactError("release-assets job lacks step evidence")
     main_binding = [
-        step for step in release_steps if step.get("name") == "Require exact main-branch release commit"
+        step
+        for step in release_steps
+        if step.get("name") == "Require exact main-branch release commit"
     ]
     if len(main_binding) != 1 or main_binding[0].get("conclusion") != "success":
         raise ReleaseArtifactError("release-assets lacks successful main-branch SHA binding")
@@ -682,7 +684,9 @@ def _validate_github_artifacts(
 def verify_github_evidence(out_dir: Path, *, token: str | None = None) -> dict[str, Any]:
     verification = verify_directory(out_dir)
     if verification["releaseEligible"] is not True:
-        raise ReleaseArtifactError("GitHub verification is only valid for release-eligible candidates")
+        raise ReleaseArtifactError(
+            "GitHub verification is only valid for release-eligible candidates"
+        )
     evidence = _load_json(out_dir / VALIDATION_NAME, label="release validation report")
     run_id = evidence["runId"]
     run = _github_json(
