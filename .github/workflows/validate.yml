@@ -201,7 +201,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - name: Dependency audit on development pins
         run: python -m pip_audit -r requirements-dev.txt
-      - name: Verify hash lock is complete and installable
+      - name: Verify validation and build hash locks
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -216,25 +216,53 @@ jobs:
               canonicalize_name(Requirement(spec).name)
               for spec in project["project"]["dependencies"]
           }
-          locked = set()
+          runtime_locked = {}
           for line in Path("requirements.lock.txt").read_text(encoding="utf-8").splitlines():
-              match = re.match(r"^([A-Za-z0-9_.-]+)==", line)
+              match = re.match(r"^([A-Za-z0-9_.-]+)==([^ \\]+)", line)
               if match:
-                  locked.add(canonicalize_name(match.group(1)))
-          missing = sorted(direct - locked)
+                  runtime_locked[canonicalize_name(match.group(1))] = match.group(2)
+          missing = sorted(direct - set(runtime_locked))
           if missing:
-              raise SystemExit(f"runtime dependencies missing from requirements.lock.txt: {missing}")
+              raise SystemExit(
+                  f"runtime dependencies missing from requirements.lock.txt: {missing}"
+              )
+
+          build_locked = {}
+          for line in Path("requirements-build.lock.txt").read_text(encoding="utf-8").splitlines():
+              match = re.match(r"^([A-Za-z0-9_.-]+)==([^ \\]+)", line)
+              if match:
+                  build_locked[canonicalize_name(match.group(1))] = match.group(2)
+
+          for spec in project["build-system"]["requires"]:
+              requirement = Requirement(spec)
+              clauses = list(requirement.specifier)
+              if len(clauses) != 1 or clauses[0].operator != "==":
+                  raise SystemExit(f"build-system requirement is not exactly pinned: {spec}")
+              name = canonicalize_name(requirement.name)
+              expected_version = clauses[0].version
+              if build_locked.get(name) != expected_version:
+                  raise SystemExit(
+                      f"build-system requirement not matched by build lock: {spec}"
+                  )
+          if canonicalize_name("build") not in build_locked:
+              raise SystemExit("build frontend missing from requirements-build.lock.txt")
           PY
-          rm -rf /tmp/gdi-lock
+          rm -rf /tmp/gdi-lock /tmp/gdi-build-lock
           python -m venv /tmp/gdi-lock
           /tmp/gdi-lock/bin/python -m pip install --require-hashes -r requirements.lock.txt
           /tmp/gdi-lock/bin/python -m pip check
           /tmp/gdi-lock/bin/python -m pip_audit
+          python -m venv /tmp/gdi-build-lock
+          /tmp/gdi-build-lock/bin/python -m pip install \
+            --require-hashes -r requirements-build.lock.txt
+          /tmp/gdi-build-lock/bin/python -m pip check
+          python -m pip_audit -r requirements-build.lock.txt
       - name: Confirm packaging and branch-protection documentation present
         run: |
           test -f docs/PACKAGING-AND-SECURITY.md
           test -f docs/BRANCH-PROTECTION.md
-          echo "Hash lock is enforced by a clean --require-hashes install and pip check."
+          test -f requirements-build.lock.txt
+          echo "Validation and build locks are enforced by clean --require-hashes installs."
           echo "No byte-reproducible-build claim is made without independent evidence."
 
   release-assets:
