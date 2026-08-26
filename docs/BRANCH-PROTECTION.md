@@ -14,7 +14,7 @@ The repository Rulesets API returns no repository Rulesets. Therefore the indepe
 
 The full classic branch-protection endpoint remains inaccessible to the available integration (HTTP 403). Consequently, PR-before-merge enforcement, strict/up-to-date behavior, review/dismissal rules, force-push/deletion controls, and bypass allowances are not independently verified here. The known three-check state and the unreadable remaining settings are separate facts; neither should be generalized into a claim that protection is wholly unknown or fully compliant.
 
-This observation is a point-in-time release-control record, not a mechanism that freezes GitHub settings. An authorized maintainer must re-check the effective configuration immediately before final review/merge and before `v1.0.0` publication.
+This observation is a point-in-time release-control record, not a mechanism that freezes GitHub settings. An authorized maintainer must re-check the effective configuration immediately before final release review and again before `v1.0.0` publication.
 
 ## Required protections before v1.0.0
 
@@ -29,19 +29,21 @@ This observation is a point-in-time release-control record, not a mechanism that
 | Admin bypass | Disabled or minimized for release candidates and `main`; any unavoidable bypass must be disclosed in release evidence |
 | Signed commits/tags | Optional; enable only if the team can operate and verify the policy reliably |
 
-The workflow preserves the historical semantic job names `conformance`, `phase2`, and `schema-02`. The additive `package`, `lint-type`, and `security` jobs are also release-critical because they cover distribution assembly, static checks, lock installability, and dependency audit. The currently observed three-check requirement does not satisfy the documented v1.0.0 target.
+The workflow preserves the historical semantic job names `conformance`, `phase2`, and `schema-02`. The additive `package`, `lint-type`, and `security` jobs are also release critical because they cover distribution assembly, static checks, lock installability, and dependency audit. The currently observed three-check requirement does not satisfy the documented `v1.0.0` target.
 
 ## Exact-SHA semantics
 
-For pull requests, the workflow explicitly checks out `github.event.pull_request.head.sha` and asserts that `git rev-parse HEAD` equals `VALIDATION_SHA` before every release-facing job. Do not substitute a GitHub synthetic PR merge-ref run for this raw-head evidence.
+For pull requests, the workflow explicitly checks out `github.event.pull_request.head.sha` and asserts that `git rev-parse HEAD` equals `VALIDATION_SHA` before every release-facing job. Do not substitute a synthetic pull-request merge-ref run for raw-head evidence.
 
 After merge, the exact resulting `main` SHA receives a fresh push validation. The manual release-candidate workflow runs all six jobs again on the selected `main` SHA before `release-assets` can execute.
+
+The 2026-08-26 engineering integration establishes that this mechanism works in both contexts: PR #29's exact head passed all six jobs, and the resulting merged `main` commit `675ce12b69309b4eee455eb661d316c53c106333` passed all six again in workflow run `32995711485`. This is engineering evidence, not evidence that the branch-protection settings themselves meet the target.
 
 Branch protection complements these in-tree controls; it does not replace them. Conversely, a green workflow does not prove that force-push, review, bypass, deletion, or required-check settings are correctly configured.
 
 ## Administrative verification record
 
-Before making PR #29 ready for final release review and again before tagging `v1.0.0`, an authorized maintainer should inspect **Settings → Branches / Rulesets** and record at minimum:
+Before the final empirical/release commit is approved for publication, and again immediately before tagging `v1.0.0`, an authorized maintainer should inspect **Settings → Branches / Rulesets** and record at minimum:
 
 - that `package`, `lint-type`, and `security` have been added to the currently observed `conformance`, `phase2`, and `schema-02` required contexts;
 - whether PR-before-merge is enforced;
