@@ -37,7 +37,7 @@ jobs:
       - run: python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
       - run: python -m pytest tests/test_source_capture.py tests/test_capture_provenance.py
       - run: python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py scripts/test_study_status.py scripts/test_second_annotation.py scripts/test_corpus_adversarial_ws01.py
-      - run: python -m pytest scripts/test_claims_registry.py scripts/test_gdi_bundle.py
+      - run: python -m pytest scripts/test_claims_registry.py scripts/test_gdi_bundle.py scripts/test_release_artifacts.py
       - run: python -m pytest scripts/test_profiles.py scripts/test_adapters.py
       - run: python scripts/corpus_metrics.py corpus/case-template.json
       - run: python scripts/validate_corpus_cases.py
@@ -89,12 +89,38 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt
-      - run: python -m build
-      - name: Install wheel into clean venv and smoke-test substantive CLI
+      - name: Assemble and verify non-release candidate payload
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/gdi-release-smoke
+          cat > /tmp/gdi-validation-smoke.json <<EOF
+          {
+            "commit": "$VALIDATION_SHA",
+            "releaseEligible": false,
+            "evidenceKind": "ci-release-assembly-smoke",
+            "workflowRunUrl": "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+            "jobs": {
+              "conformance": "skipped",
+              "phase2": "skipped",
+              "schema-02": "skipped",
+              "package": "skipped",
+              "lint-type": "skipped",
+              "security": "skipped"
+            }
+          }
+          EOF
+          tag="ci-${VALIDATION_SHA:0:12}"
+          python scripts/release_artifacts.py assemble \
+            --tag "$tag" \
+            --commit "$VALIDATION_SHA" \
+            --validation-evidence /tmp/gdi-validation-smoke.json \
+            --out /tmp/gdi-release-smoke
+          python scripts/release_artifacts.py verify /tmp/gdi-release-smoke
+      - name: Install assembled wheel into clean venv and smoke-test substantive CLI
         run: |
           set -euo pipefail
           repo="$PWD"
-          wheel="$(python -c 'from pathlib import Path; print(next(Path("dist").glob("*.whl")).resolve())')"
+          wheel="$(python -c 'from pathlib import Path; print(next(Path("/tmp/gdi-release-smoke").glob("*.whl")).resolve())')"
           rm -rf /tmp/gdi-wheel /tmp/gdi-smoke
           python -m venv /tmp/gdi-wheel
           /tmp/gdi-wheel/bin/python -m pip install "$wheel"
@@ -147,6 +173,8 @@ jobs:
           adapters
           tests/test_capture_provenance.py
           tests/test_projection_generative.py
+          scripts/release_artifacts.py
+          scripts/test_release_artifacts.py
           scripts/test_profiles.py
           scripts/test_adapters.py
       - name: Mypy on adapters (gradual typing)
