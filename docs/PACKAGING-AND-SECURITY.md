@@ -101,7 +101,7 @@ The assembled payload contains:
 8. `release-manifest.json`;
 9. `SHA256SUMS`.
 
-`release-manifest.json` records the repository tag and commit, package name/version, explicit non-isolated build-toolchain policy, and hashes/sizes of every payload asset except itself. `SHA256SUMS` is created last over those seven payload files plus `release-manifest.json`. It necessarily excludes itself. This avoids a circular self-hash while placing every other attached payload under the checksum manifest.
+`release-manifest.json` records the repository tag and commit, package name/version, explicit non-isolated build-toolchain policy, and hashes/sizes of every payload asset except itself. `SHA256SUMS` is created last over those seven payload files plus `release-manifest.json`. It necessarily excludes itself. This avoids a circular self-hash while placing every other attached payload under the checksum manifest. The verifier requires this exact payload class set plus exactly one version-matching wheel; an arbitrary additional checksummed file is not silently accepted.
 
 ### Verification layers
 
@@ -112,13 +112,21 @@ python scripts/release_artifacts.py verify path/to/release-directory
 python scripts/release_artifacts.py verify-github path/to/release-directory
 ```
 
-`verify` is offline. It fails on unsafe/path-escaping names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, SHA-256 mismatches, invalid toolchain policy, or validation-evidence/manifest commit mismatch. It establishes integrity and internal consistency of the bytes supplied to it; it does not prove GitHub executed the workflow described by `release-validation.json`.
+`verify` is offline. It fails on unsafe/path-escaping names, symbolic links, nested or non-regular entries, missing or unexpected payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, SHA-256 mismatches, invalid toolchain policy, or validation-evidence/manifest commit mismatch. It establishes integrity and internal consistency of the bytes supplied to it; it does not prove GitHub executed the workflow described by `release-validation.json`.
 
 `verify-github` first runs the same offline verification, then queries GitHub's Actions API for the report's run ID. It requires the API record to match the expected public repository, `validate` workflow and workflow path, `workflow_dispatch` event, run attempt, `main` branch, exact candidate commit, completed/successful workflow conclusion, and workflow URL. It also requires exactly seven jobs: the six release-critical prerequisites plus `release-assets`, all completed successfully. Each prerequisite must expose a successful `Assert exact validation SHA` step, and `release-assets` must expose a successful `Require exact main-branch release commit` step.
 
+The upload step creates exactly one run-scoped Actions artifact whose name includes the SHA-256 of the generated release manifest:
+
+```text
+release-candidate-<tag>-<commit>-<release-manifest-sha256>
+```
+
+`verify-github` recomputes that SHA-256 locally and requires GitHub's artifacts API for the cited run to expose exactly one non-expired artifact with the exact expected name. This binds the locally verified manifest graph to the candidate artifact identity recorded for the successful run. It prevents a later self-consistent local directory from borrowing an unrelated successful run ID unless it also matches the run-recorded manifest digest, subject to SHA-256 collision resistance and trust in GitHub's API state.
+
 `GITHUB_TOKEN` may be supplied to `verify-github` for authentication/rate limits. For this public repository anonymous API access can be sufficient when GitHub permits it.
 
-This online check authenticates current GitHub API state for the referenced run. It does not cryptographically sign the candidate payload or prove that GitHub itself cannot later alter API state. Candidate bytes remain independently bound by `release-manifest.json` and `SHA256SUMS`. No signed artifact-attestation claim is made unless such an attestation is actually generated and verified.
+This online check does not turn GitHub into a cryptographic signer of each file or prove immutability of GitHub's future API state. Candidate bytes remain independently bound by `release-manifest.json` and `SHA256SUMS`. No signed artifact-attestation claim is made unless such an attestation is actually generated and verified.
 
 ## SBOM generation
 
