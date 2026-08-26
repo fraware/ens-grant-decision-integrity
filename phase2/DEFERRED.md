@@ -2,6 +2,23 @@
 
 Items intentionally not shipped as production guarantees because half-built cryptography or verification logic would overclaim privacy, provenance, temporal, or fairness guarantees. Aligns with repository `DEFERRED.md` for the target `v1.0.0` boundary; current package is `0.4.0`.
 
+## Production Rekor v2 verification and timing
+
+**Status:** reserved profile, fail-closed (`rekor-v2`); offline recorded fixture only (`rekor-v2-recorded-fixture`).
+
+**Why:** Rekor v2 is not a version-number substitution for the historical Rekor v1 SET/integrated-time construction. Production C2 requires native v2 inclusion/checkpoint verification under independently configured trust and a separate signed timestamp source whose semantics support temporal precedence. The recorded fixture intentionally exercises trust-substitution and evidence-binding failure modes, but its v1-shaped local test construction is not production Rekor-v2 evidence.
+
+**Build only when all of the following are true:**
+
+1. The client consumes the selected Rekor-v2 entry/body representation rather than reusing the historical v1 wire construction.
+2. Inclusion/tile/checkpoint verification is implemented against independently supplied, versioned verifier trust; receipt material cannot appoint its own authority.
+3. Log identity, shard/key selection, and trust-root validity are checked under the external verifier policy.
+4. C2 temporal precedence is derived from independent signed timestamp evidence with an explicit trust boundary; a Rekor-v2 log entry is not silently treated as a trustworthy `integratedTime` clock.
+5. Real interoperable production vectors and malicious negative vectors cover inclusion, checkpoint, key substitution, timestamp substitution, malformed evidence, and deadline boundaries.
+6. `CLAIM-MATRIX.md` is updated before enabling the profile, with no stronger claim than the evidence actually establishes.
+
+Until then, `select_adapter("rekor-v2")` fails closed with `RKR263`. The fixture profile MUST NOT establish production C2.
+
 ## Production RFC 3161 verification
 
 **Status:** reserved profile, fail-closed (`rfc3161`); offline test fixture only (`rfc3161-recorded-fixture`).

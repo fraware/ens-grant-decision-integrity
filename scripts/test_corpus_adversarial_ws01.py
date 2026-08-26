@@ -15,7 +15,12 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from corpus_metrics import CorpusCaseError, compute_metrics, validate_case  # noqa: E402
-from second_annotation import SecondAnnotationError, build_handoff, verify_submission  # noqa: E402
+from second_annotation import (  # noqa: E402
+    INDEPENDENCE_ATTESTATION,
+    SecondAnnotationError,
+    build_handoff,
+    verify_submission,
+)
 from study_status import compute_study_status  # noqa: E402
 from test_corpus import (  # noqa: E402
     EXAMPLE,
@@ -111,6 +116,7 @@ def test_second_annotation_rejects_required_for_profile_change() -> None:
     submission["annotationId"] = "namespace-independent-second-v1"
     submission["annotatorId"] = "independent-reviewer-b"
     submission["independent"] = True
+    submission["independenceAttestation"] = INDEPENDENCE_ATTESTATION
     submission["elapsedMinutes"] = 10
     for field in submission["fields"]:
         field["classification"] = "unknown"

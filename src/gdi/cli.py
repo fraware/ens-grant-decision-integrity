@@ -12,10 +12,19 @@ from typing import Any
 from gdi import __version__
 from gdi.bundle import BundleError, verify_bundle
 from gdi.claims import ClaimRegistryError, lookup
-from gdi.core.conformance import validate_record
-from gdi.exit_codes import INTERNAL_ERROR, OK, USAGE_ERROR
+from gdi.core.runtime import validate_record
+from gdi.exit_codes import (
+    EVIDENCE_FAILURE,
+    INTERNAL_ERROR,
+    OK,
+    UNSUPPORTED,
+    USAGE_ERROR,
+)
+from gdi.jsonutil import load_path_strict
+from gdi.phase2 import phase2_error_type, verify_graph_bundle
 from gdi.report import render_text
-from gdi.source.artifact import SourceArtifactError, main as source_main, verify_artifact
+from gdi.resources import ResourceError, resource_path
+from gdi.source import artifact as source_artifact
 from gdi.trust.policy import TrustPolicyError, load_trust_policy
 
 
@@ -24,19 +33,25 @@ def _print_json(value: Any) -> None:
 
 
 def _profiles_dir() -> Path:
-    """Resolve versioned operational profiles under ``profiles/``."""
+    """Resolve versioned operational profiles from explicit or packaged data."""
     env = os.environ.get("GDI_PROFILES_DIR")
     if env:
         return Path(env)
-    here = Path(__file__).resolve()
-    candidates = [
-        here.parents[2] / "profiles",
-        Path.cwd() / "profiles",
-    ]
-    for candidate in candidates:
-        if candidate.is_dir():
-            return candidate
-    return candidates[0]
+    return resource_path("profiles")
+
+
+def _load_object(path: Path, *, label: str) -> dict[str, Any]:
+    value = load_path_strict(path)
+    if not isinstance(value, dict):
+        raise ValueError(f"{label} must be a JSON object")
+    return value
+
+
+def _strict_validate_paths(*paths: Path | None) -> None:
+    """Reject ambiguous JSON before delegating to legacy packaged engines."""
+    for path in paths:
+        if path is not None:
+            load_path_strict(path)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -50,7 +65,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify_record = sub.add_parser("verify-record", help="validate a decision record")
     verify_record.add_argument("record", type=Path)
 
-    verify_source = sub.add_parser("verify-source", help="verify source artifact bytes (offline)")
+    verify_source = sub.add_parser("verify-source", help="verify source artifact bytes offline")
     verify_source.add_argument("--metadata", type=Path, required=True)
     verify_source.add_argument("--file", type=Path, required=True)
 
@@ -64,7 +79,10 @@ def build_parser() -> argparse.ArgumentParser:
     project.add_argument("--force", action="store_true")
     project.add_argument("--canonical", action="store_true")
 
-    verify_projection = sub.add_parser("verify-projection", help="verify a public projection offline")
+    verify_projection = sub.add_parser(
+        "verify-projection",
+        help="verify a public projection offline",
+    )
     verify_projection.add_argument("--confidential", type=Path, required=True)
     verify_projection.add_argument("--spec", type=Path, required=True)
     verify_projection.add_argument("--public", type=Path, required=True)
@@ -81,21 +99,28 @@ def build_parser() -> argparse.ArgumentParser:
     trust = sub.add_parser("trust-policy", help="validate an external trust policy")
     trust.add_argument("policy", type=Path)
 
+    phase2 = sub.add_parser("verify-phase2", help="verify a Phase II evidence graph offline")
+    phase2.add_argument("bundle", type=Path)
+    phase2.add_argument("--trust-policy", type=Path)
+    phase2.add_argument("--trust-root", type=Path)
+    phase2.add_argument("--json", action="store_true")
+
     bundle = sub.add_parser("verify-bundle", help="offline verification-bundle check")
     bundle.add_argument("bundle", type=Path)
     bundle.add_argument("--trust-policy", type=Path)
+    bundle.add_argument("--trust-root", type=Path)
     bundle.add_argument("--online", action="store_true")
     bundle.add_argument("--json", action="store_true")
 
     profiles = sub.add_parser("profiles", help="list or show operational adoption profiles")
-    profiles.add_argument("profile_id", nargs="?", help="Optional profile ID to print")
+    profiles.add_argument("profile_id", nargs="?", help="optional profile ID to print")
     profiles.add_argument("--format", choices=("text", "json"), default="text")
 
     return parser
 
 
 def _run_projection_cli(argv: list[str]) -> int:
-    projection_src = Path(__file__).resolve().parents[2] / "projection" / "src"
+    projection_src = resource_path("projection", "src")
     if str(projection_src) not in sys.path:
         sys.path.insert(0, str(projection_src))
     from cli import main as projection_main  # type: ignore[import-not-found]
@@ -103,20 +128,48 @@ def _run_projection_cli(argv: list[str]) -> int:
     return int(projection_main(argv))
 
 
+def _load_phase2_inputs(
+    bundle_path: Path,
+    trust_policy_path: Path | None,
+    trust_root_path: Path | None,
+) -> tuple[dict[str, Any], dict[str, Any] | None, str | None]:
+    raw = _load_object(bundle_path, label="Phase II evidence bundle")
+    policy = None
+    if trust_policy_path is not None:
+        policy, _digest = load_trust_policy(trust_policy_path)
+    trust_root = None
+    if trust_root_path is not None:
+        trust_root = trust_root_path.read_text(encoding="utf-8")
+    return raw, policy, trust_root
+
+
+def _strict_validate_source_subcommand(source_argv: list[str]) -> None:
+    """Prevalidate JSON metadata for the supported nested source verifier path."""
+    if not source_argv or source_argv[0] != "verify":
+        return
+    if "--metadata" not in source_argv:
+        return
+    index = source_argv.index("--metadata")
+    if index + 1 >= len(source_argv):
+        return
+    load_path_strict(Path(source_argv[index + 1]))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
         if args.command == "verify-record":
-            record = json.loads(args.record.read_text(encoding="utf-8"))
+            record = _load_object(args.record, label="decision record")
             findings = validate_record(record)
             for finding in findings:
                 print(finding.render())
-            return OK if not any(item.severity == "error" for item in findings) else 1
+            has_errors = any(item.severity == "error" for item in findings)
+            return EVIDENCE_FAILURE if has_errors else OK
 
         if args.command == "verify-source":
-            metadata = json.loads(args.metadata.read_text(encoding="utf-8"))
-            verified = verify_artifact(metadata, args.file)
+            metadata = _load_object(args.metadata, label="source-artifact metadata")
+            verified = source_artifact.verify_artifact(metadata, args.file)
             _print_json({"ok": True, "artifactId": verified.artifact_id})
             return OK
 
@@ -124,9 +177,11 @@ def main(argv: list[str] | None = None) -> int:
             source_argv = list(args.source_args)
             if source_argv and source_argv[0] == "--":
                 source_argv = source_argv[1:]
-            return int(source_main(source_argv))
+            _strict_validate_source_subcommand(source_argv)
+            return int(source_artifact.main(source_argv))
 
         if args.command == "project":
+            _strict_validate_paths(args.confidential, args.spec)
             cli_argv = [
                 "project",
                 "--confidential",
@@ -143,6 +198,7 @@ def main(argv: list[str] | None = None) -> int:
             return _run_projection_cli(cli_argv)
 
         if args.command == "verify-projection":
+            _strict_validate_paths(args.confidential, args.spec, args.public)
             return _run_projection_cli(
                 [
                     "verify-projection",
@@ -156,6 +212,7 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         if args.command == "verify-withheld":
+            _strict_validate_paths(args.public, args.revealed_subtree, args.confidential)
             cli_argv = [
                 "verify-withheld",
                 "--public",
@@ -175,13 +232,47 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.command == "trust-policy":
             policy, digest = load_trust_policy(args.policy)
-            _print_json({"ok": True, "policyId": policy["policyId"], "policyDigestSha256": digest})
+            _print_json(
+                {
+                    "ok": True,
+                    "policyId": policy["policyId"],
+                    "policyDigestSha256": digest,
+                }
+            )
             return OK
+
+        if args.command == "verify-phase2":
+            raw, policy, trust_root = _load_phase2_inputs(
+                args.bundle,
+                args.trust_policy,
+                args.trust_root,
+            )
+            try:
+                result = verify_graph_bundle(
+                    raw,
+                    trust_root_pem=trust_root,
+                    trust_policy=policy,
+                )
+            except phase2_error_type() as exc:
+                payload = {
+                    "ok": False,
+                    "error": str(exc),
+                    "code": getattr(exc, "code", "PHASE2"),
+                    "claim": getattr(exc, "claim", None),
+                }
+                _print_json(payload)
+                if getattr(exc, "code", None) in {"RKR263", "TS3178"}:
+                    return UNSUPPORTED
+                return EVIDENCE_FAILURE
+            payload = result.as_dict()
+            _print_json(payload)
+            return OK if result.ok else EVIDENCE_FAILURE
 
         if args.command == "verify-bundle":
             report, code = verify_bundle(
                 args.bundle,
                 trust_policy_path=args.trust_policy,
+                trust_root_path=args.trust_root,
                 online=bool(args.online),
             )
             if args.json:
@@ -194,8 +285,7 @@ def main(argv: list[str] | None = None) -> int:
             root = _profiles_dir()
             if not root.is_dir():
                 raise FileNotFoundError(
-                    "profiles directory not found; "
-                    "set GDI_PROFILES_DIR or run from a source checkout"
+                    "profiles directory not found; set GDI_PROFILES_DIR or reinstall package"
                 )
             if args.profile_id:
                 path = root / f"{args.profile_id}.json"
@@ -204,7 +294,11 @@ def main(argv: list[str] | None = None) -> int:
                 text = path.read_text(encoding="utf-8")
                 sys.stdout.write(text if text.endswith("\n") else text + "\n")
                 return OK
-            ids = sorted(p.stem for p in root.glob("*.json") if p.name != "profile.schema.json")
+            ids = sorted(
+                path.stem
+                for path in root.glob("*.json")
+                if path.name != "profile.schema.json"
+            )
             if args.format == "json":
                 _print_json({"profiles": ids})
             else:
@@ -214,10 +308,18 @@ def main(argv: list[str] | None = None) -> int:
 
         parser.error(f"unknown command {args.command}")
         return USAGE_ERROR
-    except (BundleError, ClaimRegistryError, SourceArtifactError, TrustPolicyError) as exc:
+    except (
+        BundleError,
+        ClaimRegistryError,
+        source_artifact.SourceArtifactError,
+        TrustPolicyError,
+    ) as exc:
         _print_json({"ok": False, "error": str(exc), "code": getattr(exc, "code", "ERROR")})
-        return getattr(exc, "exit_code", 1)
-    except FileNotFoundError as exc:
+        return getattr(exc, "exit_code", EVIDENCE_FAILURE)
+    except (FileNotFoundError, ResourceError) as exc:
+        _print_json({"ok": False, "error": str(exc), "code": "USAGE"})
+        return USAGE_ERROR
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
         _print_json({"ok": False, "error": str(exc), "code": "USAGE"})
         return USAGE_ERROR
     except Exception as exc:  # noqa: BLE001

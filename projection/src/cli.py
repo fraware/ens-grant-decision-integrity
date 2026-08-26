@@ -9,6 +9,12 @@ import sys
 from pathlib import Path
 from typing import Any
 
+REPO_SRC = Path(__file__).resolve().parents[2] / "src"
+if str(REPO_SRC) not in sys.path:
+    sys.path.insert(0, str(REPO_SRC))
+
+from gdi.jsonutil import StrictJSONError  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
@@ -23,7 +29,7 @@ from project_v2 import project_record_v2  # noqa: E402
 from project_v2 import verify_projection_v2  # noqa: E402
 from project_v2 import verify_withheld_v2  # noqa: E402
 
-ProjectionError = (ProjectionErrorV1, ProjectionErrorV2)
+ProjectionError = (ProjectionErrorV1, ProjectionErrorV2, StrictJSONError)
 
 
 def _write_out(path: Path, value: Any, *, force: bool, canonical: bool) -> None:

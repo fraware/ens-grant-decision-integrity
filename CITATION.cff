@@ -2,11 +2,10 @@ cff-version: 1.2.0
 message: "If you use this artifact, please cite it as below."
 title: "ENS Grant Decision Integrity"
 version: "0.4.0"
-date-released: "2026-08-25"
 type: software
 authors:
   - family-names: Petel
     given-names: Mateo
 license: MIT
-abstract: "A draft Grants Charter and machine-readable decision-record profile for reconstructable ENS grant and service-provider decisions, with Phase II evaluator-manifest commitment, schema 0.2 extensions, deterministic public projection, and a retrospective empirical corpus. Package version 0.4.0 is an engineering checkpoint; it does not claim ENS endorsement or a completed v1.0.0 assurance boundary."
+abstract: "A draft Grants Charter and machine-readable decision-record assurance system for reconstructable ENS grant and service-provider decisions, including bounded evaluator provenance, source-byte binding, deterministic public projection, and a retrospective empirical corpus. Package version 0.4.0 is an unreleased engineering checkpoint; this metadata does not assert a v0.4.0 GitHub release, ENS endorsement, or a completed v1.0.0 assurance boundary."
 repository-code: "https://github.com/fraware/ens-grant-decision-integrity"

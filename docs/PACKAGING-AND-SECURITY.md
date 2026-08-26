@@ -4,6 +4,7 @@
 
 - **Supported / CI-tested runtime:** CPython **3.12**
 - `requires-python = ">=3.12"` in `pyproject.toml`
+- Release hash validation is executed on the documented Ubuntu + CPython 3.12 CI platform
 - Do not claim a broader support matrix than CI exercises
 
 ## Installable package
@@ -16,80 +17,147 @@ gdi profiles
 python -m build
 ```
 
-Package name: `ens-gdi`. Console entry point: `gdi`. Software version is independent of grant-decision `schemaVersion` `"0.1"`.
+Package name: `ens-gdi`. Console entry point: `gdi`. Software package versioning is independent of grant-decision `schemaVersion` `"0.1"` and is recorded separately from the repository release tag in `release-manifest.json`.
 
-## Hash-locked dependencies
+## Hash-locked dependencies and build toolchain
 
 | File | Role |
 |---|---|
 | `requirements-dev.txt` | Direct development/validation pins |
 | `phase2/requirements.txt` | Phase II direct pins |
-| `requirements.lock.txt` | Hash-locked direct + transitive set for release/validation reinstall |
+| `requirements.lock.txt` | Hash-locked release/validation environment for the documented CI platform |
+| `requirements-build.lock.txt` | Hash-locked release build frontend/backend toolchain |
 
 ```bash
 python -m pip install --require-hashes -r requirements.lock.txt
+python -m pip install --require-hashes -r requirements-build.lock.txt
 ```
 
-First-order version pins are **not** a complete transitive lock. Regenerate `requirements.lock.txt` when release dependencies change. Platform-specific wheels can differ; release validation should use the documented CI platform (ubuntu + CPython 3.12) or regenerate hashes there.
+First-order version pins are **not** a complete transitive lock. The `security` CI job therefore checks that every direct runtime dependency declared in `pyproject.toml` is represented in `requirements.lock.txt`; checks that every PEP 517 build-system requirement is exactly pinned and represented at the same version in `requirements-build.lock.txt`; creates clean virtual environments for both lockfiles; performs exact `--require-hashes` installs; runs `pip check`; and audits both dependency sets. A file-presence check or separately printed wheel hashes is not sufficient release evidence.
 
-## Additive CI jobs
+The PEP 517 backend requirements in `pyproject.toml` are exact pins. Release distribution assembly does **not** allow the build frontend to create a fresh isolated environment from open-ended backend constraints. `scripts/release_artifacts.py` creates a disposable build venv from `requirements-build.lock.txt` and invokes `python -m build --no-isolation`, so the wheel and sdist are built with the reviewed toolchain versions and hashes.
 
-Existing required semantic job names are preserved:
+Regenerate either lockfile deliberately whenever its corresponding dependency set changes. Recorded binary hashes are platform-specific where wheels are platform-specific; the release validation contract is Ubuntu + CPython 3.12. A different platform must regenerate and independently validate applicable hashes rather than assuming these locks are portable.
+
+## Exact-SHA CI identity
+
+For pull requests, GitHub's default checkout is a synthetic merge ref, not necessarily the raw PR-head commit. The release-facing workflow therefore defines:
+
+```text
+VALIDATION_SHA = pull_request.head.sha  # pull_request
+VALIDATION_SHA = github.sha             # push / workflow_dispatch
+```
+
+Every job checks out `VALIDATION_SHA` explicitly and immediately asserts `git rev-parse HEAD == VALIDATION_SHA`. Historical PR runs that used the default synthetic merge checkout are integration evidence only and must not be cited as raw-head execution evidence.
+
+After merge, `main` receives a fresh push run for the exact resulting commit. A public release additionally uses `workflow_dispatch` on that exact `main` SHA so all six prerequisite release jobs and asset assembly belong to the same workflow run.
+
+## CI jobs
+
+The release-critical prerequisite job names are:
 
 - `conformance`
 - `phase2`
 - `schema-02`
-
-Additive jobs (do not rename the three above):
+- `package`
+- `lint-type`
+- `security`
 
 | Job | Purpose |
 |---|---|
-| `package` | Build sdist/wheel; install wheel; CLI smoke |
-| `lint-type` | `ruff` on adapters/package; `mypy` on public modules |
-| `security` | `pip-audit` on direct pins; lock/SBOM notes |
+| `conformance` | v0.1 contract, source/policy checks, corpus protocol, claims, profiles, adapters, and release-verifier tests |
+| `phase2` | Phase II graph, commitment, replay, disclosure, and anchor-profile tests |
+| `schema-02` | Schema 0.2 and projection tests, including generative coverage |
+| `package` | Exercise release-asset assembly in non-release mode; install the assembled wheel in a locked clean venv; exercise substantive CLI paths away from the source checkout |
+| `lint-type` | `ruff` on release-facing modules and adapters; `mypy` on adapters |
+| `security` | Audit development pins; prove validation/build lock coverage and installability; run `pip check`; audit both locked environments |
 
-Branch protection may continue to require only the three semantic gates for ordinary PRs. Before `v1.0.0`, package/lint/security should be green on the exact release-candidate commit (release workflow or required checks).
+The manual release run adds the seventh `release-assets` job after all six prerequisites. The historical three semantic contexts remain important for continuity, but the documented `v1.0.0` protection target is all six prerequisite release-critical contexts.
+
+As independently observed on 2026-08-26, classic protection on `main` currently requires only `conformance`, `phase2`, and `schema-02`; the repository Rulesets list is empty. That state does **not** satisfy the final six-check target. The full protection endpoint remains inaccessible to the available integration, so other controls still require authorized settings inspection. See `docs/BRANCH-PROTECTION.md` and release-control issue #31.
+
+## Release artifact assembler
+
+`scripts/release_artifacts.py` is the release-payload assembly and verification path, with separate offline and online evidence layers.
+
+A normal PR `package` job runs assembly with `releaseEligible=false` to exercise the complete build/SBOM/manifest/checksum machinery without creating release evidence. The generated smoke bundle is disposable and cannot satisfy release gates.
+
+For an actual release candidate, manually dispatch `validate` on the exact `main` commit with the prospective repository tag. The `release-assets` job runs only after the six validation jobs and additionally requires:
+
+- `GITHUB_REF == refs/heads/main`;
+- checkout SHA equals `VALIDATION_SHA`;
+- `scripts/study_status.py` returns `readyForFinalReview=true`;
+- same-run conclusions for exactly `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security` are all `success`.
+
+The workflow-generated `release-validation.json` binds the candidate to repository, workflow name, event type, run ID, run attempt, exact commit/ref, six prerequisite job conclusions, and study status. The assembler validates that report against the local release policy before accepting `releaseEligible=true`. This is an internal consistency/policy check; it does **not** independently authenticate GitHub's Actions database.
+
+The assembled payload contains:
+
+1. exact-commit source archive;
+2. Python wheel;
+3. Python sdist;
+4. `sbom.cdx.json`;
+5. `release-validation.json`;
+6. `requirements-build.lock.txt`;
+7. `requirements.lock.txt`;
+8. `release-manifest.json`;
+9. `SHA256SUMS`.
+
+`release-manifest.json` records the repository tag and commit, package name/version, explicit non-isolated build-toolchain policy, and hashes/sizes of every payload asset except itself. `SHA256SUMS` is created last over those seven payload files plus `release-manifest.json`. It necessarily excludes itself. This avoids a circular self-hash while placing every other attached payload under the checksum manifest. The verifier requires this exact payload class set plus exactly one version-matching wheel; an arbitrary additional checksummed file is not silently accepted.
+
+### Verification layers
+
+After the manual workflow has **completed**, download the candidate and run:
+
+```bash
+python scripts/release_artifacts.py verify path/to/release-directory
+python scripts/release_artifacts.py verify-github path/to/release-directory
+```
+
+`verify` is offline. It fails on unsafe/path-escaping names, symbolic links, nested or non-regular entries, missing or unexpected payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, SHA-256 mismatches, invalid toolchain policy, or validation-evidence/manifest commit mismatch. It establishes integrity and internal consistency of the bytes supplied to it; it does not prove GitHub executed the workflow described by `release-validation.json`.
+
+`verify-github` first runs the same offline verification, then queries GitHub's Actions API for the report's run ID. It requires the API record to match the expected public repository, `validate` workflow and workflow path, `workflow_dispatch` event, run attempt, `main` branch, exact candidate commit, completed/successful workflow conclusion, and workflow URL. It also requires exactly seven jobs: the six release-critical prerequisites plus `release-assets`, all completed successfully. Each prerequisite must expose a successful `Assert exact validation SHA` step, and `release-assets` must expose a successful `Require exact main-branch release commit` step.
+
+The upload step creates exactly one run-scoped Actions artifact whose name includes the SHA-256 of the generated release manifest:
+
+```text
+release-candidate-<tag>-<commit>-<release-manifest-sha256>
+```
+
+`verify-github` recomputes that SHA-256 locally and requires GitHub's artifacts API for the cited run to expose exactly one non-expired artifact with the exact expected name. This binds the locally verified manifest graph to the candidate artifact identity recorded for the successful run. It prevents a later self-consistent local directory from borrowing an unrelated successful run ID unless it also matches the run-recorded manifest digest, subject to SHA-256 collision resistance and trust in GitHub's API state.
+
+`GITHUB_TOKEN` may be supplied to `verify-github` for authentication/rate limits. For this public repository anonymous API access can be sufficient when GitHub permits it.
+
+This online check does not turn GitHub into a cryptographic signer of each file or prove immutability of GitHub's future API state. Candidate bytes remain independently bound by `release-manifest.json` and `SHA256SUMS`. No signed artifact-attestation claim is made unless such an attestation is actually generated and verified.
+
+## SBOM generation
+
+The release assembler installs the hash-locked validation environment in a clean temporary venv, installs the built `ens-gdi` wheel with `--no-deps`, and invokes the pinned `pip-audit` toolchain to emit CycloneDX JSON for that installed environment. The SBOM therefore describes the release-validation environment containing the built package and locked dependencies; it is not presented as a minimal-runtime-only dependency graph.
+
+The SBOM toolchain is part of the validated release environment in `requirements.lock.txt`. A future change to a different SBOM generator or scope requires an explicit documentation and lock update.
 
 ## Static analysis notes
 
-- **Ruff:** configured in `pyproject.toml`; CI fails on lint findings for `src/gdi`, `adapters`, and new profile/adapter tests.
-- **Mypy:** gradual typing on `gdi` and `adapters`. Tighten public APIs over time; do not treat global coverage percentage as a correctness metric.
+- **Ruff:** configured in `pyproject.toml`; CI fails on lint findings for the explicitly enumerated release-facing package, adapter, release-engineering, and test surfaces.
+- **Mypy:** gradual typing is currently enforced on `adapters`. Do not describe this as whole-repository static type coverage, and do not treat a coverage percentage as a correctness metric.
 
-## SBOM tooling
+## Branch protection (required target)
 
-For a release candidate, generate an SBOM from the built package/environment and attach it as a release asset:
-
-```bash
-# CycloneDX (optional extra: pip install 'ens-gdi[sbom]' or cyclonedx-bom)
-cyclonedx-py environment -o sbom.cdx.json
-# or
-cyclonedx-py pyproject -o sbom.cdx.json
-
-# SPDX: use an SPDX-capable tool against the same locked environment
-# (for example syft/trivy scan of the release venv or built wheel).
-```
-
-Publish the SBOM alongside wheel, sdist, SHA-256 manifest, and release validation report. This repository does **not** claim byte-reproducible builds unless two independent clean builds of the same commit produce byte-identical artifacts under a documented process and that evidence is attached.
-
-## Branch protection (required settings)
-
-Documented requirements for `main` before `v1.0.0`. Do not silently bypass. Maintainers with admin access should verify these in GitHub settings; this document does not force-change repository settings via API.
-
-Required:
+The target for `main` before `v1.0.0` is:
 
 1. Require a pull request before merging to `main`
-2. Require status checks to pass on the exact head: at minimum `conformance`, `phase2`, `schema-02`
-3. Require branches to be up to date before merging (if operationally appropriate)
+2. Require all six prerequisite release-critical status contexts: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, `security`
+3. Require branches to be up to date before merging where operationally appropriate
 4. Prohibit force-push to `main`
 5. Prohibit deletion of `main`
 6. Require review for protocol/security changes where team size permits
-7. Minimize administrator bypass for release candidates / `main`
+7. Minimize administrator/repository-role bypass for release candidates and `main`
 8. Signed commits/tags only if the team can operate that policy reliably
 
-Record any setting that cannot be enforced in release notes rather than implying it is enforced.
+The point-in-time 2026-08-26 observation fails item 2 because only the first three contexts are required. Items 1 and 3–7 remain unverified through the integration because the full protection endpoint returns 403. Maintainers with admin access must strengthen item 2 and verify the remaining effective settings before release. Record any setting that cannot be enforced in release notes rather than implying it is enforced.
 
 See also `docs/BRANCH-PROTECTION.md`.
 
 ## Reproducible build claims
 
-Deterministic inputs and a documented build recipe (Python 3.12, locked deps, `python -m build`) are expected. **Byte-reproducible** wheel/sdist identity across machines is **not** claimed unless demonstrated with evidence.
+Pinned build frontend/backend versions, hash-locked build inputs, a documented CPython/Ubuntu platform, and a non-isolated build recipe substantially narrow build variability. They do **not** establish cross-machine byte reproducibility. A **byte-reproducible** wheel/sdist claim requires independent clean builds of the same commit to produce byte-identical target artifacts under a documented comparison protocol, with that evidence retained.

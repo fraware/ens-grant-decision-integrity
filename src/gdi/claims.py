@@ -4,12 +4,9 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
-from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
-REGISTRY_PATH = ROOT / "claims" / "claim-registry.v1.json"
-SCHEMA_PATH = ROOT / "claims" / "claim-registry.schema.json"
+from gdi.resources import ResourceError, resource_path
 
 
 class ClaimRegistryError(Exception):
@@ -21,13 +18,15 @@ class ClaimRegistryError(Exception):
 @lru_cache(maxsize=1)
 def load_registry() -> dict[str, Any]:
     try:
-        registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        registry_path = resource_path("claims", "claim-registry.v1.json")
+        schema_path = resource_path("claims", "claim-registry.schema.json")
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, ResourceError) as exc:
         raise ClaimRegistryError(f"cannot load claim registry: {exc}") from exc
     try:
         import jsonschema
 
-        schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(schema).validate(registry)
     except Exception as exc:  # noqa: BLE001 - surface as registry error
         raise ClaimRegistryError(f"claim registry failed schema validation: {exc}") from exc

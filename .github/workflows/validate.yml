@@ -5,6 +5,13 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Prospective repository release tag (for example v1.0.0)"
+        required: true
+        default: "v1.0.0"
+        type: string
 
 concurrency:
   group: validate-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -13,23 +20,31 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  VALIDATION_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   conformance:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Assert exact validation SHA
+        run: test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt -r phase2/requirements.txt
       - run: python -m pip install -e .
       - run: python scripts/validate.py
       - run: python scripts/conformance.py examples/spp3-marketplace-rfp.example.json
       - run: python scripts/test_conformance.py
       - run: python scripts/test_regressions.py
       - run: python -m pytest scripts/test_source_artifact.py scripts/test_policy_pins.py
+      - run: python -m pytest tests/test_source_capture.py tests/test_capture_provenance.py
       - run: python -m pytest scripts/test_corpus.py scripts/test_corpus_validator_binding.py scripts/test_study_status.py scripts/test_second_annotation.py scripts/test_corpus_adversarial_ws01.py
-      - run: python -m pytest scripts/test_claims_registry.py scripts/test_gdi_bundle.py
+      - run: python -m pytest scripts/test_claims_registry.py scripts/test_gdi_bundle.py scripts/test_release_artifacts.py
       - run: python -m pytest scripts/test_profiles.py scripts/test_adapters.py
       - run: python scripts/corpus_metrics.py corpus/case-template.json
       - run: python scripts/validate_corpus_cases.py
@@ -42,6 +57,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Assert exact validation SHA
+        run: test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
@@ -53,41 +72,121 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Assert exact validation SHA
+        run: test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt -r phase2/requirements.txt
       - run: python -m pip install -e .
       - run: python -m pytest scripts/test_schema_02.py
-      - run: python -m pytest projection/tests
+      - run: python -m pytest projection/tests tests/test_projection_generative.py
 
   package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Assert exact validation SHA
+        run: test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: python -m pip install -r requirements-dev.txt
-      - run: python -m build
-      - name: Install wheel into clean venv and smoke-test CLI
+      - name: Install hash-locked release/validation environment
+        run: python -m pip install --require-hashes -r requirements.lock.txt
+      - name: Assemble and verify non-release candidate payload
         run: |
+          set -euo pipefail
+          rm -rf /tmp/gdi-release-smoke
+          cat > /tmp/gdi-validation-smoke.json <<EOF
+          {
+            "commit": "$VALIDATION_SHA",
+            "releaseEligible": false,
+            "evidenceKind": "ci-release-assembly-smoke",
+            "workflowRunUrl": "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+            "jobs": {
+              "conformance": "skipped",
+              "phase2": "skipped",
+              "schema-02": "skipped",
+              "package": "skipped",
+              "lint-type": "skipped",
+              "security": "skipped"
+            }
+          }
+          EOF
+          tag="ci-${VALIDATION_SHA:0:12}"
+          python scripts/release_artifacts.py assemble \
+            --tag "$tag" \
+            --commit "$VALIDATION_SHA" \
+            --validation-evidence /tmp/gdi-validation-smoke.json \
+            --out /tmp/gdi-release-smoke
+          python scripts/release_artifacts.py verify /tmp/gdi-release-smoke
+      - name: Install assembled wheel into locked clean venv and smoke-test substantive CLI
+        run: |
+          set -euo pipefail
+          repo="$PWD"
+          wheel="$(python -c 'from pathlib import Path; print(next(Path("/tmp/gdi-release-smoke").glob("*.whl")).resolve())')"
+          rm -rf /tmp/gdi-wheel /tmp/gdi-smoke
           python -m venv /tmp/gdi-wheel
-          /tmp/gdi-wheel/bin/python -m pip install dist/*.whl
+          /tmp/gdi-wheel/bin/python -m pip install \
+            --require-hashes -r "$repo/requirements.lock.txt"
+          /tmp/gdi-wheel/bin/python -m pip install --no-deps "$wheel"
+          mkdir -p /tmp/gdi-smoke
+          cp "$repo/examples/spp3-marketplace-rfp.example.json" /tmp/gdi-smoke/record.json
+          cp "$repo/examples/tier-a-simplified-grant.example.json" /tmp/gdi-smoke/tier.json
+          cp "$repo/projection/examples/tier-a-projection-spec-v2.json" /tmp/gdi-smoke/spec.json
+          cp "$repo/tests/fixtures/trust/test-trust-policy.json" /tmp/gdi-smoke/policy.json
+          cp -R "$repo/examples/verification-bundle" /tmp/gdi-smoke/bundle
+          cp "$repo/phase2/examples/retrospective-public.bundle.json" /tmp/gdi-smoke/phase2.json
+          cp "$repo/phase2/vectors/rekor-fixture-trust-root.pem" /tmp/gdi-smoke/rekor-root.pem
+          cd /tmp/gdi-smoke
           /tmp/gdi-wheel/bin/gdi --version
-          GDI_PROFILES_DIR="$PWD/profiles" /tmp/gdi-wheel/bin/gdi profiles --format json
+          /tmp/gdi-wheel/bin/gdi claims --id C2
+          /tmp/gdi-wheel/bin/gdi profiles --format json
+          /tmp/gdi-wheel/bin/gdi verify-record record.json
+          /tmp/gdi-wheel/bin/gdi trust-policy policy.json
+          /tmp/gdi-wheel/bin/gdi verify-bundle bundle --json
+          /tmp/gdi-wheel/bin/gdi project --confidential tier.json --spec spec.json --out public.json
+          /tmp/gdi-wheel/bin/gdi verify-projection --confidential tier.json --spec spec.json --public public.json
+          /tmp/gdi-wheel/bin/gdi verify-phase2 phase2.json --trust-root rekor-root.pem --json
 
   lint-type:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Assert exact validation SHA
+        run: test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt -r phase2/requirements.txt
       - run: python -m pip install -e .
-      - name: Ruff lint (adapters + profile tests + profiles CLI)
-        run: python -m ruff check src/gdi/cli.py adapters scripts/test_profiles.py scripts/test_adapters.py
+      - name: Ruff lint on release-facing modules
+        run: >-
+          python -m ruff check
+          src/gdi/cli.py
+          src/gdi/bundle.py
+          src/gdi/report.py
+          src/gdi/resources.py
+          src/gdi/core/runtime.py
+          src/gdi/source/artifact.py
+          src/gdi/source/capture.py
+          src/gdi/source/policy_pins.py
+          src/gdi/trust/policy.py
+          src/gdi/phase2/__init__.py
+          src/gdi/projection/__init__.py
+          adapters
+          tests/test_capture_provenance.py
+          tests/test_projection_generative.py
+          scripts/release_artifacts.py
+          scripts/test_release_artifacts.py
+          scripts/test_profiles.py
+          scripts/test_adapters.py
       - name: Mypy on adapters (gradual typing)
         run: python -m mypy adapters
 
@@ -95,16 +194,177 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Assert exact validation SHA
+        run: test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt
-      - name: Dependency audit on direct pins
+      - name: Dependency audit on development pins
         run: python -m pip_audit -r requirements-dev.txt
-      - name: Confirm lock and packaging docs present
+      - name: Verify validation and build hash locks
         run: |
-          test -f requirements.lock.txt
+          set -euo pipefail
+          python - <<'PY'
+          import re
+          import tomllib
+          from pathlib import Path
+          from packaging.requirements import Requirement
+          from packaging.utils import canonicalize_name
+
+          project = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+          direct = {
+              canonicalize_name(Requirement(spec).name)
+              for spec in project["project"]["dependencies"]
+          }
+          runtime_locked = {}
+          for line in Path("requirements.lock.txt").read_text(encoding="utf-8").splitlines():
+              match = re.match(r"^([A-Za-z0-9_.-]+)==([^ \\]+)", line)
+              if match:
+                  runtime_locked[canonicalize_name(match.group(1))] = match.group(2)
+          missing = sorted(direct - set(runtime_locked))
+          if missing:
+              raise SystemExit(
+                  f"runtime dependencies missing from requirements.lock.txt: {missing}"
+              )
+
+          build_locked = {}
+          for line in Path("requirements-build.lock.txt").read_text(encoding="utf-8").splitlines():
+              match = re.match(r"^([A-Za-z0-9_.-]+)==([^ \\]+)", line)
+              if match:
+                  build_locked[canonicalize_name(match.group(1))] = match.group(2)
+
+          for spec in project["build-system"]["requires"]:
+              requirement = Requirement(spec)
+              clauses = list(requirement.specifier)
+              if len(clauses) != 1 or clauses[0].operator != "==":
+                  raise SystemExit(f"build-system requirement is not exactly pinned: {spec}")
+              name = canonicalize_name(requirement.name)
+              expected_version = clauses[0].version
+              if build_locked.get(name) != expected_version:
+                  raise SystemExit(
+                      f"build-system requirement not matched by build lock: {spec}"
+                  )
+          if canonicalize_name("build") not in build_locked:
+              raise SystemExit("build frontend missing from requirements-build.lock.txt")
+          PY
+          rm -rf /tmp/gdi-lock /tmp/gdi-build-lock
+          python -m venv /tmp/gdi-lock
+          /tmp/gdi-lock/bin/python -m pip install --require-hashes -r requirements.lock.txt
+          /tmp/gdi-lock/bin/python -m pip check
+          /tmp/gdi-lock/bin/python -m pip_audit
+          python -m venv /tmp/gdi-build-lock
+          /tmp/gdi-build-lock/bin/python -m pip install \
+            --require-hashes -r requirements-build.lock.txt
+          /tmp/gdi-build-lock/bin/python -m pip check
+          /tmp/gdi-lock/bin/python -m pip_audit -r requirements-build.lock.txt
+      - name: Confirm packaging and branch-protection documentation present
+        run: |
           test -f docs/PACKAGING-AND-SECURITY.md
           test -f docs/BRANCH-PROTECTION.md
-          echo "Release validation should use: pip install --require-hashes -r requirements.lock.txt"
-          echo "SBOM: CycloneDX or SPDX at release; no byte-reproducible claim without evidence"
+          test -f requirements-build.lock.txt
+          echo "Validation and build locks are enforced by clean --require-hashes installs."
+          echo "No byte-reproducible-build claim is made without independent evidence."
+
+  release-assets:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [conformance, phase2, schema-02, package, lint-type, security]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Require exact main-branch release commit
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install hash-locked release/validation environment
+        run: python -m pip install --require-hashes -r requirements.lock.txt
+      - name: Require completed empirical study gate
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python scripts/study_status.py > /tmp/study-status.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path("/tmp/study-status.json").read_text(encoding="utf-8"))
+          if status.get("readyForFinalReview") is not True:
+              raise SystemExit(f"study is not ready for final review: {status.get('blockers')}")
+          PY
+      - name: Bind same-run validation evidence
+        env:
+          CONFORMANCE_RESULT: ${{ needs.conformance.result }}
+          PHASE2_RESULT: ${{ needs.phase2.result }}
+          SCHEMA02_RESULT: ${{ needs.schema-02.result }}
+          PACKAGE_RESULT: ${{ needs.package.result }}
+          LINT_TYPE_RESULT: ${{ needs.lint-type.result }}
+          SECURITY_RESULT: ${{ needs.security.result }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          study = json.loads(Path("/tmp/study-status.json").read_text(encoding="utf-8"))
+          evidence = {
+              "commit": os.environ["VALIDATION_SHA"],
+              "ref": os.environ["GITHUB_REF"],
+              "releaseEligible": True,
+              "evidenceKind": "same-run-main-release-validation",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "eventName": os.environ["GITHUB_EVENT_NAME"],
+              "workflowName": os.environ["GITHUB_WORKFLOW"],
+              "runId": int(os.environ["GITHUB_RUN_ID"]),
+              "runAttempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "workflowRunUrl": (
+                  f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}"
+                  f"/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+              ),
+              "jobs": {
+                  "conformance": os.environ["CONFORMANCE_RESULT"],
+                  "phase2": os.environ["PHASE2_RESULT"],
+                  "schema-02": os.environ["SCHEMA02_RESULT"],
+                  "package": os.environ["PACKAGE_RESULT"],
+                  "lint-type": os.environ["LINT_TYPE_RESULT"],
+                  "security": os.environ["SECURITY_RESULT"],
+              },
+              "studyStatus": study,
+          }
+          Path("/tmp/release-validation-evidence.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: Assemble releasable payload from exact main commit
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/gdi-release-candidate
+          python scripts/release_artifacts.py assemble \
+            --tag "${{ inputs.release_tag }}" \
+            --commit "$VALIDATION_SHA" \
+            --validation-evidence /tmp/release-validation-evidence.json \
+            --out /tmp/gdi-release-candidate
+          python scripts/release_artifacts.py verify /tmp/gdi-release-candidate
+      - name: Bind uploaded candidate to manifest digest
+        id: candidate-identity
+        run: |
+          set -euo pipefail
+          digest="$(sha256sum /tmp/gdi-release-candidate/release-manifest.json | awk '{print $1}')"
+          test "${#digest}" -eq 64
+          echo "manifest_sha256=$digest" >> "$GITHUB_OUTPUT"
+      - name: Upload verified release-candidate payload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-candidate-${{ inputs.release_tag }}-${{ env.VALIDATION_SHA }}-${{ steps.candidate-identity.outputs.manifest_sha256 }}
+          path: /tmp/gdi-release-candidate/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30

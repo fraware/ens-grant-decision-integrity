@@ -1,17 +1,21 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools==84.0.0", "wheel==0.46.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ens-gdi"
 version = "0.4.0"
-description = "ENS Grant Decision Integrity unified verifier"
+description = "ENS Grant Decision Integrity verifier and evidence tooling"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "MIT" }
+license = "MIT"
 authors = [{ name = "ENS GDI contributors" }]
 dependencies = [
   "jsonschema==4.26.0",
+  "rfc8785==0.1.4",
+  "jcs==0.2.1",
+  "cryptography==50.0.0",
+  "asn1crypto==1.5.1",
 ]
 
 [project.optional-dependencies]
@@ -25,9 +29,6 @@ dev = [
 sbom = [
   "cyclonedx-bom==6.1.2",
 ]
-phase2 = [
-  # Installed from phase2/requirements.txt in CI; listed here for documentation only.
-]
 
 [project.scripts]
 gdi = "gdi.cli:main"
@@ -37,6 +38,16 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 gdi = ["py.typed"]
+
+[tool.setuptools.data-files]
+"ens_gdi/schema" = ["schema/*.json"]
+"ens_gdi/claims" = ["claims/*.json"]
+"ens_gdi/profiles" = ["profiles/*.json"]
+"ens_gdi/projection/src" = ["projection/src/*.py"]
+"ens_gdi/projection/schema" = ["projection/schema/*.json"]
+"ens_gdi/phase2/src" = ["phase2/src/*.py"]
+"ens_gdi/phase2/src/anchors" = ["phase2/src/anchors/*.py"]
+"ens_gdi/phase2/schema" = ["phase2/schema/*.json"]
 
 [tool.ruff]
 target-version = "py312"

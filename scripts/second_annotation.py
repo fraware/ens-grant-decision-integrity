@@ -5,10 +5,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
 from corpus_metrics import CATEGORIES, CorpusCaseError, validate_case
+from gdi.jsonutil import StrictJSONError, loads_strict
+
+INDEPENDENCE_ATTESTATION = (
+    "I produced this annotation without consulting the withheld primary reconstruction "
+    "materials before submission."
+)
 
 
 class SecondAnnotationError(Exception):
@@ -19,9 +26,9 @@ class SecondAnnotationError(Exception):
 
 def _load_json(path: Path, *, label: str, code: str) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise SecondAnnotationError(f"cannot load {label} {path}: {exc}", code=code) from exc
+        value = loads_strict(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
+        raise SecondAnnotationError(f"cannot load strict {label} {path}: {exc}", code=code) from exc
     if not isinstance(value, dict):
         raise SecondAnnotationError(f"{label} must be a JSON object: {path}", code=code)
     return value
@@ -171,15 +178,32 @@ def verify_submission(
     submission = handoff.get("annotationSubmission")
     if not isinstance(submission, dict):
         raise SecondAnnotationError("annotationSubmission must be a JSON object", code="ANN005")
-    allowed_submission_keys = {"annotationId", "annotatorId", "independent", "elapsedMinutes", "fields"}
+    allowed_submission_keys = {
+        "annotationId",
+        "annotatorId",
+        "independent",
+        "independenceAttestation",
+        "elapsedMinutes",
+        "fields",
+    }
     if set(submission) != allowed_submission_keys:
         raise SecondAnnotationError(
-            "annotationSubmission must contain exactly annotationId, annotatorId, independent, elapsedMinutes, and fields",
+            "annotationSubmission must contain exactly annotationId, annotatorId, independent, "
+            "independenceAttestation, elapsedMinutes, and fields",
             code="ANN005",
         )
 
-    annotation_id = _require_nonempty_string(submission.get("annotationId"), label="annotationSubmission.annotationId")
-    annotator_id = _require_nonempty_string(submission.get("annotatorId"), label="annotationSubmission.annotatorId")
+    annotation_id = _require_nonempty_string(
+        submission.get("annotationId"), label="annotationSubmission.annotationId"
+    )
+    if annotation_id == primary["annotationId"]:
+        raise SecondAnnotationError(
+            "second annotation must use an annotationId distinct from the primary annotation",
+            code="ANN006",
+        )
+    annotator_id = _require_nonempty_string(
+        submission.get("annotatorId"), label="annotationSubmission.annotatorId"
+    )
     if annotator_id == primary["annotatorId"]:
         raise SecondAnnotationError(
             "second annotation must use an annotatorId distinct from the primary annotation",
@@ -190,10 +214,27 @@ def verify_submission(
             "second annotator must explicitly attest independent=true",
             code="ANN006",
         )
+    attestation = _require_nonempty_string(
+        submission.get("independenceAttestation"),
+        label="annotationSubmission.independenceAttestation",
+    )
+    if attestation != INDEPENDENCE_ATTESTATION:
+        raise SecondAnnotationError(
+            "independenceAttestation must exactly match the required human attestation text",
+            code="ANN006",
+        )
 
     elapsed = submission.get("elapsedMinutes")
-    if not isinstance(elapsed, (int, float)) or isinstance(elapsed, bool) or elapsed < 0:
-        raise SecondAnnotationError("annotationSubmission.elapsedMinutes must be a non-negative number", code="ANN005")
+    if (
+        not isinstance(elapsed, (int, float))
+        or isinstance(elapsed, bool)
+        or not math.isfinite(float(elapsed))
+        or elapsed < 0
+    ):
+        raise SecondAnnotationError(
+            "annotationSubmission.elapsedMinutes must be a finite non-negative number",
+            code="ANN005",
+        )
 
     submitted_fields = submission.get("fields")
     if not isinstance(submitted_fields, list):
@@ -305,14 +346,20 @@ def main() -> int:
         if args.command == "prepare":
             handoff = build_handoff(case, base_dir=base_dir)
             _write_json(args.out, handoff)
-            print(json.dumps({
-                "ok": True,
-                "caseId": handoff["caseId"],
-                "materialFieldCount": len(handoff["materialFields"]),
-                "sourceArtifactCount": len(handoff["sourceArtifacts"]),
-                "out": str(args.out),
-                "nonClaim": "Preparation strips primary classifications, reconstructed record values, validator findings, review notes, and computed metrics from the handoff; it does not prove human independence.",
-            }, indent=2, sort_keys=True))
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "caseId": handoff["caseId"],
+                        "materialFieldCount": len(handoff["materialFields"]),
+                        "sourceArtifactCount": len(handoff["sourceArtifacts"]),
+                        "out": str(args.out),
+                        "nonClaim": "Preparation strips primary classifications, reconstructed record values, validator findings, review notes, and computed metrics from the handoff; it does not prove human independence.",
+                    },
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
             return 0
 
         handoff = _load_json(args.handoff, label="annotation handoff", code="ANN004")
@@ -321,9 +368,10 @@ def main() -> int:
             "ok": True,
             "caseId": case["caseId"],
             "annotation": annotation,
+            "independenceAttestation": handoff["annotationSubmission"]["independenceAttestation"],
             "nextStep": "Freeze the verified annotation before exposing the second annotator to the primary reconstruction; then integrate both annotations and begin reconciliation.",
             "nonClaims": [
-                "Tool verification establishes handoff consistency and annotation-shape constraints, not that the human process was independent.",
+                "Tool verification establishes handoff consistency and an explicit human attestation value, not that the human process was independent.",
                 "A verified second annotation is not a substantive correctness, fairness, merit, or legitimacy judgment.",
             ],
         }

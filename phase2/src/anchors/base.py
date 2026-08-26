@@ -44,10 +44,17 @@ def select_adapter(profile_id: str, **kwargs: Any) -> AnchorAdapter:
     from anchors.rekor import RekorAdapter
     from anchors.rekor_v2 import RekorV2Adapter
     from anchors.rfc3161 import Rfc3161Adapter
+    from support import Phase2Error
 
     if profile_id in {"rekor-v1", "rekor-v1-recorded-fixture"}:
         return RekorAdapter(profile_id=profile_id, **kwargs)
-    if profile_id in {"rekor-v2", "rekor-v2-recorded-fixture"}:
+    if profile_id == "rekor-v2":
+        raise Phase2Error(
+            "rekor-v2 production verification is reserved until native Rekor v2 inclusion semantics and independent signed timestamp evidence are implemented",
+            code="RKR263",
+            claim="C2",
+        )
+    if profile_id == "rekor-v2-recorded-fixture":
         return RekorV2Adapter(profile_id=profile_id, **kwargs)
     if profile_id in {"rfc3161", "rfc3161-recorded-fixture"}:
         return Rfc3161Adapter(profile_id=profile_id, **kwargs)

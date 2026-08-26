@@ -12,6 +12,7 @@ from typing import Any
 
 from gdi.core.conformance import Finding as RecordFinding
 from gdi.core.conformance import validate_record
+from gdi.jsonutil import StrictJSONError, loads_strict
 from gdi.source.artifact import SourceArtifactError, verify_artifact
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -29,6 +30,16 @@ class CorpusCaseError(Exception):
     def __init__(self, message: str, *, code: str) -> None:
         super().__init__(message)
         self.code = code
+
+
+def _load_evidence_object(path: Path, *, label: str, code: str) -> dict[str, Any]:
+    try:
+        value = loads_strict(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
+        raise CorpusCaseError(f"cannot load {label}: {exc}", code=code) from exc
+    if not isinstance(value, dict):
+        raise CorpusCaseError(f"{label} must be a JSON object", code=code)
+    return value
 
 
 def _schema_validate(case: dict[str, Any]) -> None:
@@ -98,13 +109,11 @@ def _verify_snapshot(snapshot: dict[str, Any], *, base_dir: Path, label: str) ->
 
 
 def _load_decision_record(path: Path, *, label: str) -> dict[str, Any]:
-    try:
-        record = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise CorpusCaseError(f"cannot load empirical {label} decision record: {exc}", code="CORP025") from exc
-    if not isinstance(record, dict):
-        raise CorpusCaseError(f"empirical {label} decision record must be a JSON object", code="CORP025")
-    return record
+    return _load_evidence_object(
+        path,
+        label=f"empirical {label} decision record",
+        code="CORP025",
+    )
 
 
 def _run_record_validator(path: Path, *, label: str) -> list[RecordFinding]:
@@ -179,18 +188,11 @@ def _verify_redistributable_sources(case: dict[str, Any], *, base_dir: Path) -> 
             continue
         metadata_path = _resolve_case_path(base_dir, source["metadataPath"], label=f"source {source['artifactId']} metadata")
         bytes_path = _resolve_case_path(base_dir, source["bytesPath"], label=f"source {source['artifactId']} bytes")
-        try:
-            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            raise CorpusCaseError(
-                f"cannot load source-artifact metadata for {source['artifactId']}: {exc}",
-                code="CORP021",
-            ) from exc
-        if not isinstance(metadata, dict):
-            raise CorpusCaseError(
-                f"source-artifact metadata for {source['artifactId']} must be a JSON object",
-                code="CORP021",
-            )
+        metadata = _load_evidence_object(
+            metadata_path,
+            label=f"source-artifact metadata for {source['artifactId']}",
+            code="CORP021",
+        )
         try:
             verified = verify_artifact(metadata, bytes_path)
         except SourceArtifactError as exc:
@@ -425,13 +427,7 @@ def compute_metrics(case: dict[str, Any], *, base_dir: Path | None = None) -> di
 
 
 def _load_case(path: Path) -> dict[str, Any]:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise CorpusCaseError(f"cannot load corpus case: {exc}", code="CORP013") from exc
-    if not isinstance(value, dict):
-        raise CorpusCaseError("corpus case must be a JSON object", code="CORP013")
-    return value
+    return _load_evidence_object(path, label="corpus case", code="CORP013")
 
 
 def main(argv: list[str] | None = None) -> int:

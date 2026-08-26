@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 from pathlib import Path
 
@@ -12,7 +13,12 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from source_artifact import SourceArtifactError, build_artifact, verify_artifact  # noqa: E402
+from source_artifact import (  # noqa: E402
+    SourceArtifactError,
+    build_artifact,
+    main,
+    verify_artifact,
+)
 
 
 def _build(path: Path) -> dict:
@@ -36,6 +42,28 @@ def test_source_artifact_round_trip_binds_exact_bytes(tmp_path: Path) -> None:
     verified = verify_artifact(artifact, path)
     assert verified.observed_content_hash == artifact["contentHash"]
     assert verified.observed_byte_length == artifact["byteLength"]
+
+
+def test_source_verify_cli_rejects_duplicate_json_keys(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = tmp_path / "policy.txt"
+    path.write_bytes(b"fixed governing policy bytes\n")
+    artifact = _build(path)
+    raw = json.dumps(artifact, indent=2)
+    raw = raw.replace(
+        '"artifactId": "policy-1",',
+        '"artifactId": "policy-1",\n  "artifactId": "ambiguous",',
+        1,
+    )
+    metadata = tmp_path / "artifact.json"
+    metadata.write_text(raw, encoding="utf-8")
+
+    code = main(["verify", "--metadata", str(metadata), "--file", str(path)])
+    output = capsys.readouterr().out
+    assert code == 1
+    assert "SRC005" in output
+    assert "duplicate JSON object key" in output
 
 
 def test_same_length_content_tamper_fails_hash(tmp_path: Path) -> None:

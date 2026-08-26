@@ -20,11 +20,11 @@ from __future__ import annotations
 
 import copy
 import hashlib
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from gdi.jsonutil import load_path_strict
 from rfc8785 import dumps as jcs_dumps
 
 PROJECTION_DOMAIN = "ens-gdi/public-projection/v1"
@@ -172,4 +172,4 @@ def verify_withheld_commitment(confidential: dict[str, Any], path: str, expected
 
 
 def load_json(path: str | Path) -> Any:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    return load_path_strict(path)

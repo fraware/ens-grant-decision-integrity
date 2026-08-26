@@ -25,25 +25,53 @@ Release URLs:
 
 For a public release:
 
-1. merge the reviewed changes to `main`;
-2. require green validation on the exact release commit (local contract in `VALIDATION.md`; CI jobs `conformance`, `phase2`, `schema-02`, plus additive `package`, `lint-type`, and `security` for the release candidate);
+1. complete the empirical release gate and reviewed changes, then merge the reviewed changes to `main`;
+2. require green validation on the exact release commit for all six release-critical CI jobs: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security`;
 3. record that commit SHA;
-4. build release assets from that exact SHA in a clean Python 3.12 environment with the hash-locked dependency set (`requirements.lock.txt`);
-5. create an annotated tag pointing to that commit;
-6. attach explicit release assets (not only auto-generated source archives):
+4. use the `validate` workflow's manual `workflow_dispatch` release-candidate path on **that exact `main` commit**. The workflow reruns all six release jobs on the selected SHA, requires `scripts/study_status.py` to report `readyForFinalReview=true`, and only then invokes `scripts/release_artifacts.py`;
+5. after the workflow has completed, download the candidate and perform both verification layers before creating a tag:
+   - `python scripts/release_artifacts.py verify <release-directory>` for offline file/manifest/internal-report integrity;
+   - `python scripts/release_artifacts.py verify-github <release-directory>` for online authentication of the recorded GitHub Actions run, job state, and run-scoped uploaded-candidate identity. `GITHUB_TOKEN` may be supplied for API authentication/rate limits but is not required for the public repository when anonymous API access is available;
+6. create an annotated tag pointing to that exact commit only after both layers succeed;
+7. attach explicit release assets (not only auto-generated source archives):
    - source archive from the exact release commit;
    - Python wheel;
    - source distribution (sdist);
-   - SHA-256 checksum manifest covering **all attached release assets**;
-   - SBOM (CycloneDX or SPDX);
-   - machine-readable release manifest (tag, commit, artifact names/hashes/sizes, validation report reference);
-   - release validation report;
-   - optional signed build provenance/attestation when infrastructure supports it;
-7. verify every artifact hash before and after publication;
-8. publish the tag, commit SHA, asset filenames, and SHA-256 digests together in the release notes;
-9. preserve the Simocracy proposal and decision source identifiers in provenance records, keeping allocation-decision status separate from payment authorization, transfer, receipt, and settlement evidence.
+   - SBOM (CycloneDX JSON generated from the installed wheel plus the validated locked environment);
+   - release validation report containing the workflow-run identity, exact commit, six prerequisite job conclusions, and study-status output;
+   - `requirements-build.lock.txt`, the hash-locked release build frontend/backend toolchain;
+   - `requirements.lock.txt`, the hash-locked release/validation environment used by the SBOM path;
+   - machine-readable release manifest (tag, commit, package version, toolchain policy, payload names/hashes/sizes, validation report reference);
+   - SHA-256 checksum manifest generated **last**, covering every attached payload asset including the release manifest but necessarily excluding the checksum manifest itself;
+8. verify every published artifact hash again after upload;
+9. publish the tag, commit SHA, package version, workflow run ID, release-manifest SHA-256, asset filenames, and SHA-256 digests together in the release notes;
+10. preserve the Simocracy proposal and decision source identifiers in provenance records, keeping allocation-decision status separate from payment authorization, transfer, receipt, and settlement evidence.
 
-The archive/wheel/sdist digest authenticates only the exact file whose digest is published. This repository does **not** claim byte-reproducible builds across tools or platforms unless two independent clean builds of the same commit produce byte-identical target artifacts under a documented process and that evidence is attached. Deterministic inputs (Python 3.12, locked deps, `python -m build`) are documented without equating them to byte reproducibility.
+The checksum graph is intentionally acyclic. `release-manifest.json` records hashes/sizes for the source archive, wheel, sdist, SBOM, validation report, build lock, and validation-environment lock. `SHA256SUMS` is then generated over those files **plus `release-manifest.json`**. `SHA256SUMS` cannot cryptographically include its own final digest and is therefore the sole attached payload excluded from its own scope.
+
+The offline downloaded-candidate verifier does more than recompute digests. It rejects unsafe/path-escaping asset names, symbolic links, nested or non-regular entries, missing or unexpected payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, digest mismatches, invalid toolchain policy, and manifest/validation-report commit disagreement.
+
+### GitHub Actions evidence and artifact binding
+
+`release-validation.json` is a file produced by the workflow. Hashing that file proves the exact bytes distributed; validating its fields proves only that those bytes satisfy the local evidence schema/policy. Neither operation independently proves that GitHub actually executed the stated workflow or recorded the stated conclusions.
+
+`verify-github` closes that separate online provenance gap by querying GitHub's Actions API after the run has completed. For a release-eligible candidate it requires the report and GitHub record to agree on repository, workflow name/path, `workflow_dispatch` event, run ID, run attempt, `main` branch, exact commit SHA, completed/successful workflow conclusion, and run URL. It also requires exactly the six release-critical prerequisite jobs plus `release-assets`, all completed successfully; successful `Assert exact validation SHA` steps in each prerequisite job; and a successful `Require exact main-branch release commit` step in `release-assets`.
+
+The workflow additionally computes SHA-256 over the generated `release-manifest.json` and includes that 64-hex digest in the name of the sole Actions artifact uploaded by `release-assets`:
+
+```text
+release-candidate-<tag>-<commit>-<release-manifest-sha256>
+```
+
+`verify-github` recomputes the manifest digest from the downloaded directory and requires GitHub's run-scoped artifacts API to expose exactly one non-expired artifact with that exact name. Because the manifest itself hashes every non-control payload and `SHA256SUMS` hashes the manifest, this binds the locally verified candidate graph to the artifact identity recorded for the exact successful workflow run, subject to SHA-256 collision resistance and trust in GitHub's API state.
+
+This remains bounded evidence. GitHub artifact-name binding is not a cryptographic signature by GitHub over each file, and it does not prove that GitHub cannot later alter API state. Candidate byte identity is checked separately by the manifest/checksum layer. A future signed artifact attestation may strengthen this boundary, but none is claimed unless actually generated and verified.
+
+The workflow and assembler still fail closed internally. `releaseEligible=true` report content is accepted only when it declares the expected repository/workflow/event identity, a positive run ID/attempt, `refs/heads/main`, exactly the six required prerequisite jobs with conclusion `success`, and `studyStatus.readyForFinalReview=true`. A normal PR `package` job uses `releaseEligible=false`; a successful smoke bundle is not release evidence.
+
+Release distribution assembly also has a separate build trust boundary. `pyproject.toml` exactly pins the PEP 517 backend requirements, `requirements-build.lock.txt` hash-locks the build frontend/backend environment, and the assembler creates a disposable build venv from that lock before invoking `python -m build --no-isolation`. This prevents a future open-ended `setuptools>=...` resolution from silently changing release artifact construction.
+
+The archive/wheel/sdist digest authenticates only the exact file whose digest is published. This repository does **not** claim byte-reproducible builds across tools or platforms unless two independent clean builds of the same commit produce byte-identical target artifacts under a documented process and that evidence is attached. Exact build pins and hash-locked inputs reduce variability; they do not by themselves establish reproducibility.
 
 Do not repeat the v0.3.2 pattern of a tag with no attached assets while advertising an attached-archive integrity procedure.
 
@@ -52,6 +80,12 @@ A Rekor envelope over an evaluator-manifest commitment is not a signed release o
 Packaging, SBOM tooling, and branch-protection requirements: `docs/PACKAGING-AND-SECURITY.md`, `docs/BRANCH-PROTECTION.md`.
 
 Detailed Phase II exit gates, pre-tag checklist, and tag procedure: `phase2/RELEASE.md`.
+
+## Pull-request validation identity
+
+For `pull_request` events, GitHub's default checkout target is a synthetic PR merge ref. That is useful for integration testing but is **not** the raw PR-head commit. The current workflow therefore passes an explicit `ref` equal to `github.event.pull_request.head.sha` and immediately asserts `git rev-parse HEAD == VALIDATION_SHA` in every release-facing job. For `push` and `workflow_dispatch`, `VALIDATION_SHA` is `github.sha`.
+
+Any historical PR workflow run that used the default synthetic merge checkout must not be cited as proof that the raw PR head itself executed the test suite. Release decisions rely on the explicit-SHA workflow and, after merge, on a fresh `main` run for the resulting exact release commit.
 
 ## Evidence-version discipline
 
@@ -76,7 +110,7 @@ The current repository provenance snapshot records $219 in Simocracy allocation 
 
 An in-tree checksum list can detect accidental corruption in a copied tree. It is not an independent authenticity anchor when the checksums and the files they describe can change in the same commit.
 
-The reviewed commit SHA identifies the release tree. The **published** SHA-256 manifest for release assets (wheel, sdist, source archive, SBOM, validation report) provides a portable integrity check for distributed artifacts. That release-asset manifest belongs on the GitHub Release (or equivalent), not as a substitute for the commit SHA.
+The reviewed commit SHA identifies the release tree. The **published** SHA-256 manifest for release payloads provides a portable integrity check for distributed artifacts. That checksum manifest belongs on the GitHub Release (or equivalent), not as a substitute for the commit SHA.
 
 ## Schema-level integrity field
 

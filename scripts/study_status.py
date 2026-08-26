@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from gdi.corpus.study_status import *  # noqa: F403
-from gdi.corpus.study_status import main
+from gdi.corpus.study_status import _load_json, main
 
 if __name__ == "__main__":
     raise SystemExit(main())
