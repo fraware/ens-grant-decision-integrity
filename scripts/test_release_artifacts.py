@@ -104,6 +104,40 @@ def test_release_directory_rejects_extra_unchecksummed_asset(tmp_path: Path) -> 
         verify_directory(out)
 
 
+def test_release_directory_rejects_nested_directory(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    (out / "nested").mkdir()
+
+    with pytest.raises(ReleaseArtifactError, match="flat regular files"):
+        verify_directory(out)
+
+
+def test_release_directory_rejects_symlinked_payload(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    sbom = out / "sbom.cdx.json"
+    outside = tmp_path / "outside-sbom.json"
+    outside.write_bytes(sbom.read_bytes())
+    sbom.unlink()
+    try:
+        sbom.symlink_to(outside)
+    except OSError as exc:
+        pytest.skip(f"symlink creation unavailable: {exc}")
+
+    with pytest.raises(ReleaseArtifactError, match="symbolic links"):
+        verify_directory(out)
+
+
+def test_release_manifest_rejects_path_escape_filename(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    manifest = out / MANIFEST_NAME
+    manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+    manifest_data["artifacts"][0]["name"] = "../outside.json"
+    _write_json(manifest, manifest_data)
+
+    with pytest.raises(ReleaseArtifactError, match="unsafe asset filename"):
+        verify_directory(out)
+
+
 def test_release_directory_rejects_checksum_scope_omission(tmp_path: Path) -> None:
     out = _release_dir(tmp_path)
     lines = (out / CHECKSUM_NAME).read_text(encoding="utf-8").splitlines()
