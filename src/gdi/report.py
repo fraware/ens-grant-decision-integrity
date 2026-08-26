@@ -6,9 +6,11 @@ from typing import Any
 
 from gdi import __version__
 
-
 HARD_NON_CLAIMS = [
-    "ok=true means every required selected check reached pass or warning without failure; it does not mean all possible claims are true.",
+    (
+        "ok=true means every required selected check reached pass or warning without failure; "
+        "it does not mean all possible claims are true."
+    ),
     "Hashes, anchors, and signatures are not institutional funding authority.",
     "Allocation is not payment, receipt, or settlement.",
     "Annotation agreement is not correctness, fairness, or legitimacy.",
@@ -16,7 +18,12 @@ HARD_NON_CLAIMS = [
 ]
 
 
-def empty_report(*, bundle_id: str, manifest_digest: str, bundle_class: str | None = None) -> dict[str, Any]:
+def empty_report(
+    *,
+    bundle_id: str,
+    manifest_digest: str,
+    bundle_class: str | None = None,
+) -> dict[str, Any]:
     subject: dict[str, Any] = {
         "bundleId": bundle_id,
         "manifestDigestSha256": manifest_digest,
