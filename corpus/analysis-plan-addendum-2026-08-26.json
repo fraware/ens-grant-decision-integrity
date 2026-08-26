@@ -1,0 +1,116 @@
+{
+  "analysisAddendumVersion": "1",
+  "createdOn": "2026-08-26",
+  "status": "post-start-pre-second-annotation-analysis-addendum",
+  "studyPlanVersion": "1",
+  "studyPlanPath": "corpus/study-plan.json",
+  "doubleAnnotationPlanPath": "corpus/double-annotation-plan-2026-08-25.json",
+  "outcomeStateAtFreeze": {
+    "countedEmpiricalCases": 9,
+    "doubleAnnotatedCases": 0,
+    "secondAnnotationAgreementObserved": false,
+    "note": "These interpretation and reporting rules are frozen before any independent second-annotation agreement result is recorded. They do not rewrite the original study plan or make the post-start addenda preregistered."
+  },
+  "analysisBoundary": {
+    "design": "heterogeneous assurance stress-test",
+    "populationInference": false,
+    "causalInference": false,
+    "representativenessClaim": false,
+    "meritOrFairnessInference": false,
+    "rule": "All corpus results are descriptive of the checked-in historical reconstructions and supplied evidence sets. Do not generalize estimates to all ENS decisions, all grant programs, or institutional legitimacy."
+  },
+  "primaryCorpusMetrics": {
+    "rule": "Retain the primary metrics declared in study-plan.json. Per-case values remain the direct analysis unit.",
+    "aggregateReporting": {
+      "status": "post-hoc-descriptive-only",
+      "allowed": [
+        "case count",
+        "minimum",
+        "maximum",
+        "median",
+        "interquartile range",
+        "category counts"
+      ],
+      "notAllowedAsConfirmatory": [
+        "population means interpreted as estimands",
+        "population confidence intervals",
+        "hypothesis-test p-values",
+        "claims that aggregate summaries estimate all ENS decisions"
+      ],
+      "note": "Primary-annotation outcomes were already available when this addendum was created, so any newly added cross-case aggregate is explicitly post-hoc descriptive rather than preregistered primary analysis."
+    }
+  },
+  "independentAnnotationAnalysis": {
+    "selectedCaseRule": "Use the three cases fixed by double-annotation-plan-2026-08-25.json. Do not replace a selected case because its agreement is low, high, inconvenient, or undefined.",
+    "freezeRule": "Compute agreement only from the two frozen independent annotations before reconciliation. Reconciled labels must never replace either pre-reconciliation annotation in reliability calculations.",
+    "perCaseOutputs": [
+      "compared field count",
+      "raw classification agreement",
+      "Cohen kappa when defined",
+      "classification-by-classification disagreement counts"
+    ],
+    "cohenKappaRules": [
+      "Report kappa as descriptive agreement evidence only.",
+      "If expected agreement equals 1, report kappa as undefined; do not substitute an arbitrary value.",
+      "Do not attach qualitative labels such as poor, fair, moderate, substantial, excellent, or near-perfect as if they were validated population categories.",
+      "Do not pool fields across cases into a single inferential kappa that treats nested field observations as independent population samples."
+    ],
+    "crossCaseSummary": {
+      "allowed": [
+        "the three per-case raw agreements side by side",
+        "the three per-case kappas side by side when defined",
+        "macro-average raw agreement across the three selected cases, explicitly labeled descriptive",
+        "aggregate disagreement counts across the frozen field pairs, explicitly labeled descriptive"
+      ],
+      "prohibitedClaims": [
+        "population-level inter-rater reliability",
+        "reliability of all ENS decision records",
+        "annotation correctness or source truth inferred from agreement",
+        "statistical precision implied by the three-case minimum"
+      ],
+      "minimumInterpretation": "Completing three selected cases satisfies the study-plan 25% double-annotation gate at the current corpus size, but three cases are insufficient for a strong population-level reliability claim."
+    }
+  },
+  "timingAnalysis": {
+    "primaryAnnotationTimes": {
+      "status": "legacy-observational",
+      "rule": "Previously recorded primary elapsedMinutes values may be reported as recorded metadata, but their operational scope was not prospectively standardized. Do not reinterpret them as complete administrative burden or directly comparable standardized task times."
+    },
+    "secondAnnotationTimes": {
+      "status": "prospectively-standardized-from-2026-08-26",
+      "definition": "Active time spent inspecting the supplied source set and producing the annotation submission, excluding unrelated breaks, communication, engineering/package preparation, and post-submission reconciliation."
+    },
+    "prohibitedClaims": [
+      "elapsedMinutes measures total institutional administrative burden",
+      "elapsedMinutes measures implementation or adoption cost",
+      "primary and second-annotation times are directly comparable unless their measurement scopes are demonstrated equivalent"
+    ]
+  },
+  "reconciliationAnalysis": {
+    "rule": "Preserve every pre-reconciliation disagreement. Reconciliation may correct the case record or classify a disagreement, but must not alter the frozen reliability inputs.",
+    "report": [
+      "number of disagreements reviewed",
+      "disagreement resolution rationale",
+      "record changes with preserved before/after hashes when applicable",
+      "residual unresolved questions"
+    ]
+  },
+  "missingAndUndefinedResults": {
+    "rule": "Unknown, not-applicable, unavailable evidence, and mathematically undefined agreement statistics are valid outcomes. Do not impute, drop, or relabel them to improve results."
+  },
+  "finalReportRules": [
+    "Identify the original study plan separately from every post-start addendum.",
+    "State the exact repository commit used to regenerate final metrics.",
+    "Report all three selected second-annotation cases, including unfavorable or undefined agreement results.",
+    "Separate preregistered primary metrics from post-hoc descriptive aggregates.",
+    "Separate legacy primary timing observations from prospectively standardized second-annotation timing.",
+    "Do not convert missing public evidence into evidence that a private process did not exist.",
+    "Do not convert validator success or inter-annotator agreement into substantive correctness, fairness, merit, or institutional legitimacy."
+  ],
+  "nonClaims": [
+    "This addendum is not part of the original preregistration.",
+    "This addendum does not erase that primary-annotation outcomes were already known when it was written.",
+    "Freezing second-annotation interpretation rules before agreement outcomes reduces outcome-contingent analysis flexibility but does not make the corpus statistically representative.",
+    "No independent second annotation is created or implied by this file."
+  ]
+}
