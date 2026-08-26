@@ -26,7 +26,7 @@ Release URLs:
 For a public release:
 
 1. complete the empirical release gate and reviewed changes, then merge the reviewed changes to `main`;
-2. require green validation on the exact release commit (local contract in `VALIDATION.md`; CI jobs `conformance`, `phase2`, `schema-02`, plus additive `package`, `lint-type`, and `security` for the release candidate);
+2. require green validation on the exact release commit for all six release-critical CI jobs: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security`;
 3. record that commit SHA;
 4. use the `validate` workflow's manual `workflow_dispatch` release-candidate path on **that exact `main` commit**. The workflow reruns all six release jobs on the selected SHA, requires `scripts/study_status.py` to report `readyForFinalReview=true`, and only then invokes `scripts/release_artifacts.py`;
 5. inspect and independently verify the uploaded release-candidate payload before creating a tag;
@@ -37,18 +37,24 @@ For a public release:
    - source distribution (sdist);
    - SBOM (CycloneDX JSON generated from the installed wheel plus the validated locked environment);
    - release validation report bound to the same workflow run, exact commit, six job conclusions, and study-status output;
-   - machine-readable release manifest (tag, commit, package version, payload names/hashes/sizes, validation report reference);
+   - `requirements-build.lock.txt`, the hash-locked release build frontend/backend toolchain;
+   - `requirements.lock.txt`, the hash-locked release/validation environment used by the SBOM path;
+   - machine-readable release manifest (tag, commit, package version, toolchain policy, payload names/hashes/sizes, validation report reference);
    - SHA-256 checksum manifest generated **last**, covering every attached payload asset including the release manifest but necessarily excluding the checksum manifest itself;
    - optional signed build provenance/attestation when infrastructure supports it;
 8. run `python scripts/release_artifacts.py verify <release-directory>` before publication and verify every published artifact hash again after upload;
 9. publish the tag, commit SHA, package version, asset filenames, and SHA-256 digests together in the release notes;
 10. preserve the Simocracy proposal and decision source identifiers in provenance records, keeping allocation-decision status separate from payment authorization, transfer, receipt, and settlement evidence.
 
-The checksum graph is intentionally acyclic. `release-manifest.json` records hashes/sizes for the source archive, wheel, sdist, SBOM, and validation report. `SHA256SUMS` is then generated over those files **plus `release-manifest.json`**. `SHA256SUMS` cannot cryptographically include its own final digest and is therefore the sole attached payload excluded from its own scope. The release verifier rejects missing files, extra unchecksummed files, duplicate checksum entries, size mismatches, and digest mismatches.
+The checksum graph is intentionally acyclic. `release-manifest.json` records hashes/sizes for the source archive, wheel, sdist, SBOM, validation report, build lock, and validation-environment lock. `SHA256SUMS` is then generated over those files **plus `release-manifest.json`**. `SHA256SUMS` cannot cryptographically include its own final digest and is therefore the sole attached payload excluded from its own scope.
+
+The downloaded-candidate verifier does more than recompute digests. It rejects unsafe/path-escaping asset names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, digest mismatches, invalid toolchain policy, and manifest/validation-report commit disagreement.
 
 The manual release path and the assembler both fail closed. `releaseEligible=true` evidence is accepted only when it is bound to `refs/heads/main`, contains exactly the six required release jobs with conclusion `success`, and embeds `studyStatus.readyForFinalReview=true`. A normal PR `package` job exercises the same assembly machinery with `releaseEligible=false`; a successful smoke bundle is not release evidence.
 
-The archive/wheel/sdist digest authenticates only the exact file whose digest is published. This repository does **not** claim byte-reproducible builds across tools or platforms unless two independent clean builds of the same commit produce byte-identical target artifacts under a documented process and that evidence is attached. Deterministic inputs (Python 3.12, locked deps, `python -m build`) are documented without equating them to byte reproducibility.
+Release distribution assembly also has a separate build trust boundary. `pyproject.toml` exactly pins the PEP 517 backend requirements, `requirements-build.lock.txt` hash-locks the build frontend/backend environment, and the assembler creates a disposable build venv from that lock before invoking `python -m build --no-isolation`. This prevents a future open-ended `setuptools>=...` resolution from silently changing release artifact construction.
+
+The archive/wheel/sdist digest authenticates only the exact file whose digest is published. This repository does **not** claim byte-reproducible builds across tools or platforms unless two independent clean builds of the same commit produce byte-identical target artifacts under a documented process and that evidence is attached. Exact build pins and hash-locked inputs reduce variability; they do not by themselves establish reproducibility.
 
 Do not repeat the v0.3.2 pattern of a tag with no attached assets while advertising an attached-archive integrity procedure.
 
