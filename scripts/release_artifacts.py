@@ -20,6 +20,7 @@ MANIFEST_NAME = "release-manifest.json"
 VALIDATION_NAME = "release-validation.json"
 SBOM_NAME = "sbom.cdx.json"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+SAFE_TAG_RE = re.compile(r"^[A-Za-z0-9._-]+$")
 REQUIRED_RELEASE_JOBS = {
     "conformance",
     "phase2",
@@ -139,9 +140,30 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
             )
 
 
+def _validate_manifest_identity(manifest: dict[str, Any]) -> tuple[str, str]:
+    if manifest.get("manifestVersion") != "1":
+        raise ReleaseArtifactError("release manifest must use manifestVersion 1")
+    tag = manifest.get("tag")
+    if not isinstance(tag, str) or SAFE_TAG_RE.fullmatch(tag) is None:
+        raise ReleaseArtifactError("release manifest contains an invalid tag")
+    commit = manifest.get("commit")
+    if not isinstance(commit, str) or SHA_RE.fullmatch(commit) is None:
+        raise ReleaseArtifactError("release manifest contains an invalid commit SHA")
+    package = manifest.get("package")
+    if not isinstance(package, dict) or set(package) != {"name", "version"}:
+        raise ReleaseArtifactError("release manifest package must contain name and version")
+    if any(not isinstance(package[key], str) or not package[key] for key in package):
+        raise ReleaseArtifactError("release manifest package name/version must be non-empty strings")
+    checksum = manifest.get("checksumManifest")
+    if not isinstance(checksum, dict):
+        raise ReleaseArtifactError("release manifest checksumManifest must be an object")
+    if checksum.get("name") != CHECKSUM_NAME or checksum.get("selfHashExcluded") is not True:
+        raise ReleaseArtifactError("release manifest checksum policy is invalid")
+    return tag, commit
+
+
 def _source_archive(out_dir: Path, *, tag: str, commit: str) -> Path:
-    safe_tag = re.sub(r"[^A-Za-z0-9._-]+", "-", tag).strip("-")
-    if not safe_tag or safe_tag != tag:
+    if SAFE_TAG_RE.fullmatch(tag) is None:
         raise ReleaseArtifactError(
             "tag must contain only letters, digits, dot, underscore, or hyphen"
         )
@@ -264,6 +286,10 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
     manifest_path = out_dir / MANIFEST_NAME
     checksum_path = out_dir / CHECKSUM_NAME
     manifest = _load_json(manifest_path, label="release manifest")
+    tag, commit = _validate_manifest_identity(manifest)
+    validation = _load_json(out_dir / VALIDATION_NAME, label="release validation report")
+    _validate_evidence(validation, commit=commit)
+
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list):
         raise ReleaseArtifactError("release manifest artifacts must be a list")
@@ -277,11 +303,16 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
         size = item.get("size")
         if not isinstance(name, str) or not name or name in expected:
             raise ReleaseArtifactError(f"invalid or duplicate manifest artifact name: {name!r}")
+        if name in {MANIFEST_NAME, CHECKSUM_NAME}:
+            raise ReleaseArtifactError(f"manifest artifact cannot self-reference control file: {name}")
         if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ReleaseArtifactError(f"invalid SHA-256 for manifest artifact {name}")
         if not isinstance(size, int) or isinstance(size, bool) or size < 0:
             raise ReleaseArtifactError(f"invalid size for manifest artifact {name}")
         expected[name] = (digest, size)
+
+    if VALIDATION_NAME not in expected:
+        raise ReleaseArtifactError("release manifest must include the validation report")
 
     for name, (digest, size) in expected.items():
         path = out_dir / name
@@ -322,8 +353,9 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
         )
     return {
         "ok": True,
-        "tag": manifest.get("tag"),
-        "commit": manifest.get("commit"),
+        "tag": tag,
+        "commit": commit,
+        "releaseEligible": validation["releaseEligible"],
         "verifiedPayloadCount": len(parsed),
         "checksumManifest": CHECKSUM_NAME,
     }
@@ -370,7 +402,6 @@ def assemble(
     verification = verify_directory(out_dir)
     return {
         **verification,
-        "releaseEligible": evidence["releaseEligible"],
         "artifacts": sorted(path.name for path in [*payloads, manifest, checksum]),
     }
 
