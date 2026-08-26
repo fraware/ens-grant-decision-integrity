@@ -1,9 +1,9 @@
 # v1.0.0 acceptance gate checklist (Gates A–L)
 
-**Evaluated:** 2026-08-26 after merge of PR #29.  
-**Current `main`:** `675ce12b69309b4eee455eb661d316c53c106333`.  
-**Merged-main validation:** workflow `validate`, run `32995711485`, `success`.  
-**Tag decision:** **DO NOT TAG `v1.0.0` yet.** The engineering hardening is integrated and exact-`main` validation is green, but the genuine independent second-annotation study gate is incomplete, active `main` protection still requires only three of six release-critical checks, and no eligible final release candidate has been produced and post-run verified.  
+**Evaluated:** 2026-08-26 after the validated engineering integration and post-merge release-control refresh.  
+**Validated engineering baseline:** merge commit `675ce12b69309b4eee455eb661d316c53c106333`; workflow `validate`, run `32995711485`, `success`.  
+**Self-certification rule:** this in-tree checklist does not claim that its own containing commit is the current validated release SHA. The controlling exact candidate SHA and workflow result must be established externally from repository/CI state after the final tree is frozen.  
+**Tag decision:** **DO NOT TAG `v1.0.0` yet.** Engineering hardening is integrated and the stated engineering baseline is exact-`main` green, but the genuine independent second-annotation study gate is incomplete, active `main` protection still requires only three of six release-critical checks, and no eligible final release candidate has been produced and post-run verified.  
 **Evidence rule:** a gate is `pass` only when repository state or machine evidence supports it. A plan, checklist entry, stale workflow, or documentation statement is not evidence.
 
 Statuses: `pass` | `partial` | `fail` | `blocked` | `not-applicable`.
@@ -25,13 +25,13 @@ Every release-critical job passed the explicit exact-SHA assertion before substa
 
 The conformance job executed corpus validation and `scripts/study_status.py`. That machine report is valid but intentionally reports the study as incomplete: 9 counted cases, required declared strata covered, 0 independently double-annotated cases, minimum required at the current corpus size 3, `doubleAnnotationFractionMet=false`, `readyForFinalReview=false`, and `status="in-progress"`.
 
-This merged-main result is the current engineering baseline. It is not the final release commit because genuine human annotation work in Gate G must still change empirical artifacts before `v1.0.0` can be eligible.
+This merged-main result is the validated engineering baseline. It is not the final release commit because genuine human annotation work in Gate G must still change empirical artifacts before `v1.0.0` can be eligible.
 
 ## Gate A — Repository and version identity
 
 | ID | Status | Evidence / notes |
 |---|---|---|
-| A1 | partial | The engineering integration identity is frozen and validated on `main` at `675ce12b...`. The final release identity is not yet frozen because Gate G requires future verified human evidence and regenerated empirical outputs. |
+| A1 | partial | The engineering integration identity is frozen and validated at `675ce12b...`. The final release identity is not yet frozen because Gate G requires future verified human evidence and regenerated empirical outputs. |
 | A2 | blocked | Final release-validation evidence must bind the eventual exact eligible `main` commit to same-run six-job validation, successful `release-assets`, and post-run API verification of the candidate artifact identity. |
 | A3 | blocked | `v1.0.0` must not be tagged while Gate G, Gate J branch protection, or final candidate verification remains blocking/failing. |
 | A4 | pass | Package `0.4.0` is distinguished from schema, Phase II, projection, evidence-format, and repository release-tag versions. |
@@ -178,7 +178,7 @@ As of 2026-08-26, future-dated August 28 material in `provenance/` consists of a
 
 1. **Human empirical evidence:** complete and freeze the three genuine independent second annotations selected prospectively; verify each return; integrate without rewriting primaries; compute pre-reconciliation agreement honestly; then regenerate corpus validation, study status, metrics, and the final empirical report.
 2. **Branch protection:** require `package`, `lint-type`, and `security` in addition to the currently required `conformance`, `phase2`, and `schema-02`; independently verify the effective PR/up-to-date/review/force-push/deletion/bypass controls or explicitly document and deliberately accept any release deviation.
-3. **Final empirical commit:** after verified human evidence and any reconciliation/report changes are reviewed and merged, run all six exact-SHA jobs on the resulting exact `main` commit. The current green engineering baseline cannot substitute for validation of that future changed commit.
+3. **Final empirical commit:** after verified human evidence and any reconciliation/report changes are reviewed and merged, run all six exact-SHA jobs on the resulting exact `main` commit. The validated engineering baseline cannot substitute for validation of that future changed commit.
 4. **Final candidate:** manually dispatch `validate` on that exact eligible `main` commit. `release-assets` must see same-run six-job success plus `studyStatus.readyForFinalReview=true` and produce the manifest-digest-bound candidate.
 5. **Publication verification:** download the candidate; run offline verification and post-run workflow/artifact verification; inspect the evidence; only then create the annotated repository tag and publish the verified asset set. Re-verify published hashes after upload.
 
@@ -187,8 +187,8 @@ As of 2026-08-26, future-dated August 28 material in `provenance/` consists of a
 - PR #29 exact head passed all six release-critical jobs.
 - PR #29 was merged and closed into `main` with an expected-head SHA lock.
 - The hardening branch was automatically removed after merge.
-- The exact merged `main` commit `675ce12b69309b4eee455eb661d316c53c106333` passed all six release-critical jobs in run `32995711485`.
-- There are no open pull requests.
+- The engineering baseline merge commit `675ce12b69309b4eee455eb661d316c53c106333` passed all six release-critical jobs in run `32995711485`.
+- The post-merge release-control documentation was refreshed through a separate exact-head-validated PR rather than by bypassing `main`.
 - No `v1.0.0` release has been published; the published release line remains at `v0.3.2`.
 
 No adoption pilot and no future funding event are hidden prerequisites for this software-release boundary. No merge, green workflow, or documentation update overrides the remaining human evidence and release-control gates.
