@@ -20,15 +20,28 @@ from release_artifacts import (
 COMMIT = "a" * 40
 
 
+def _nonrelease_evidence(*, commit: str = COMMIT) -> dict:
+    return {
+        "commit": commit,
+        "releaseEligible": False,
+        "workflowRunUrl": (
+            "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1"
+        ),
+        "jobs": {"conformance": "skipped"},
+    }
+
+
 def _release_dir(tmp_path: Path) -> Path:
     out = tmp_path / "release"
     out.mkdir()
-    payloads = []
+    validation = out / "release-validation.json"
+    _write_json(validation, _nonrelease_evidence())
+
+    payloads = [validation]
     for name, content in {
         "ens-gdi-0.4.0-py3-none-any.whl": b"wheel",
         "ens_gdi-0.4.0.tar.gz": b"sdist",
         "ens-grant-decision-integrity-v1.0.0.tar.gz": b"source",
-        "release-validation.json": b'{"ok":true}\n',
         "sbom.cdx.json": b'{"bomFormat":"CycloneDX"}\n',
     }.items():
         path = out / name
@@ -55,7 +68,9 @@ def _eligible_evidence() -> dict:
         "commit": COMMIT,
         "ref": "refs/heads/main",
         "releaseEligible": True,
-        "workflowRunUrl": "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1",
+        "workflowRunUrl": (
+            "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1"
+        ),
         "jobs": {name: "success" for name in sorted(REQUIRED_RELEASE_JOBS)},
         "studyStatus": {"readyForFinalReview": True},
     }
@@ -66,6 +81,7 @@ def test_release_directory_verifies_complete_acyclic_checksum_scope(tmp_path: Pa
     result = verify_directory(out)
 
     assert result["ok"] is True
+    assert result["releaseEligible"] is False
     assert result["verifiedPayloadCount"] == 6
     checksums = (out / CHECKSUM_NAME).read_text(encoding="utf-8")
     assert MANIFEST_NAME in checksums
@@ -97,13 +113,31 @@ def test_release_directory_rejects_checksum_scope_omission(tmp_path: Path) -> No
         verify_directory(out)
 
 
+def test_release_directory_rejects_cross_file_commit_mismatch(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    validation = out / "release-validation.json"
+    _write_json(validation, _nonrelease_evidence(commit="b" * 40))
+
+    manifest = out / MANIFEST_NAME
+    manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+    for artifact in manifest_data["artifacts"]:
+        if artifact["name"] == validation.name:
+            import hashlib
+
+            data = validation.read_bytes()
+            artifact["sha256"] = hashlib.sha256(data).hexdigest()
+            artifact["size"] = len(data)
+    _write_json(manifest, manifest_data)
+
+    payloads = [out / item["name"] for item in manifest_data["artifacts"]]
+    write_checksum_manifest(out, payloads=[*payloads, manifest])
+
+    with pytest.raises(ReleaseArtifactError, match="does not match"):
+        verify_directory(out)
+
+
 def test_validation_evidence_must_bind_exact_commit_and_job_results() -> None:
-    evidence = {
-        "commit": COMMIT,
-        "releaseEligible": False,
-        "workflowRunUrl": "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1",
-        "jobs": {"conformance": "success"},
-    }
+    evidence = _nonrelease_evidence()
     _validate_evidence(evidence, commit=COMMIT)
 
     wrong = json.loads(json.dumps(evidence))
@@ -113,12 +147,8 @@ def test_validation_evidence_must_bind_exact_commit_and_job_results() -> None:
 
 
 def test_validation_evidence_rejects_unrecognized_job_conclusion() -> None:
-    evidence = {
-        "commit": COMMIT,
-        "releaseEligible": False,
-        "workflowRunUrl": "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1",
-        "jobs": {"conformance": "green-ish"},
-    }
+    evidence = _nonrelease_evidence()
+    evidence["jobs"] = {"conformance": "green-ish"}
     with pytest.raises(ReleaseArtifactError, match="invalid validation conclusion"):
         _validate_evidence(evidence, commit=COMMIT)
 
