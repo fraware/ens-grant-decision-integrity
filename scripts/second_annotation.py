@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from corpus_metrics import CATEGORIES, CorpusCaseError, validate_case
+from gdi.jsonutil import StrictJSONError, loads_strict
 
 INDEPENDENCE_ATTESTATION = (
     "I produced this annotation without consulting the withheld primary reconstruction "
@@ -25,9 +26,9 @@ class SecondAnnotationError(Exception):
 
 def _load_json(path: Path, *, label: str, code: str) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise SecondAnnotationError(f"cannot load {label} {path}: {exc}", code=code) from exc
+        value = loads_strict(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
+        raise SecondAnnotationError(f"cannot load strict {label} {path}: {exc}", code=code) from exc
     if not isinstance(value, dict):
         raise SecondAnnotationError(f"{label} must be a JSON object: {path}", code=code)
     return value
