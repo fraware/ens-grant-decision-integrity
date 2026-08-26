@@ -1,8 +1,10 @@
-"""SSRF-safe source capture tests (offline; no live network)."""
+"""SSRF-safe source capture tests (local-only; no external network)."""
 
 from __future__ import annotations
 
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from threading import Thread
 
 import pytest
 
@@ -96,6 +98,51 @@ def test_redirect_into_private_ip_rejected(tmp_path: Path) -> None:
             resolver=resolver,
         )
     assert exc.value.code == "CAP008"
+
+
+def test_default_transport_revalidates_redirect_before_following(tmp_path: Path) -> None:
+    class _Handler(BaseHTTPRequestHandler):
+        reached_secret = False
+
+        def do_GET(self) -> None:
+            if self.path == "/start":
+                port = self.server.server_address[1]
+                self.send_response(302)
+                self.send_header("Location", f"http://localhost:{port}/secret")
+                self.end_headers()
+                return
+            if self.path == "/secret":
+                type(self).reached_secret = True
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain")
+                self.end_headers()
+                self.wfile.write(b"must-not-be-fetched")
+                return
+            self.send_response(404)
+            self.end_headers()
+
+        def log_message(self, _format: str, *args: object) -> None:
+            return None
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        port = server.server_address[1]
+        with pytest.raises(SourceArtifactError) as exc:
+            capture_http(
+                source_uri=f"http://127.0.0.1:{port}/start",
+                out_dir=tmp_path,
+                artifact_id="cap-default-redirect",
+                allow_http=True,
+                allow_private=True,
+            )
+        assert exc.value.code == "CAP006"
+        assert _Handler.reached_secret is False
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
 
 
 def test_manual_file_content_addressed(tmp_path: Path) -> None:
