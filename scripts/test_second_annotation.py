@@ -24,6 +24,26 @@ HANDOFF_PATH = (
     / "spp3-namespace-2026.handoff.json"
 )
 FROZEN_HANDOFF_SHA256 = "48047269447cf331ed76403773d8431bcb44fe39dd3ee3853fff5e555a4d4674"
+FROZEN_HANDOFFS = (
+    (
+        "spp3-namespace-2026",
+        "spp3-namespace-2026.handoff.json",
+        "48047269447cf331ed76403773d8431bcb44fe39dd3ee3853fff5e555a4d4674",
+        13655,
+    ),
+    (
+        "spp3-ethid-withdrawal-2026",
+        "spp3-ethid-withdrawal-2026.handoff.json",
+        "8cce81fc95b9066aa1959cce0f89abb62170230841ebf2b4249b4a68c42e6f01",
+        13334,
+    ),
+    (
+        "spp2-agora-budget-rejection-2025",
+        "spp2-agora-budget-rejection-2025.handoff.json",
+        "74bd65b6f29e55836f6932b9a3b562d1efa7480086c1fcec4d6f1c6a9489d83a",
+        13730,
+    ),
+)
 
 
 def _case() -> dict:
@@ -86,6 +106,28 @@ def test_handoff_exposes_full_classification_vocabulary() -> None:
         "unknown",
         "not-applicable",
     }
+
+
+@pytest.mark.parametrize(
+    ("case_dir", "handoff_name", "expected_sha256", "expected_bytes"),
+    FROZEN_HANDOFFS,
+)
+def test_all_frozen_handoffs_match_declared_bytes_and_current_cases(
+    case_dir: str,
+    handoff_name: str,
+    expected_sha256: str,
+    expected_bytes: int,
+) -> None:
+    case_path = ROOT / "corpus" / "cases" / case_dir / "case.json"
+    handoff_path = ROOT / "corpus" / "second-annotation-handoffs" / handoff_name
+    frozen_bytes = handoff_path.read_bytes()
+
+    assert len(frozen_bytes) == expected_bytes
+    assert hashlib.sha256(frozen_bytes).hexdigest() == expected_sha256
+
+    case = _load_json(case_path, label="corpus case", code="ANN001")
+    handoff = _load_json(handoff_path, label="annotation handoff", code="ANN004")
+    assert handoff == build_handoff(case, base_dir=case_path.parent)
 
 
 def test_frozen_handoff_digest_and_current_verifier_compatibility() -> None:
