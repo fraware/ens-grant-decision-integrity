@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from gdi.jsonutil import StrictJSONError, loads_strict
 from gdi.resources import ResourceError, resource_path
 
 HASH_PREFIX = "sha256:"
@@ -228,8 +229,8 @@ def _failure(exc: SourceArtifactError) -> dict[str, Any]:
 
 def _load_json(path: Path) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        value = loads_strict(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
         raise SourceArtifactError(f"source-artifact input error: {exc}", code="SRC005") from exc
     if not isinstance(value, dict):
         raise SourceArtifactError("source-artifact metadata must be a JSON object", code="SRC005")
