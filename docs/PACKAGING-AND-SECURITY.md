@@ -17,7 +17,7 @@ gdi profiles
 python -m build
 ```
 
-Package name: `ens-gdi`. Console entry point: `gdi`. Software version is independent of grant-decision `schemaVersion` `"0.1"`.
+Package name: `ens-gdi`. Console entry point: `gdi`. Software package versioning is independent of grant-decision `schemaVersion` `"0.1"` and is recorded separately from the repository release tag in `release-manifest.json`.
 
 ## Hash-locked dependencies
 
@@ -35,7 +35,20 @@ First-order version pins are **not** a complete transitive lock. The `security` 
 
 Regenerate `requirements.lock.txt` whenever release dependencies change. The recorded binary hashes are platform-specific where wheels are platform-specific; the release validation contract is Ubuntu + CPython 3.12. A different platform must regenerate and independently validate the applicable hashes rather than assuming this lock is portable.
 
-## Additive CI jobs
+## Exact-SHA CI identity
+
+For pull requests, GitHub's default checkout is a synthetic merge ref, not necessarily the raw PR-head commit. The release-facing workflow therefore defines:
+
+```text
+VALIDATION_SHA = pull_request.head.sha  # pull_request
+VALIDATION_SHA = github.sha             # push / workflow_dispatch
+```
+
+Every job checks out `VALIDATION_SHA` explicitly and immediately asserts `git rev-parse HEAD == VALIDATION_SHA`. Historical PR runs that used the default synthetic merge checkout are integration evidence only and must not be cited as raw-head execution evidence.
+
+After merge, `main` receives a fresh push run for the exact resulting commit. A public release additionally uses `workflow_dispatch` on that exact `main` SHA so all six release jobs and asset assembly belong to the same workflow run.
+
+## CI jobs
 
 Existing required semantic job names are preserved:
 
@@ -47,34 +60,57 @@ Additive jobs (do not rename the three above):
 
 | Job | Purpose |
 |---|---|
-| `package` | Build sdist/wheel; install wheel in a clean venv; exercise substantive CLI paths away from the source checkout |
+| `package` | Exercise release-asset assembly in non-release mode; install the assembled wheel in a clean venv; exercise substantive CLI paths away from the source checkout |
 | `lint-type` | `ruff` on release-facing modules and adapters; `mypy` on adapters |
-| `security` | Audit development pins; prove runtime-lock coverage/installability; `pip check`; audit the locked environment |
+| `security` | Audit development pins; prove lock coverage/installability; `pip check`; audit the locked environment |
 
 Branch protection may continue to require only the three semantic gates for ordinary PRs. Before `v1.0.0`, all six jobs must be green on the exact release-candidate commit and again on the exact merged release commit before tagging.
 
-## Static analysis notes
+## Release artifact assembler
 
-- **Ruff:** configured in `pyproject.toml`; CI fails on lint findings for the explicitly enumerated release-facing package, adapter, and test surfaces.
-- **Mypy:** gradual typing is currently enforced on `adapters`. Do not describe this as whole-repository static type coverage, and do not treat a coverage percentage as a correctness metric.
+`scripts/release_artifacts.py` is the single release-payload assembly and verification path.
 
-## SBOM tooling
+A normal PR `package` job runs it with `releaseEligible=false` to exercise the complete build/SBOM/manifest/checksum machinery without creating release evidence. The generated smoke bundle is disposable and cannot satisfy release gates.
 
-For a release candidate, generate an SBOM from the built package/environment and attach it as a release asset:
+For an actual release candidate, manually dispatch `validate` on the exact `main` commit with the prospective repository tag. The `release-assets` job runs only after the six validation jobs and additionally requires:
+
+- `GITHUB_REF == refs/heads/main`;
+- checkout SHA equals `VALIDATION_SHA`;
+- `scripts/study_status.py` returns `readyForFinalReview=true`;
+- same-run conclusions for exactly `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security` are all `success`.
+
+The assembler independently validates those conditions when `releaseEligible=true`; they are not trusted merely because the workflow wrapper says so.
+
+The assembled payload contains:
+
+1. exact-commit source archive;
+2. Python wheel;
+3. Python sdist;
+4. `sbom.cdx.json`;
+5. `release-validation.json`;
+6. `release-manifest.json`;
+7. `SHA256SUMS`.
+
+`release-manifest.json` records the repository tag and commit, package name/version, and hashes/sizes of the source archive, wheel, sdist, SBOM, and validation report. `SHA256SUMS` is created last over those five files plus `release-manifest.json`. It necessarily excludes itself. This avoids a circular self-hash while still placing every other attached payload under the checksum manifest.
+
+Verify a downloaded/unpacked candidate with:
 
 ```bash
-# CycloneDX (optional extra: pip install 'ens-gdi[sbom]' or cyclonedx-bom)
-cyclonedx-py environment -o sbom.cdx.json
-# or
-cyclonedx-py pyproject -o sbom.cdx.json
-
-# SPDX: use an SPDX-capable tool against the same locked environment
-# (for example syft/trivy scan of the release venv or built wheel).
+python scripts/release_artifacts.py verify path/to/release-directory
 ```
 
-Publish the SBOM alongside wheel, sdist, SHA-256 manifest, and release validation report. The SBOM-generation toolchain is separate from the application runtime lock unless explicitly incorporated into that lock and validated. Record the tool/version used in the release manifest.
+Verification fails on missing payloads, extra unchecksummed files, duplicate checksum entries, size mismatches, or SHA-256 mismatches.
 
-This repository does **not** claim byte-reproducible builds unless two independent clean builds of the same commit produce byte-identical artifacts under a documented process and that evidence is attached.
+## SBOM generation
+
+The release assembler installs the hash-locked validation environment in a clean temporary venv, installs the built `ens-gdi` wheel with `--no-deps`, and invokes the pinned `pip-audit` toolchain to emit CycloneDX JSON for that installed environment. The SBOM therefore describes the release-validation environment containing the built package and locked dependencies; it is not presented as a minimal-runtime-only dependency graph.
+
+The SBOM toolchain is part of the validated release environment in `requirements.lock.txt`. A future change to a different SBOM generator or scope requires an explicit documentation and lock update.
+
+## Static analysis notes
+
+- **Ruff:** configured in `pyproject.toml`; CI fails on lint findings for the explicitly enumerated release-facing package, adapter, release-engineering, and test surfaces.
+- **Mypy:** gradual typing is currently enforced on `adapters`. Do not describe this as whole-repository static type coverage, and do not treat a coverage percentage as a correctness metric.
 
 ## Branch protection (required settings)
 
