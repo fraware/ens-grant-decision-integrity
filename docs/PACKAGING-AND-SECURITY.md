@@ -4,6 +4,7 @@
 
 - **Supported / CI-tested runtime:** CPython **3.12**
 - `requires-python = ">=3.12"` in `pyproject.toml`
+- Release hash validation is executed on the documented Ubuntu + CPython 3.12 CI platform
 - Do not claim a broader support matrix than CI exercises
 
 ## Installable package
@@ -24,13 +25,15 @@ Package name: `ens-gdi`. Console entry point: `gdi`. Software version is indepen
 |---|---|
 | `requirements-dev.txt` | Direct development/validation pins |
 | `phase2/requirements.txt` | Phase II direct pins |
-| `requirements.lock.txt` | Hash-locked direct + transitive set for release/validation reinstall |
+| `requirements.lock.txt` | Hash-locked runtime + validation dependency set for the documented CI platform |
 
 ```bash
 python -m pip install --require-hashes -r requirements.lock.txt
 ```
 
-First-order version pins are **not** a complete transitive lock. Regenerate `requirements.lock.txt` when release dependencies change. Platform-specific wheels can differ; release validation should use the documented CI platform (ubuntu + CPython 3.12) or regenerate hashes there.
+First-order version pins are **not** a complete transitive lock. The `security` CI job therefore checks that every direct runtime dependency declared in `pyproject.toml` is represented in `requirements.lock.txt`, creates a clean virtual environment, performs the exact `--require-hashes` install, runs `pip check`, and audits the resulting locked environment. A file-presence check or separately printed wheel hashes is not sufficient release evidence.
+
+Regenerate `requirements.lock.txt` whenever release dependencies change. The recorded binary hashes are platform-specific where wheels are platform-specific; the release validation contract is Ubuntu + CPython 3.12. A different platform must regenerate and independently validate the applicable hashes rather than assuming this lock is portable.
 
 ## Additive CI jobs
 
@@ -44,16 +47,16 @@ Additive jobs (do not rename the three above):
 
 | Job | Purpose |
 |---|---|
-| `package` | Build sdist/wheel; install wheel; CLI smoke |
-| `lint-type` | `ruff` on adapters/package; `mypy` on public modules |
-| `security` | `pip-audit` on direct pins; lock/SBOM notes |
+| `package` | Build sdist/wheel; install wheel in a clean venv; exercise substantive CLI paths away from the source checkout |
+| `lint-type` | `ruff` on release-facing modules and adapters; `mypy` on adapters |
+| `security` | Audit development pins; prove runtime-lock coverage/installability; `pip check`; audit the locked environment |
 
-Branch protection may continue to require only the three semantic gates for ordinary PRs. Before `v1.0.0`, package/lint/security should be green on the exact release-candidate commit (release workflow or required checks).
+Branch protection may continue to require only the three semantic gates for ordinary PRs. Before `v1.0.0`, all six jobs must be green on the exact release-candidate commit and again on the exact merged release commit before tagging.
 
 ## Static analysis notes
 
-- **Ruff:** configured in `pyproject.toml`; CI fails on lint findings for `src/gdi`, `adapters`, and new profile/adapter tests.
-- **Mypy:** gradual typing on `gdi` and `adapters`. Tighten public APIs over time; do not treat global coverage percentage as a correctness metric.
+- **Ruff:** configured in `pyproject.toml`; CI fails on lint findings for the explicitly enumerated release-facing package, adapter, and test surfaces.
+- **Mypy:** gradual typing is currently enforced on `adapters`. Do not describe this as whole-repository static type coverage, and do not treat a coverage percentage as a correctness metric.
 
 ## SBOM tooling
 
@@ -69,7 +72,9 @@ cyclonedx-py pyproject -o sbom.cdx.json
 # (for example syft/trivy scan of the release venv or built wheel).
 ```
 
-Publish the SBOM alongside wheel, sdist, SHA-256 manifest, and release validation report. This repository does **not** claim byte-reproducible builds unless two independent clean builds of the same commit produce byte-identical artifacts under a documented process and that evidence is attached.
+Publish the SBOM alongside wheel, sdist, SHA-256 manifest, and release validation report. The SBOM-generation toolchain is separate from the application runtime lock unless explicitly incorporated into that lock and validated. Record the tool/version used in the release manifest.
+
+This repository does **not** claim byte-reproducible builds unless two independent clean builds of the same commit produce byte-identical artifacts under a documented process and that evidence is attached.
 
 ## Branch protection (required settings)
 
@@ -92,4 +97,4 @@ See also `docs/BRANCH-PROTECTION.md`.
 
 ## Reproducible build claims
 
-Deterministic inputs and a documented build recipe (Python 3.12, locked deps, `python -m build`) are expected. **Byte-reproducible** wheel/sdist identity across machines is **not** claimed unless demonstrated with evidence.
+Deterministic inputs and a documented build recipe (Python 3.12, validated hash-locked dependencies, `python -m build`) are expected. **Byte-reproducible** wheel/sdist identity across machines is **not** claimed unless demonstrated with evidence.
