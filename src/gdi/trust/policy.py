@@ -69,7 +69,10 @@ def load_trust_policy(path: Path) -> tuple[dict[str, Any], str]:
     try:
         policy = loads_strict(raw.decode("utf-8"))
     except (UnicodeDecodeError, StrictJSONError) as exc:
-        raise TrustPolicyError(f"trust policy is not valid strict JSON: {exc}", code="TRUST003") from exc
+        raise TrustPolicyError(
+            f"trust policy is not valid strict JSON: {exc}",
+            code="TRUST003",
+        ) from exc
     if not isinstance(policy, dict):
         raise TrustPolicyError("trust policy must be a JSON object", code="TRUST003")
     try:
