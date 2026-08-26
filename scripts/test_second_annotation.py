@@ -117,6 +117,15 @@ def test_verify_accepts_not_applicable_with_rationale() -> None:
     assert verified["rationale"]
 
 
+def test_verify_rejects_primary_annotation_id_reuse() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"]["annotationId"] = case["annotations"][0]["annotationId"]
+
+    with pytest.raises(SecondAnnotationError, match="annotationId distinct") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN006"
+
+
 def test_verify_rejects_primary_annotator_reuse() -> None:
     case, handoff = _completed_unknown_handoff()
     handoff["annotationSubmission"]["annotatorId"] = case["annotations"][0]["annotatorId"]
@@ -151,6 +160,15 @@ def test_verify_rejects_wrong_independence_attestation() -> None:
     with pytest.raises(SecondAnnotationError, match="attestation text") as exc:
         verify_submission(case, handoff, base_dir=CASE_PATH.parent)
     assert exc.value.code == "ANN006"
+
+
+def test_verify_rejects_nonfinite_elapsed_minutes() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"]["elapsedMinutes"] = float("nan")
+
+    with pytest.raises(SecondAnnotationError, match="finite non-negative") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN005"
 
 
 def test_verify_rejects_missing_material_field() -> None:
