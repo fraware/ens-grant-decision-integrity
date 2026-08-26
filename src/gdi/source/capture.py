@@ -56,6 +56,21 @@ class CaptureResult:
     capture_log_path: Path
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Force redirects back through the capture loop for destination revalidation."""
+
+    def redirect_request(
+        self,
+        req: urllib.request.Request,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+        newurl: str,
+    ) -> None:
+        return None
+
+
 def _utc_now() -> str:
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -400,6 +415,15 @@ def capture_http(
     crossed_origin = False
     original = urlsplit(source_uri)
 
+    network_opener = opener
+    if network_opener is None:
+        context = ssl.create_default_context()
+        transport = urllib.request.build_opener(
+            _NoRedirectHandler(),
+            urllib.request.HTTPSHandler(context=context),
+        )
+        network_opener = transport.open
+
     for _ in range(max_redirects + 1):
         assert_safe_url(
             current,
@@ -413,11 +437,7 @@ def capture_http(
             method="GET",
         )
         try:
-            if opener is not None:
-                response = opener(request, timeout=timeout_sec)
-            else:
-                context = ssl.create_default_context()
-                response = urllib.request.urlopen(request, timeout=timeout_sec, context=context)
+            response = network_opener(request, timeout=timeout_sec)
         except urllib.error.HTTPError as exc:
             if 300 <= exc.code < 400 and exc.headers.get("Location"):
                 location = exc.headers["Location"]
