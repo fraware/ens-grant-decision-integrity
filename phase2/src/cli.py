@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from gdi.jsonutil import StrictJSONError, loads_strict
+
 SRC_DIR = Path(__file__).resolve().parent
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
@@ -25,7 +27,10 @@ from support import Phase2Error, VerificationResult  # noqa: E402
 
 
 def _load_json(path: str) -> Any:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    try:
+        return loads_strict(Path(path).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
+        raise Phase2Error(f"invalid strict JSON input {path}: {exc}", code="CLI012") from exc
 
 
 def _write_json(path: str, value: Any) -> None:
