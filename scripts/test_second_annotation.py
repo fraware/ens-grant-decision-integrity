@@ -47,6 +47,18 @@ def test_prepare_strips_primary_reconstruction_material() -> None:
     assert all(set(field) == {"path", "requiredForProfile"} for field in handoff["materialFields"])
 
 
+def test_handoff_exposes_full_classification_vocabulary() -> None:
+    handoff = build_handoff(_case(), base_dir=CASE_PATH.parent)
+
+    assert set(handoff["classificationDefinitions"]) == {
+        "direct-source",
+        "derived",
+        "interpretive",
+        "unknown",
+        "not-applicable",
+    }
+
+
 def test_verify_accepts_complete_independent_unknown_annotation() -> None:
     case, handoff = _completed_unknown_handoff()
     annotation = verify_submission(case, handoff, base_dir=CASE_PATH.parent)
@@ -55,6 +67,22 @@ def test_verify_accepts_complete_independent_unknown_annotation() -> None:
     assert annotation["independent"] is True
     assert len(annotation["fields"]) == len(case["annotations"][0]["fields"])
     assert {field["classification"] for field in annotation["fields"]} == {"unknown"}
+
+
+def test_verify_accepts_not_applicable_with_rationale() -> None:
+    case, handoff = _completed_unknown_handoff()
+    field = next(
+        item
+        for item in handoff["annotationSubmission"]["fields"]
+        if item["path"] == "/timestamps/createdAt"
+    )
+    field["classification"] = "not-applicable"
+    field["rationale"] = "Reconstruction metadata is outside the historical process being reconstructed."
+
+    annotation = verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    verified = next(item for item in annotation["fields"] if item["path"] == "/timestamps/createdAt")
+    assert verified["classification"] == "not-applicable"
+    assert verified["rationale"]
 
 
 def test_verify_rejects_primary_annotator_reuse() -> None:
