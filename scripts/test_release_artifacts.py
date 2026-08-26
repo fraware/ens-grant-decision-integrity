@@ -12,6 +12,7 @@ from release_artifacts import (
     REQUIRED_RELEASE_JOBS,
     VALIDATION_LOCK_NAME,
     ReleaseArtifactError,
+    _load_json,
     _validate_evidence,
     _validate_github_artifacts,
     _validate_github_records,
@@ -172,6 +173,29 @@ def test_release_directory_verifies_complete_acyclic_checksum_scope(tmp_path: Pa
     assert BUILD_LOCK_NAME in checksums
     assert VALIDATION_LOCK_NAME in checksums
     assert CHECKSUM_NAME not in checksums
+
+
+def test_release_manifest_rejects_duplicate_json_keys(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    manifest = out / MANIFEST_NAME
+    raw = manifest.read_text(encoding="utf-8")
+    raw = raw.replace(
+        '"manifestVersion": "1",',
+        '"manifestVersion": "1",\n  "manifestVersion": "ambiguous",',
+        1,
+    )
+    manifest.write_text(raw, encoding="utf-8")
+
+    with pytest.raises(ReleaseArtifactError, match="duplicate JSON object key"):
+        verify_directory(out)
+
+
+def test_release_json_loader_rejects_nonstandard_nan(tmp_path: Path) -> None:
+    path = tmp_path / "evidence.json"
+    path.write_text('{"releaseEligible": NaN}\n', encoding="utf-8")
+
+    with pytest.raises(ReleaseArtifactError, match="non-standard JSON numeric constant"):
+        _load_json(path, label="test evidence")
 
 
 def test_release_directory_rejects_payload_tampering(tmp_path: Path) -> None:
