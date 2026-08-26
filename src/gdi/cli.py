@@ -13,7 +13,13 @@ from gdi import __version__
 from gdi.bundle import BundleError, verify_bundle
 from gdi.claims import ClaimRegistryError, lookup
 from gdi.core.runtime import validate_record
-from gdi.exit_codes import EVIDENCE_FAILURE, INTERNAL_ERROR, OK, UNSUPPORTED, USAGE_ERROR
+from gdi.exit_codes import (
+    EVIDENCE_FAILURE,
+    INTERNAL_ERROR,
+    OK,
+    UNSUPPORTED,
+    USAGE_ERROR,
+)
 from gdi.phase2 import phase2_error_type, verify_graph_bundle
 from gdi.report import render_text
 from gdi.resources import ResourceError, resource_path
@@ -133,7 +139,8 @@ def main(argv: list[str] | None = None) -> int:
             findings = validate_record(record)
             for finding in findings:
                 print(finding.render())
-            return OK if not any(item.severity == "error" for item in findings) else EVIDENCE_FAILURE
+            has_errors = any(item.severity == "error" for item in findings)
+            return EVIDENCE_FAILURE if has_errors else OK
 
         if args.command == "verify-source":
             metadata = json.loads(args.metadata.read_text(encoding="utf-8"))
