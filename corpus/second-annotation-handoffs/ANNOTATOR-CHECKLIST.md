@@ -30,9 +30,9 @@ Public sources may reveal the historical outcome. Independence means reconstruct
 
 1. Use a distinct `annotatorId` that is not the primary annotator ID.
 2. Cover every material field in the handoff (same paths; do not add/remove fields).
-3. Classify each field using only the allowed classes (`direct-source`, `derived`, `interpretive`, `unknown`).
+3. Classify each field using exactly one class defined in the frozen handoff: `direct-source`, `derived`, `interpretive`, `unknown`, or `not-applicable`. Use `not-applicable` only when the field is outside the represented process/profile and provide a rationale, as required by the verifier.
 4. Cite only source artifact IDs from the handoff inventory.
-5. Record elapsed minutes honestly.
+5. Record `elapsedMinutes` honestly as active time spent inspecting the supplied source set and producing the annotation submission. Exclude unrelated breaks, communication, engineering/package preparation, and post-submission reconciliation. This timing instruction standardizes second-annotation timing prospectively; it does not retroactively redefine the scope of previously recorded primary-annotation times.
 6. Set `independent=true` only if you did not consult withheld primary materials before submission. If you did consult them, stop and return the package unused; do not mark independent.
 
 ## Operator verify + integrate (after return)
@@ -68,4 +68,6 @@ Then, for each verified annotation (human review, not automatic merge):
 
 - Integration remains **blocked** until all three human returns verify.
 - Tooling cannot prove the human process was independent.
+- Three completed cases satisfy the predeclared 25% minimum at the current corpus size, but that case count is too small to support a population-level reliability claim. Agreement statistics remain descriptive for these cases unless a larger independent-annotation sample is obtained.
+- `elapsedMinutes` is an annotation-time observation, not a complete measure of source discovery, institutional administration, or total adoption cost.
 - This checklist is not itself a second annotation and does not count toward the double-annotation fraction.
