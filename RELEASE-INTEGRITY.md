@@ -29,28 +29,38 @@ For a public release:
 2. require green validation on the exact release commit for all six release-critical CI jobs: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security`;
 3. record that commit SHA;
 4. use the `validate` workflow's manual `workflow_dispatch` release-candidate path on **that exact `main` commit**. The workflow reruns all six release jobs on the selected SHA, requires `scripts/study_status.py` to report `readyForFinalReview=true`, and only then invokes `scripts/release_artifacts.py`;
-5. inspect and independently verify the uploaded release-candidate payload before creating a tag;
-6. create an annotated tag pointing to that exact commit;
+5. after the workflow has completed, download the candidate and perform both verification layers before creating a tag:
+   - `python scripts/release_artifacts.py verify <release-directory>` for offline file/manifest/internal-report integrity;
+   - `python scripts/release_artifacts.py verify-github <release-directory>` for online authentication of the recorded GitHub Actions run and job state. `GITHUB_TOKEN` may be supplied for API authentication/rate limits but is not required for the public repository when anonymous API access is available;
+6. create an annotated tag pointing to that exact commit only after both layers succeed;
 7. attach explicit release assets (not only auto-generated source archives):
    - source archive from the exact release commit;
    - Python wheel;
    - source distribution (sdist);
    - SBOM (CycloneDX JSON generated from the installed wheel plus the validated locked environment);
-   - release validation report bound to the same workflow run, exact commit, six job conclusions, and study-status output;
+   - release validation report containing the workflow-run identity, exact commit, six prerequisite job conclusions, and study-status output;
    - `requirements-build.lock.txt`, the hash-locked release build frontend/backend toolchain;
    - `requirements.lock.txt`, the hash-locked release/validation environment used by the SBOM path;
    - machine-readable release manifest (tag, commit, package version, toolchain policy, payload names/hashes/sizes, validation report reference);
    - SHA-256 checksum manifest generated **last**, covering every attached payload asset including the release manifest but necessarily excluding the checksum manifest itself;
    - optional signed build provenance/attestation when infrastructure supports it;
-8. run `python scripts/release_artifacts.py verify <release-directory>` before publication and verify every published artifact hash again after upload;
-9. publish the tag, commit SHA, package version, asset filenames, and SHA-256 digests together in the release notes;
+8. verify every published artifact hash again after upload;
+9. publish the tag, commit SHA, package version, workflow run ID, asset filenames, and SHA-256 digests together in the release notes;
 10. preserve the Simocracy proposal and decision source identifiers in provenance records, keeping allocation-decision status separate from payment authorization, transfer, receipt, and settlement evidence.
 
 The checksum graph is intentionally acyclic. `release-manifest.json` records hashes/sizes for the source archive, wheel, sdist, SBOM, validation report, build lock, and validation-environment lock. `SHA256SUMS` is then generated over those files **plus `release-manifest.json`**. `SHA256SUMS` cannot cryptographically include its own final digest and is therefore the sole attached payload excluded from its own scope.
 
-The downloaded-candidate verifier does more than recompute digests. It rejects unsafe/path-escaping asset names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, digest mismatches, invalid toolchain policy, and manifest/validation-report commit disagreement.
+The offline downloaded-candidate verifier does more than recompute digests. It rejects unsafe/path-escaping asset names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, digest mismatches, invalid toolchain policy, and manifest/validation-report commit disagreement.
 
-The manual release path and the assembler both fail closed. `releaseEligible=true` evidence is accepted only when it is bound to `refs/heads/main`, contains exactly the six required release jobs with conclusion `success`, and embeds `studyStatus.readyForFinalReview=true`. A normal PR `package` job exercises the same assembly machinery with `releaseEligible=false`; a successful smoke bundle is not release evidence.
+### GitHub Actions evidence boundary
+
+`release-validation.json` is a file produced by the workflow. Hashing that file proves the exact bytes distributed; validating its fields proves only that those bytes satisfy the local evidence schema/policy. Neither operation independently proves that GitHub actually executed the stated workflow or recorded the stated conclusions.
+
+`verify-github` closes that separate online provenance gap by querying GitHub's Actions API after the run has completed. For a release-eligible candidate it requires the report and GitHub record to agree on repository, workflow name/path, `workflow_dispatch` event, run ID, run attempt, `main` branch, exact commit SHA, completed/successful workflow conclusion, and run URL. It also requires exactly the six release-critical prerequisite jobs plus `release-assets`, all completed successfully; successful `Assert exact validation SHA` steps in each prerequisite job; and a successful `Require exact main-branch release commit` step in `release-assets`.
+
+This remains bounded evidence. `verify-github` authenticates current GitHub API state for the referenced run; it is not a cryptographic signature by GitHub over the downloaded assets. Candidate byte identity is checked separately by the manifest/checksum layer. A future signed artifact attestation may strengthen this boundary, but none is claimed unless actually generated and verified.
+
+The workflow and assembler still fail closed internally. `releaseEligible=true` report content is accepted only when it declares the expected repository/workflow/event identity, a positive run ID/attempt, `refs/heads/main`, exactly the six required prerequisite jobs with conclusion `success`, and `studyStatus.readyForFinalReview=true`. A normal PR `package` job uses `releaseEligible=false`; a successful smoke bundle is not release evidence.
 
 Release distribution assembly also has a separate build trust boundary. `pyproject.toml` exactly pins the PEP 517 backend requirements, `requirements-build.lock.txt` hash-locks the build frontend/backend environment, and the assembler creates a disposable build venv from that lock before invoking `python -m build --no-isolation`. This prevents a future open-ended `setuptools>=...` resolution from silently changing release artifact construction.
 
