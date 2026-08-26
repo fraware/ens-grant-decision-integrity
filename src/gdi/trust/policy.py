@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from gdi.jsonutil import StrictJSONError, loads_strict
 from gdi.resources import resource_path
 
 
@@ -66,9 +67,11 @@ def load_trust_policy(path: Path) -> tuple[dict[str, Any], str]:
         raise TrustPolicyError(f"cannot read trust policy: {exc}", code="TRUST002") from exc
     digest = "sha256:" + hashlib.sha256(raw).hexdigest()
     try:
-        policy = json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise TrustPolicyError(f"trust policy is not valid JSON: {exc}", code="TRUST003") from exc
+        policy = loads_strict(raw.decode("utf-8"))
+    except (UnicodeDecodeError, StrictJSONError) as exc:
+        raise TrustPolicyError(f"trust policy is not valid strict JSON: {exc}", code="TRUST003") from exc
+    if not isinstance(policy, dict):
+        raise TrustPolicyError("trust policy must be a JSON object", code="TRUST003")
     try:
         import jsonschema
 
