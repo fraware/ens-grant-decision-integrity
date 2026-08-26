@@ -13,7 +13,7 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
@@ -45,7 +45,10 @@ def _hash_file(path: Path) -> tuple[str, int]:
     try:
         handle = path.open("rb")
     except OSError as exc:
-        raise SourceArtifactError(f"cannot open captured source bytes: {exc}", code="SRC001") from exc
+        raise SourceArtifactError(
+            f"cannot open captured source bytes: {exc}",
+            code="SRC001",
+        ) from exc
     digest = hashlib.sha256()
     size = 0
     with handle:
@@ -148,8 +151,7 @@ def build_artifact(
         "artifactVersion": "1",
         "artifactId": artifact_id,
         "sourceUri": source_uri,
-        "capturedAt": captured_at
-        or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "capturedAt": captured_at or datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "mediaType": media_type,
         "byteLength": size,
         "contentHash": content_hash,
@@ -207,7 +209,10 @@ def verification_result(verified: VerifiedSourceArtifact) -> dict[str, Any]:
             "Byte identity does not establish source truth or completeness.",
             "Byte identity does not establish institutional adoption or authority.",
             "capturedAt is capture metadata, not an independently verified timestamp.",
-            "sourceUri and resolvedUri are declared provenance fields; source ownership is not authenticated.",
+            (
+                "sourceUri and resolvedUri are declared provenance fields; "
+                "source ownership is not authenticated."
+            ),
         ],
     }
 
@@ -235,7 +240,10 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     try:
         path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
     except OSError as exc:
-        raise SourceArtifactError(f"cannot write source-artifact output: {exc}", code="SRC007") from exc
+        raise SourceArtifactError(
+            f"cannot write source-artifact output: {exc}",
+            code="SRC007",
+        ) from exc
 
 
 def main(argv: list[str] | None = None) -> int:
