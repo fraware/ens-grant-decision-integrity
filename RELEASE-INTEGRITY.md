@@ -31,7 +31,7 @@ For a public release:
 4. use the `validate` workflow's manual `workflow_dispatch` release-candidate path on **that exact `main` commit**. The workflow reruns all six release jobs on the selected SHA, requires `scripts/study_status.py` to report `readyForFinalReview=true`, and only then invokes `scripts/release_artifacts.py`;
 5. after the workflow has completed, download the candidate and perform both verification layers before creating a tag:
    - `python scripts/release_artifacts.py verify <release-directory>` for offline file/manifest/internal-report integrity;
-   - `python scripts/release_artifacts.py verify-github <release-directory>` for online authentication of the recorded GitHub Actions run and job state. `GITHUB_TOKEN` may be supplied for API authentication/rate limits but is not required for the public repository when anonymous API access is available;
+   - `python scripts/release_artifacts.py verify-github <release-directory>` for online authentication of the recorded GitHub Actions run, job state, and run-scoped uploaded-candidate identity. `GITHUB_TOKEN` may be supplied for API authentication/rate limits but is not required for the public repository when anonymous API access is available;
 6. create an annotated tag pointing to that exact commit only after both layers succeed;
 7. attach explicit release assets (not only auto-generated source archives):
    - source archive from the exact release commit;
@@ -43,22 +43,29 @@ For a public release:
    - `requirements.lock.txt`, the hash-locked release/validation environment used by the SBOM path;
    - machine-readable release manifest (tag, commit, package version, toolchain policy, payload names/hashes/sizes, validation report reference);
    - SHA-256 checksum manifest generated **last**, covering every attached payload asset including the release manifest but necessarily excluding the checksum manifest itself;
-   - optional signed build provenance/attestation when infrastructure supports it;
 8. verify every published artifact hash again after upload;
-9. publish the tag, commit SHA, package version, workflow run ID, asset filenames, and SHA-256 digests together in the release notes;
+9. publish the tag, commit SHA, package version, workflow run ID, release-manifest SHA-256, asset filenames, and SHA-256 digests together in the release notes;
 10. preserve the Simocracy proposal and decision source identifiers in provenance records, keeping allocation-decision status separate from payment authorization, transfer, receipt, and settlement evidence.
 
 The checksum graph is intentionally acyclic. `release-manifest.json` records hashes/sizes for the source archive, wheel, sdist, SBOM, validation report, build lock, and validation-environment lock. `SHA256SUMS` is then generated over those files **plus `release-manifest.json`**. `SHA256SUMS` cannot cryptographically include its own final digest and is therefore the sole attached payload excluded from its own scope.
 
-The offline downloaded-candidate verifier does more than recompute digests. It rejects unsafe/path-escaping asset names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, digest mismatches, invalid toolchain policy, and manifest/validation-report commit disagreement.
+The offline downloaded-candidate verifier does more than recompute digests. It rejects unsafe/path-escaping asset names, symbolic links, nested or non-regular entries, missing or unexpected payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, digest mismatches, invalid toolchain policy, and manifest/validation-report commit disagreement.
 
-### GitHub Actions evidence boundary
+### GitHub Actions evidence and artifact binding
 
 `release-validation.json` is a file produced by the workflow. Hashing that file proves the exact bytes distributed; validating its fields proves only that those bytes satisfy the local evidence schema/policy. Neither operation independently proves that GitHub actually executed the stated workflow or recorded the stated conclusions.
 
 `verify-github` closes that separate online provenance gap by querying GitHub's Actions API after the run has completed. For a release-eligible candidate it requires the report and GitHub record to agree on repository, workflow name/path, `workflow_dispatch` event, run ID, run attempt, `main` branch, exact commit SHA, completed/successful workflow conclusion, and run URL. It also requires exactly the six release-critical prerequisite jobs plus `release-assets`, all completed successfully; successful `Assert exact validation SHA` steps in each prerequisite job; and a successful `Require exact main-branch release commit` step in `release-assets`.
 
-This remains bounded evidence. `verify-github` authenticates current GitHub API state for the referenced run; it is not a cryptographic signature by GitHub over the downloaded assets. Candidate byte identity is checked separately by the manifest/checksum layer. A future signed artifact attestation may strengthen this boundary, but none is claimed unless actually generated and verified.
+The workflow additionally computes SHA-256 over the generated `release-manifest.json` and includes that 64-hex digest in the name of the sole Actions artifact uploaded by `release-assets`:
+
+```text
+release-candidate-<tag>-<commit>-<release-manifest-sha256>
+```
+
+`verify-github` recomputes the manifest digest from the downloaded directory and requires GitHub's run-scoped artifacts API to expose exactly one non-expired artifact with that exact name. Because the manifest itself hashes every non-control payload and `SHA256SUMS` hashes the manifest, this binds the locally verified candidate graph to the artifact identity recorded for the exact successful workflow run, subject to SHA-256 collision resistance and trust in GitHub's API state.
+
+This remains bounded evidence. GitHub artifact-name binding is not a cryptographic signature by GitHub over each file, and it does not prove that GitHub cannot later alter API state. Candidate byte identity is checked separately by the manifest/checksum layer. A future signed artifact attestation may strengthen this boundary, but none is claimed unless actually generated and verified.
 
 The workflow and assembler still fail closed internally. `releaseEligible=true` report content is accepted only when it declares the expected repository/workflow/event identity, a positive run ID/attempt, `refs/heads/main`, exactly the six required prerequisite jobs with conclusion `success`, and `studyStatus.readyForFinalReview=true`. A normal PR `package` job uses `releaseEligible=false`; a successful smoke bundle is not release evidence.
 
