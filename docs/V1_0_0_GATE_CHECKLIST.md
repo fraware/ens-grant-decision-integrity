@@ -4,7 +4,7 @@
 **Verified raw-PR-head engineering baseline:** `697a2bd39a2a4cb3da001b7f038e474e5b494fcf`, workflow `validate` run `32962628034`, completed successfully with all six jobs green: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security`. Every job explicitly checked out `VALIDATION_SHA` and passed `git rev-parse HEAD == VALIDATION_SHA` before validation.  
 **Historical evidence correction:** earlier pull-request runs used GitHub's default synthetic merge checkout. They remain useful integration evidence but are **not** cited as proof that the raw PR-head commit itself executed the suite.  
 **Current-tree rule:** any commit after the verified baseline must independently pass the same explicit-SHA six-job workflow before it can replace the baseline.  
-**Tag decision:** **DO NOT TAG `v1.0.0` yet.** Genuine independent second annotation is incomplete, the final release commit has not been frozen/validated on `main`, and final release assets have not been produced from a release-eligible same-run `main` validation.  
+**Tag decision:** **DO NOT TAG `v1.0.0` yet.** Genuine independent second annotation is incomplete, the final release commit has not been frozen/validated on `main`, and final release assets have not been produced and post-run verified from a release-eligible same-run `main` validation.  
 **Evidence rule:** a gate is `pass` only when repository state or machine evidence supports it. A planned action is not evidence.
 
 Statuses: `pass` | `partial` | `fail` | `blocked` | `not-applicable`
@@ -13,12 +13,12 @@ Statuses: `pass` | `partial` | `fail` | `blocked` | `not-applicable`
 
 | ID | Status | Evidence / notes |
 |---|---|---|
-| A1 | partial | PR #29 has an explicit raw-head six-job green baseline at `697a2bd3…`. Final release identity still requires a frozen merged `main` commit and exact merged-commit validation. |
-| A2 | blocked | Final release-validation report must be bound to the eventual exact release commit and same-run six-job `main` validation. |
+| A1 | partial | PR #29 has an explicit raw-head six-job green baseline. Final release identity still requires a frozen merged `main` commit and exact merged-commit validation. |
+| A2 | blocked | Final release-validation report must be bound to the eventual exact release commit and same-run six-job `main` validation; post-run GitHub API verification must authenticate the cited workflow/run/job state. |
 | A3 | blocked | `v1.0.0` must not be tagged while any blocking gate remains. |
 | A4 | pass | Package `0.4.0` is distinguished from schema, Phase II, projection, evidence-format, and repository release-tag versions. |
 | A5 | pass | README and RELEASE-INTEGRITY distinguish historical `v0.3.2` from unreleased package-line `0.4.0` work. |
-| A6 | partial / unverified-setting | In-tree release workflow requires all six release jobs. Current branch-protection settings could not be independently re-read through the available GitHub integration (403), so no stronger enforcement claim is made here. |
+| A6 | partial / unverified-setting | In-tree release workflow targets all six release jobs. Current branch-protection settings could not be independently re-read through the available GitHub integration (403), so no stronger enforcement claim is made here. |
 
 ## Gate B — Core v0.1 semantics
 
@@ -115,24 +115,29 @@ The original frozen blank handoffs retain their published exact-byte hashes. A c
 
 | ID | Status | Evidence / notes |
 |---|---|---|
-| J1 | pass | Wheel and sdist build successfully on CPython 3.12. |
+| J1 | pass | Wheel and sdist build successfully on CPython 3.12; PEP 517 backend requirements are now exact pins and the release assembler builds from a separate hash-locked build toolchain with `--no-isolation`. |
 | J2 | pass | `package` assembles a non-release candidate, re-verifies its manifest/checksum graph, installs the assembled wheel away from the source checkout, and exercises substantive CLI paths. |
-| J3 | pass | Runtime lock covers project runtime dependencies and clean `--require-hashes` installation plus `pip check` passed. |
-| J4 | pass | Development dependency audit and audit of the clean locked environment passed. |
-| J5 | pass | Adversarial and deterministic generative projection/capture/bundle/corpus/release-integrity tests are in the CI matrix and passed. |
-| J6 | partial / unverified-setting | The in-tree workflow requires six release jobs, but current external branch-protection enforcement could not be independently re-read through the integration. |
-| J7 | blocked | Annotated `v1.0.0` tag must be created only after the final empirical/release gates and exact `main` validation. |
+| J3 | pass (machinery) | Runtime/validation lock coverage and clean `--require-hashes` install are enforced; the separate build lock must also clean-install with hashes and match the exact PEP 517 backend pins. Final current-head CI evidence remains governed by the current-tree rule above. |
+| J4 | pass (machinery) | Development pins, the clean validation lock, and the build lock are all in the security audit path. Final current-head CI evidence remains governed by the current-tree rule above. |
+| J5 | pass | Adversarial and deterministic generative projection/capture/bundle/corpus/release-integrity tests are in the CI matrix, including path traversal, symlink, required-payload, workflow-run provenance, and candidate-artifact binding regressions. |
+| J6 | partial / unverified-setting | The in-tree target is six release checks, but current external branch-protection enforcement could not be independently re-read through the integration. |
+| J7 | blocked | Annotated `v1.0.0` tag must be created only after the final empirical/release gates, exact `main` validation, and post-run candidate verification. |
 | J8 | pass (machinery) / blocked (final asset) | CycloneDX SBOM generation is implemented and exercised in non-release smoke; the final SBOM must be generated from the frozen release commit. |
 | J9 | pass (machinery) / blocked (final asset) | Acyclic `SHA256SUMS` generation/verification is implemented and tested; the final checksum manifest must be generated from the frozen release commit. |
-| J10 | pass (machinery) / blocked (final asset) | `release-manifest.json` generation/verification is implemented and cross-checks commit identity against `release-validation.json`; the final manifest does not yet exist. |
-| J11 | pass (machinery) / blocked (final asset) | Manual `main`-only `release-assets` workflow requires same-run six-job success and `studyStatus.readyForFinalReview=true`; the final validation report/assets cannot exist before those gates are met. |
-| J12 | pass | No byte-reproducible-build claim is made without independent evidence. |
+| J10 | pass (machinery) / blocked (final asset) | `release-manifest.json` records commit/package/toolchain identity and exact required payload hashes/sizes; verifier rejects missing, unexpected, unsafe, symlinked, nested, or inconsistent assets. Final manifest does not yet exist. |
+| J11 | pass (machinery) / blocked (final evidence) | Manual `main`-only `release-assets` requires same-run six-job success and `studyStatus.readyForFinalReview=true`; validation report binds run ID/attempt/repository/workflow/event/commit; `verify-github` independently queries GitHub after run completion and requires the successful seven-job run plus exact-SHA/main-binding steps. Final evidence cannot exist before empirical completion. |
+| J12 | pass (machinery) / blocked (final evidence) | The workflow names the sole uploaded candidate artifact with SHA-256 of `release-manifest.json`; `verify-github` recomputes that digest and requires the run-scoped artifact identity to match, preventing a later self-consistent local bundle from merely borrowing an unrelated successful run ID. |
+| J13 | pass | No byte-reproducible-build or GitHub-signed-artifact claim is made without independent evidence. |
 
-### Release-asset integrity graph
+### Release-asset integrity and provenance graph
 
-`scripts/release_artifacts.py` builds an exact-commit source archive, wheel, sdist, validation report, and SBOM; writes a release manifest over those payloads; then writes `SHA256SUMS` **last** over all of them plus the release manifest. The checksum manifest excludes itself, avoiding an impossible circular self-hash. Downloaded-bundle verification rejects missing or extra assets, duplicate checksum entries, hash/size mismatches, invalid manifest identity, control-file self-reference, and cross-file commit disagreement.
+`scripts/release_artifacts.py` builds an exact-commit source archive, wheel, sdist, validation report, SBOM, build lock, and validation lock; writes a release manifest over those seven payloads; then writes `SHA256SUMS` **last** over all seven plus the release manifest. The checksum manifest excludes itself, avoiding an impossible circular self-hash. Offline downloaded-bundle verification rejects missing or unexpected payloads, path escapes, symlinks, nested/non-regular entries, duplicate checksum entries, hash/size mismatches, invalid manifest/toolchain identity, control-file self-reference, and cross-file commit disagreement.
 
-`releaseEligible=true` evidence is accepted only when it is bound to `refs/heads/main`, contains exactly the six required jobs all marked `success`, and embeds `studyStatus.readyForFinalReview=true`. Normal PR assembly uses `releaseEligible=false` and cannot be relabeled by the assembler as release evidence.
+For `releaseEligible=true`, the embedded report must declare the exact expected repository/workflow/event/run/ref identity, exactly six successful prerequisite jobs, and `studyStatus.readyForFinalReview=true`. This report is still self-declared bytes; offline verification does not authenticate GitHub Actions state.
+
+Post-run `verify-github` queries GitHub's workflow-run, jobs, and artifacts APIs. It requires a completed/successful `workflow_dispatch` run on exact `main` commit, exactly the six prerequisite jobs plus successful `release-assets`, successful exact-SHA assertions, successful main/SHA binding, and exactly one non-expired artifact named `release-candidate-<tag>-<commit>-<manifest-sha256>`, where the manifest digest is recomputed from the downloaded candidate. This binds the locally verified manifest graph to the run-recorded candidate artifact identity. It remains an API-state/SHA-256 trust claim, not a signed-attestation claim.
+
+Normal PR assembly uses `releaseEligible=false` and cannot be relabeled by the assembler as release evidence.
 
 ## Gate K — Funding provenance
 
@@ -151,7 +156,7 @@ The original frozen blank handoffs retain their published exact-byte hashes. A c
 | Claim registry / ASSURANCE-CASE | pass | Machine claims and unresolved-required-check semantics are bounded. |
 | Source provenance | pass | Exact-byte, capture-event, SSRF-hardening, and DNS-rebinding non-claims documented. |
 | Phase II deferred profiles | pass | Production RFC 3161 and Rekor v2 timing remain explicit fail-closed boundaries. |
-| RELEASE-INTEGRITY / packaging-security | pass (procedure) | Explicit raw-head checkout semantics, release-eligible workflow, SBOM scope, and acyclic checksum graph are documented. Final merged-commit evidence remains outstanding. |
+| RELEASE-INTEGRITY / packaging-security | pass (procedure) | Explicit raw-head checkout semantics, separate build/validation locks, offline candidate integrity, online GitHub run/job verification, and manifest-digest Actions artifact binding are documented. Final merged-commit/release evidence remains outstanding. |
 | Citation metadata | pass | Package line `0.4.0` is explicitly an unreleased checkpoint and is recorded separately from a future repository release tag; no fictitious release date. |
 | Second-annotation protocol | pass | Five-class vocabulary, explicit human attestation, frozen-package compatibility, timing scope, and reliability non-claims are documented and tested. |
 | Empirical analysis plan | pass (scope) | Pre-second-annotation interpretation rules explicitly bound the current study to descriptive claims and record non-identification of improvement/burden effects. |
@@ -161,8 +166,8 @@ The original frozen blank handoffs retain their published exact-byte hashes. A c
 
 1. Three genuine independent second annotations must be completed and frozen before reconciliation; agreement metrics and the final empirical report must then be regenerated. Software must not manufacture this evidence.
 2. After empirical completion and any resulting reviewed changes are frozen, the exact current PR head must pass all six explicit-SHA release jobs, PR #29 must be made ready/reviewed and merged, and the exact resulting `main` release commit must pass all six jobs again.
-3. On that exact eligible `main` commit, manually dispatch the `validate` workflow release path. `release-assets` must see same-run six-job success plus `studyStatus.readyForFinalReview=true` and produce a verified candidate bundle.
-4. Independently inspect/verify the uploaded bundle, then create the annotated repository tag and attach the verified individual assets. Re-verify published hashes after upload.
+3. On that exact eligible `main` commit, manually dispatch the `validate` workflow release path. `release-assets` must see same-run six-job success plus `studyStatus.readyForFinalReview=true` and produce the candidate bundle whose artifact name is bound to the release-manifest digest.
+4. After the workflow is completed, download the candidate; run both offline `verify` and online `verify-github`; inspect the results; only then create the annotated repository tag and attach the verified individual assets. Re-verify published hashes after upload.
 5. Branch-protection enforcement is not currently independently readable through the available integration; do not make a stronger claim about repository settings without direct evidence.
 
 No adoption pilot and no future funding event are treated as hidden prerequisites for this software-release boundary.
