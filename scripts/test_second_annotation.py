@@ -10,6 +10,7 @@ import pytest
 from second_annotation import (
     INDEPENDENCE_ATTESTATION,
     SecondAnnotationError,
+    _load_json,
     build_handoff,
     verify_submission,
 )
@@ -47,6 +48,16 @@ def _completed_unknown_handoff() -> tuple[dict, dict]:
     handoff = build_handoff(case, base_dir=CASE_PATH.parent)
     _complete_submission(handoff)
     return case, handoff
+
+
+def test_completed_handoff_loader_rejects_duplicate_json_keys(tmp_path: Path) -> None:
+    path = tmp_path / "handoff.json"
+    path.write_text('{"handoffVersion":"1","handoffVersion":"2"}\n', encoding="utf-8")
+
+    with pytest.raises(SecondAnnotationError) as exc:
+        _load_json(path, label="annotation handoff", code="ANN004")
+    assert exc.value.code == "ANN004"
+    assert "duplicate JSON object key" in str(exc.value)
 
 
 def test_prepare_strips_primary_reconstruction_material() -> None:
