@@ -15,12 +15,13 @@ _PROJECTION_SRC = resource_path("projection", "src")
 if str(_PROJECTION_SRC) not in sys.path:
     sys.path.insert(0, str(_PROJECTION_SRC))
 
-from project import ProjectionError as ProjectionErrorV1  # noqa: E402
-from project import project_record  # noqa: E402
-from project_v2 import ProjectionError as ProjectionErrorV2  # noqa: E402
-from project_v2 import project_record_v2  # noqa: E402
-from project_v2 import verify_projection_v2  # noqa: E402
-from project_v2 import verify_withheld_v2  # noqa: E402
+from project import ProjectionError as ProjectionErrorV1, project_record  # noqa: E402
+from project_v2 import (  # noqa: E402
+    ProjectionError as ProjectionErrorV2,
+    project_record_v2,
+    verify_projection_v2,
+    verify_withheld_v2,
+)
 
 ProjectionError = ProjectionErrorV2
 
