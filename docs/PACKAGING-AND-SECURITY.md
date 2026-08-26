@@ -50,11 +50,11 @@ VALIDATION_SHA = github.sha             # push / workflow_dispatch
 
 Every job checks out `VALIDATION_SHA` explicitly and immediately asserts `git rev-parse HEAD == VALIDATION_SHA`. Historical PR runs that used the default synthetic merge checkout are integration evidence only and must not be cited as raw-head execution evidence.
 
-After merge, `main` receives a fresh push run for the exact resulting commit. A public release additionally uses `workflow_dispatch` on that exact `main` SHA so all six release jobs and asset assembly belong to the same workflow run.
+After merge, `main` receives a fresh push run for the exact resulting commit. A public release additionally uses `workflow_dispatch` on that exact `main` SHA so all six prerequisite release jobs and asset assembly belong to the same workflow run.
 
 ## CI jobs
 
-The release-critical job names are:
+The release-critical prerequisite job names are:
 
 - `conformance`
 - `phase2`
@@ -72,13 +72,13 @@ The release-critical job names are:
 | `lint-type` | `ruff` on release-facing modules and adapters; `mypy` on adapters |
 | `security` | Audit development pins; prove validation/build lock coverage and installability; run `pip check`; audit both locked environments |
 
-The historical three semantic contexts remain important for continuity, but the documented `v1.0.0` protection target is all six release-critical contexts. Do not describe a three-check configuration as satisfying the final six-check target. The effective GitHub settings remain an administrative fact that must be verified separately; see `docs/BRANCH-PROTECTION.md` and release-control issue #31.
+The manual release run adds the seventh `release-assets` job after all six prerequisites. The historical three semantic contexts remain important for continuity, but the documented `v1.0.0` protection target is all six prerequisite release-critical contexts. Do not describe a three-check configuration as satisfying the final six-check target. The effective GitHub settings remain an administrative fact that must be verified separately; see `docs/BRANCH-PROTECTION.md` and release-control issue #31.
 
 ## Release artifact assembler
 
-`scripts/release_artifacts.py` is the single release-payload assembly and verification path.
+`scripts/release_artifacts.py` is the release-payload assembly and verification path, with separate offline and online evidence layers.
 
-A normal PR `package` job runs it with `releaseEligible=false` to exercise the complete build/SBOM/manifest/checksum machinery without creating release evidence. The generated smoke bundle is disposable and cannot satisfy release gates.
+A normal PR `package` job runs assembly with `releaseEligible=false` to exercise the complete build/SBOM/manifest/checksum machinery without creating release evidence. The generated smoke bundle is disposable and cannot satisfy release gates.
 
 For an actual release candidate, manually dispatch `validate` on the exact `main` commit with the prospective repository tag. The `release-assets` job runs only after the six validation jobs and additionally requires:
 
@@ -87,7 +87,7 @@ For an actual release candidate, manually dispatch `validate` on the exact `main
 - `scripts/study_status.py` returns `readyForFinalReview=true`;
 - same-run conclusions for exactly `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, and `security` are all `success`.
 
-The assembler independently validates those conditions when `releaseEligible=true`; they are not trusted merely because the workflow wrapper says so.
+The workflow-generated `release-validation.json` binds the candidate to repository, workflow name, event type, run ID, run attempt, exact commit/ref, six prerequisite job conclusions, and study status. The assembler validates that report against the local release policy before accepting `releaseEligible=true`. This is an internal consistency/policy check; it does **not** independently authenticate GitHub's Actions database.
 
 The assembled payload contains:
 
@@ -103,13 +103,22 @@ The assembled payload contains:
 
 `release-manifest.json` records the repository tag and commit, package name/version, explicit non-isolated build-toolchain policy, and hashes/sizes of every payload asset except itself. `SHA256SUMS` is created last over those seven payload files plus `release-manifest.json`. It necessarily excludes itself. This avoids a circular self-hash while placing every other attached payload under the checksum manifest.
 
-Verify a downloaded/unpacked candidate with:
+### Verification layers
+
+After the manual workflow has **completed**, download the candidate and run:
 
 ```bash
 python scripts/release_artifacts.py verify path/to/release-directory
+python scripts/release_artifacts.py verify-github path/to/release-directory
 ```
 
-Verification fails on unsafe/path-escaping names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, SHA-256 mismatches, invalid toolchain policy, or validation-evidence/manifest commit mismatch.
+`verify` is offline. It fails on unsafe/path-escaping names, symbolic links, nested or non-regular entries, missing required payload classes, extra unchecksummed files, duplicate checksum entries, size mismatches, SHA-256 mismatches, invalid toolchain policy, or validation-evidence/manifest commit mismatch. It establishes integrity and internal consistency of the bytes supplied to it; it does not prove GitHub executed the workflow described by `release-validation.json`.
+
+`verify-github` first runs the same offline verification, then queries GitHub's Actions API for the report's run ID. It requires the API record to match the expected public repository, `validate` workflow and workflow path, `workflow_dispatch` event, run attempt, `main` branch, exact candidate commit, completed/successful workflow conclusion, and workflow URL. It also requires exactly seven jobs: the six release-critical prerequisites plus `release-assets`, all completed successfully. Each prerequisite must expose a successful `Assert exact validation SHA` step, and `release-assets` must expose a successful `Require exact main-branch release commit` step.
+
+`GITHUB_TOKEN` may be supplied to `verify-github` for authentication/rate limits. For this public repository anonymous API access can be sufficient when GitHub permits it.
+
+This online check authenticates current GitHub API state for the referenced run. It does not cryptographically sign the candidate payload or prove that GitHub itself cannot later alter API state. Candidate bytes remain independently bound by `release-manifest.json` and `SHA256SUMS`. No signed artifact-attestation claim is made unless such an attestation is actually generated and verified.
 
 ## SBOM generation
 
@@ -129,7 +138,7 @@ Documented target for `main` before `v1.0.0`. Do not silently bypass. Maintainer
 Required target:
 
 1. Require a pull request before merging to `main`
-2. Require all six release-critical status contexts: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, `security`
+2. Require all six prerequisite release-critical status contexts: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, `security`
 3. Require branches to be up to date before merging where operationally appropriate
 4. Prohibit force-push to `main`
 5. Prohibit deletion of `main`
