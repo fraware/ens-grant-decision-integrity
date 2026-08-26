@@ -8,6 +8,7 @@ import pytest
 from release_artifacts import (
     CHECKSUM_NAME,
     MANIFEST_NAME,
+    REQUIRED_RELEASE_JOBS,
     ReleaseArtifactError,
     _validate_evidence,
     _write_json,
@@ -47,6 +48,17 @@ def _release_dir(tmp_path: Path) -> Path:
     )
     write_checksum_manifest(out, payloads=[*payloads, manifest])
     return out
+
+
+def _eligible_evidence() -> dict:
+    return {
+        "commit": COMMIT,
+        "ref": "refs/heads/main",
+        "releaseEligible": True,
+        "workflowRunUrl": "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1",
+        "jobs": {name: "success" for name in sorted(REQUIRED_RELEASE_JOBS)},
+        "studyStatus": {"readyForFinalReview": True},
+    }
 
 
 def test_release_directory_verifies_complete_acyclic_checksum_scope(tmp_path: Path) -> None:
@@ -109,3 +121,28 @@ def test_validation_evidence_rejects_unrecognized_job_conclusion() -> None:
     }
     with pytest.raises(ReleaseArtifactError, match="invalid validation conclusion"):
         _validate_evidence(evidence, commit=COMMIT)
+
+
+def test_release_eligible_evidence_requires_main_six_green_and_ready_study() -> None:
+    evidence = _eligible_evidence()
+    _validate_evidence(evidence, commit=COMMIT)
+
+    wrong_ref = json.loads(json.dumps(evidence))
+    wrong_ref["ref"] = "refs/heads/release/final-hardening"
+    with pytest.raises(ReleaseArtifactError, match="refs/heads/main"):
+        _validate_evidence(wrong_ref, commit=COMMIT)
+
+    missing_job = json.loads(json.dumps(evidence))
+    missing_job["jobs"].pop("security")
+    with pytest.raises(ReleaseArtifactError, match="exactly the six"):
+        _validate_evidence(missing_job, commit=COMMIT)
+
+    failed_job = json.loads(json.dumps(evidence))
+    failed_job["jobs"]["package"] = "failure"
+    with pytest.raises(ReleaseArtifactError, match="all release jobs"):
+        _validate_evidence(failed_job, commit=COMMIT)
+
+    incomplete_study = json.loads(json.dumps(evidence))
+    incomplete_study["studyStatus"]["readyForFinalReview"] = False
+    with pytest.raises(ReleaseArtifactError, match="readyForFinalReview=true"):
+        _validate_evidence(incomplete_study, commit=COMMIT)
