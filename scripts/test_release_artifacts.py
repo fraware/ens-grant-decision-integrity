@@ -13,6 +13,7 @@ from release_artifacts import (
     VALIDATION_LOCK_NAME,
     ReleaseArtifactError,
     _validate_evidence,
+    _validate_github_artifacts,
     _validate_github_records,
     _write_json,
     build_manifest,
@@ -23,6 +24,7 @@ from release_artifacts import (
 COMMIT = "a" * 40
 RUN_ID = 123456
 RUN_ATTEMPT = 2
+MANIFEST_SHA = "c" * 64
 
 
 def _nonrelease_evidence(*, commit: str = COMMIT) -> dict:
@@ -140,6 +142,24 @@ def _github_jobs() -> dict:
     return {"total_count": len(rows), "jobs": rows}
 
 
+def _github_artifacts(*, manifest_sha: str = MANIFEST_SHA) -> dict:
+    name = f"release-candidate-v1.0.0-{COMMIT}-{manifest_sha}"
+    return {
+        "total_count": 1,
+        "artifacts": [
+            {
+                "id": 987654,
+                "name": name,
+                "expired": False,
+                "archive_download_url": (
+                    "https://api.github.com/repos/fraware/ens-grant-decision-integrity/"
+                    "actions/artifacts/987654/zip"
+                ),
+            }
+        ],
+    }
+
+
 def test_release_directory_verifies_complete_acyclic_checksum_scope(tmp_path: Path) -> None:
     out = _release_dir(tmp_path)
     result = verify_directory(out)
@@ -167,6 +187,31 @@ def test_release_directory_rejects_extra_unchecksummed_asset(tmp_path: Path) -> 
     (out / "unexpected.txt").write_text("unexpected\n", encoding="utf-8")
 
     with pytest.raises(ReleaseArtifactError, match="missing or extra files"):
+        verify_directory(out)
+
+
+def test_release_manifest_rejects_extra_even_when_checksummed(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    unexpected = out / "unexpected.txt"
+    unexpected.write_text("unexpected\n", encoding="utf-8")
+
+    manifest = out / MANIFEST_NAME
+    manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+    import hashlib
+
+    data = unexpected.read_bytes()
+    manifest_data["artifacts"].append(
+        {
+            "name": unexpected.name,
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "size": len(data),
+        }
+    )
+    _write_json(manifest, manifest_data)
+    payloads = [out / item["name"] for item in manifest_data["artifacts"]]
+    write_checksum_manifest(out, payloads=[*payloads, manifest])
+
+    with pytest.raises(ReleaseArtifactError, match="unexpected payloads"):
         verify_directory(out)
 
 
@@ -344,4 +389,41 @@ def test_github_records_reject_wrong_head_sha() -> None:
             run,
             _github_jobs(),
             commit=COMMIT,
+        )
+
+
+def test_github_artifact_binds_manifest_digest_to_run() -> None:
+    artifact_id, name = _validate_github_artifacts(
+        _github_artifacts(),
+        tag="v1.0.0",
+        commit=COMMIT,
+        manifest_sha256=MANIFEST_SHA,
+    )
+    assert artifact_id == 987654
+    assert name.endswith(MANIFEST_SHA)
+
+
+def test_github_artifact_rejects_different_manifest_digest() -> None:
+    with pytest.raises(ReleaseArtifactError, match="artifact name mismatch"):
+        _validate_github_artifacts(
+            _github_artifacts(),
+            tag="v1.0.0",
+            commit=COMMIT,
+            manifest_sha256="d" * 64,
+        )
+
+
+def test_github_artifact_requires_exactly_one_candidate() -> None:
+    artifacts = _github_artifacts()
+    duplicate = json.loads(json.dumps(artifacts["artifacts"][0]))
+    duplicate["id"] = 987655
+    artifacts["artifacts"].append(duplicate)
+    artifacts["total_count"] = 2
+
+    with pytest.raises(ReleaseArtifactError, match="exactly one artifact"):
+        _validate_github_artifacts(
+            artifacts,
+            tag="v1.0.0",
+            commit=COMMIT,
+            manifest_sha256=MANIFEST_SHA,
         )
