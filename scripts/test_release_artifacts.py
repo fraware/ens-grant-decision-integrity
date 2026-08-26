@@ -46,7 +46,7 @@ def _release_dir(tmp_path: Path) -> Path:
 
     payloads = [validation]
     for name, content in {
-        "ens-gdi-0.4.0-py3-none-any.whl": b"wheel",
+        "ens_gdi-0.4.0-py3-none-any.whl": b"wheel",
         "ens_gdi-0.4.0.tar.gz": b"sdist",
         "ens-grant-decision-integrity-v1.0.0.tar.gz": b"source",
         "sbom.cdx.json": b'{"bomFormat":"CycloneDX"}\n',
