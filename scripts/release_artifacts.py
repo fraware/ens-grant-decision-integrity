@@ -6,15 +6,21 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
 import sys
 import tomllib
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY = "fraware/ens-grant-decision-integrity"
+WORKFLOW_NAME = "validate"
+WORKFLOW_PATH = ".github/workflows/validate.yml"
 CHECKSUM_NAME = "SHA256SUMS"
 MANIFEST_NAME = "release-manifest.json"
 VALIDATION_NAME = "release-validation.json"
@@ -130,6 +136,29 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
             raise ReleaseArtifactError(f"invalid validation conclusion for {name}: {conclusion!r}")
 
     if release_eligible:
+        if evidence.get("evidenceKind") != "same-run-main-release-validation":
+            raise ReleaseArtifactError("release-eligible evidence has the wrong evidenceKind")
+        if evidence.get("repository") != REPOSITORY:
+            raise ReleaseArtifactError("release-eligible evidence has the wrong repository")
+        if evidence.get("eventName") != "workflow_dispatch":
+            raise ReleaseArtifactError("release-eligible evidence must come from workflow_dispatch")
+        if evidence.get("workflowName") != WORKFLOW_NAME:
+            raise ReleaseArtifactError("release-eligible evidence has the wrong workflow name")
+        run_id = evidence.get("runId")
+        run_attempt = evidence.get("runAttempt")
+        if not isinstance(run_id, int) or isinstance(run_id, bool) or run_id <= 0:
+            raise ReleaseArtifactError("release-eligible evidence must contain a positive runId")
+        if (
+            not isinstance(run_attempt, int)
+            or isinstance(run_attempt, bool)
+            or run_attempt <= 0
+        ):
+            raise ReleaseArtifactError(
+                "release-eligible evidence must contain a positive runAttempt"
+            )
+        expected_url = f"https://github.com/{REPOSITORY}/actions/runs/{run_id}"
+        if run_url != expected_url:
+            raise ReleaseArtifactError("workflowRunUrl does not match repository/runId")
         if evidence.get("ref") != "refs/heads/main":
             raise ReleaseArtifactError(
                 "release-eligible evidence must be produced from refs/heads/main"
@@ -355,6 +384,7 @@ def build_manifest(
         "nonClaims": [
             "Artifact hashes authenticate the exact distributed bytes only.",
             "Pinned build inputs do not establish cross-machine byte reproducibility.",
+            "Offline verification does not authenticate GitHub Actions state; use verify-github.",
             "The Git commit SHA remains the reviewed source-tree identity anchor.",
         ],
     }
@@ -486,6 +516,143 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
     }
 
 
+def _github_json(url: str, *, token: str | None) -> dict[str, Any]:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "ens-gdi-release-verifier",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+        urllib.error.HTTPError,
+        urllib.error.URLError,
+    ) as exc:
+        raise ReleaseArtifactError(f"cannot query GitHub Actions evidence: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ReleaseArtifactError("GitHub Actions API returned a non-object payload")
+    return payload
+
+
+def _validate_github_records(
+    evidence: dict[str, Any],
+    run: dict[str, Any],
+    jobs_document: dict[str, Any],
+    *,
+    commit: str,
+) -> None:
+    _validate_evidence(evidence, commit=commit)
+    if evidence.get("releaseEligible") is not True:
+        raise ReleaseArtifactError("GitHub verification requires releaseEligible=true evidence")
+
+    run_id = evidence["runId"]
+    run_attempt = evidence["runAttempt"]
+    expected_run = {
+        "id": run_id,
+        "run_attempt": run_attempt,
+        "name": WORKFLOW_NAME,
+        "path": WORKFLOW_PATH,
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": commit,
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": evidence["workflowRunUrl"],
+    }
+    mismatches = {
+        key: {"expected": expected, "observed": run.get(key)}
+        for key, expected in expected_run.items()
+        if run.get(key) != expected
+    }
+    repository = run.get("repository")
+    if not isinstance(repository, dict) or repository.get("full_name") != REPOSITORY:
+        mismatches["repository.full_name"] = {
+            "expected": REPOSITORY,
+            "observed": repository.get("full_name") if isinstance(repository, dict) else None,
+        }
+    if mismatches:
+        raise ReleaseArtifactError(f"GitHub workflow-run identity mismatch: {mismatches}")
+
+    rows = jobs_document.get("jobs")
+    total_count = jobs_document.get("total_count")
+    if not isinstance(rows, list) or not isinstance(total_count, int):
+        raise ReleaseArtifactError("GitHub jobs response is malformed")
+    if total_count != len(rows):
+        raise ReleaseArtifactError(
+            "GitHub jobs response is incomplete; expected all jobs in one verified response"
+        )
+
+    expected_names = REQUIRED_RELEASE_JOBS | {"release-assets"}
+    observed: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ReleaseArtifactError("GitHub jobs response contains a non-object job")
+        name = row.get("name")
+        if not isinstance(name, str) or name in observed:
+            raise ReleaseArtifactError(f"invalid or duplicate GitHub job name: {name!r}")
+        observed[name] = row
+    if set(observed) != expected_names:
+        raise ReleaseArtifactError(
+            f"GitHub release run job set mismatch: expected={sorted(expected_names)} "
+            f"observed={sorted(observed)}"
+        )
+
+    failed = sorted(
+        name
+        for name, row in observed.items()
+        if row.get("status") != "completed" or row.get("conclusion") != "success"
+    )
+    if failed:
+        raise ReleaseArtifactError(f"GitHub release run has unsuccessful jobs: {failed}")
+
+    for name in REQUIRED_RELEASE_JOBS:
+        steps = observed[name].get("steps")
+        if not isinstance(steps, list):
+            raise ReleaseArtifactError(f"GitHub job lacks step evidence: {name}")
+        exact_sha = [step for step in steps if step.get("name") == "Assert exact validation SHA"]
+        if len(exact_sha) != 1 or exact_sha[0].get("conclusion") != "success":
+            raise ReleaseArtifactError(f"GitHub job lacks successful exact-SHA assertion: {name}")
+
+    release_steps = observed["release-assets"].get("steps")
+    if not isinstance(release_steps, list):
+        raise ReleaseArtifactError("release-assets job lacks step evidence")
+    main_binding = [
+        step for step in release_steps if step.get("name") == "Require exact main-branch release commit"
+    ]
+    if len(main_binding) != 1 or main_binding[0].get("conclusion") != "success":
+        raise ReleaseArtifactError("release-assets lacks successful main-branch SHA binding")
+
+
+def verify_github_evidence(out_dir: Path, *, token: str | None = None) -> dict[str, Any]:
+    verification = verify_directory(out_dir)
+    if verification["releaseEligible"] is not True:
+        raise ReleaseArtifactError("GitHub verification is only valid for release-eligible candidates")
+    evidence = _load_json(out_dir / VALIDATION_NAME, label="release validation report")
+    run_id = evidence["runId"]
+    run = _github_json(
+        f"https://api.github.com/repos/{REPOSITORY}/actions/runs/{run_id}",
+        token=token,
+    )
+    jobs_document = _github_json(
+        f"https://api.github.com/repos/{REPOSITORY}/actions/runs/{run_id}/jobs?per_page=100",
+        token=token,
+    )
+    _validate_github_records(evidence, run, jobs_document, commit=verification["commit"])
+    return {
+        **verification,
+        "githubEvidenceVerified": True,
+        "githubRunId": run_id,
+        "githubRunAttempt": evidence["runAttempt"],
+    }
+
+
 def assemble(
     *,
     tag: str,
@@ -560,6 +727,9 @@ def main() -> int:
     verify_parser = subparsers.add_parser("verify")
     verify_parser.add_argument("directory", type=Path)
 
+    verify_github_parser = subparsers.add_parser("verify-github")
+    verify_github_parser.add_argument("directory", type=Path)
+
     args = parser.parse_args()
     try:
         if args.command == "assemble":
@@ -569,6 +739,11 @@ def main() -> int:
                 evidence_path=args.validation_evidence,
                 out_dir=args.out,
                 require_clean=not args.allow_dirty_checkout,
+            )
+        elif args.command == "verify-github":
+            result = verify_github_evidence(
+                args.directory,
+                token=os.environ.get("GITHUB_TOKEN"),
             )
         else:
             result = verify_directory(args.directory)
