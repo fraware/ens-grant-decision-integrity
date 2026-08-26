@@ -19,6 +19,8 @@ CHECKSUM_NAME = "SHA256SUMS"
 MANIFEST_NAME = "release-manifest.json"
 VALIDATION_NAME = "release-validation.json"
 SBOM_NAME = "sbom.cdx.json"
+BUILD_LOCK_NAME = "requirements-build.lock.txt"
+VALIDATION_LOCK_NAME = "requirements.lock.txt"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SAFE_TAG_RE = re.compile(r"^[A-Za-z0-9._-]+$")
 ASSET_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
@@ -78,9 +80,19 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     )
 
 
+def _pyproject() -> dict[str, Any]:
+    return tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+
 def _project_metadata() -> tuple[str, str]:
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    project = _pyproject()["project"]
     return str(project["name"]), str(project["version"])
+
+
+def _venv_python(venv: Path) -> Path:
+    if sys.platform == "win32":
+        return venv / "Scripts" / "python.exe"
+    return venv / "bin" / "python"
 
 
 def _assert_commit(commit: str, *, require_clean: bool) -> None:
@@ -163,7 +175,9 @@ def _assert_flat_regular_directory(out_dir: Path) -> None:
             )
 
 
-def _validate_manifest_identity(manifest: dict[str, Any]) -> tuple[str, str]:
+def _validate_manifest_identity(
+    manifest: dict[str, Any],
+) -> tuple[str, str, str, str]:
     if manifest.get("manifestVersion") != "1":
         raise ReleaseArtifactError("release manifest must use manifestVersion 1")
     tag = manifest.get("tag")
@@ -184,7 +198,15 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> tuple[str, str]:
         raise ReleaseArtifactError("release manifest checksumManifest must be an object")
     if checksum.get("name") != CHECKSUM_NAME or checksum.get("selfHashExcluded") is not True:
         raise ReleaseArtifactError("release manifest checksum policy is invalid")
-    return tag, commit
+    toolchain = manifest.get("toolchain")
+    expected_toolchain = {
+        "buildLock": BUILD_LOCK_NAME,
+        "validationLock": VALIDATION_LOCK_NAME,
+        "pep517Isolation": False,
+    }
+    if toolchain != expected_toolchain:
+        raise ReleaseArtifactError("release manifest toolchain policy is invalid")
+    return tag, commit, package["name"], package["version"]
 
 
 def _source_archive(out_dir: Path, *, tag: str, commit: str) -> Path:
@@ -204,8 +226,42 @@ def _source_archive(out_dir: Path, *, tag: str, commit: str) -> Path:
     return path
 
 
+def _copy_release_lockfiles(out_dir: Path) -> tuple[Path, Path]:
+    build_lock = out_dir / BUILD_LOCK_NAME
+    validation_lock = out_dir / VALIDATION_LOCK_NAME
+    shutil.copyfile(ROOT / BUILD_LOCK_NAME, build_lock)
+    shutil.copyfile(ROOT / VALIDATION_LOCK_NAME, validation_lock)
+    return build_lock, validation_lock
+
+
 def _build_python_distributions(out_dir: Path) -> tuple[Path, Path]:
-    _run(sys.executable, "-m", "build", "--outdir", str(out_dir))
+    venv = out_dir.parent / f".{out_dir.name}-build-venv"
+    if venv.exists():
+        shutil.rmtree(venv)
+    try:
+        _run(sys.executable, "-m", "venv", str(venv))
+        python = _venv_python(venv)
+        _run(
+            str(python),
+            "-m",
+            "pip",
+            "install",
+            "--require-hashes",
+            "-r",
+            str(ROOT / BUILD_LOCK_NAME),
+        )
+        _run(
+            str(python),
+            "-m",
+            "build",
+            "--no-isolation",
+            "--outdir",
+            str(out_dir),
+        )
+    finally:
+        if venv.exists():
+            shutil.rmtree(venv)
+
     wheels = sorted(out_dir.glob("*.whl"))
     sdists = sorted(out_dir.glob("*.tar.gz"))
     source_archives = [
@@ -227,9 +283,7 @@ def _generate_sbom(out_dir: Path, *, wheel: Path) -> Path:
         shutil.rmtree(venv)
     try:
         _run(sys.executable, "-m", "venv", str(venv))
-        python = venv / "bin" / "python"
-        if sys.platform == "win32":
-            python = venv / "Scripts" / "python.exe"
+        python = _venv_python(venv)
         _run(
             str(python),
             "-m",
@@ -237,7 +291,7 @@ def _generate_sbom(out_dir: Path, *, wheel: Path) -> Path:
             "install",
             "--require-hashes",
             "-r",
-            str(ROOT / "requirements.lock.txt"),
+            str(ROOT / VALIDATION_LOCK_NAME),
         )
         _run(str(python), "-m", "pip", "install", "--no-deps", str(wheel))
         site_packages = _run(
@@ -282,7 +336,14 @@ def build_manifest(
         "tag": tag,
         "commit": commit,
         "package": {"name": package_name, "version": package_version},
-        "artifacts": [_descriptor(path) for path in sorted(payloads, key=lambda item: item.name)],
+        "toolchain": {
+            "buildLock": BUILD_LOCK_NAME,
+            "validationLock": VALIDATION_LOCK_NAME,
+            "pep517Isolation": False,
+        },
+        "artifacts": [
+            _descriptor(path) for path in sorted(payloads, key=lambda item: item.name)
+        ],
         "checksumManifest": {
             "name": CHECKSUM_NAME,
             "scope": (
@@ -293,7 +354,7 @@ def build_manifest(
         },
         "nonClaims": [
             "Artifact hashes authenticate the exact distributed bytes only.",
-            "This manifest does not claim byte-reproducible builds across machines or toolchains.",
+            "Pinned build inputs do not establish cross-machine byte reproducibility.",
             "The Git commit SHA remains the reviewed source-tree identity anchor.",
         ],
     }
@@ -307,12 +368,43 @@ def write_checksum_manifest(out_dir: Path, *, payloads: list[Path]) -> Path:
     return checksum
 
 
+def _require_release_payload_set(
+    expected: set[str],
+    *,
+    tag: str,
+    package_name: str,
+    package_version: str,
+) -> None:
+    normalized = package_name.replace("-", "_")
+    source_name = f"ens-grant-decision-integrity-{tag}.tar.gz"
+    sdist_name = f"{normalized}-{package_version}.tar.gz"
+    wheel_prefix = f"{normalized}-{package_version}-"
+    wheels = sorted(
+        name for name in expected if name.startswith(wheel_prefix) and name.endswith(".whl")
+    )
+    required = {
+        source_name,
+        sdist_name,
+        SBOM_NAME,
+        VALIDATION_NAME,
+        BUILD_LOCK_NAME,
+        VALIDATION_LOCK_NAME,
+    }
+    missing = sorted(required - expected)
+    if missing:
+        raise ReleaseArtifactError(f"release manifest is missing required payloads: {missing}")
+    if len(wheels) != 1:
+        raise ReleaseArtifactError(
+            f"release manifest must contain exactly one package wheel; observed={wheels}"
+        )
+
+
 def verify_directory(out_dir: Path) -> dict[str, Any]:
     _assert_flat_regular_directory(out_dir)
     manifest_path = out_dir / MANIFEST_NAME
     checksum_path = out_dir / CHECKSUM_NAME
     manifest = _load_json(manifest_path, label="release manifest")
-    tag, commit = _validate_manifest_identity(manifest)
+    tag, commit, package_name, package_version = _validate_manifest_identity(manifest)
     validation = _load_json(out_dir / VALIDATION_NAME, label="release validation report")
     _validate_evidence(validation, commit=commit)
 
@@ -339,8 +431,12 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
             raise ReleaseArtifactError(f"invalid size for manifest artifact {name}")
         expected[name] = (digest, size)
 
-    if VALIDATION_NAME not in expected:
-        raise ReleaseArtifactError("release manifest must include the validation report")
+    _require_release_payload_set(
+        set(expected),
+        tag=tag,
+        package_name=package_name,
+        package_version=package_version,
+    )
 
     for name, (digest, size) in expected.items():
         path = out_dir / name
@@ -412,12 +508,21 @@ def assemble(
 
     validation = out_dir / VALIDATION_NAME
     _write_json(validation, evidence)
+    build_lock, validation_lock = _copy_release_lockfiles(out_dir)
     source = _source_archive(out_dir, tag=tag, commit=commit)
     wheel, sdist = _build_python_distributions(out_dir)
     sbom = _generate_sbom(out_dir, wheel=wheel)
     package_name, package_version = _project_metadata()
 
-    payloads = [source, wheel, sdist, sbom, validation]
+    payloads = [
+        source,
+        wheel,
+        sdist,
+        sbom,
+        validation,
+        build_lock,
+        validation_lock,
+    ]
     manifest = out_dir / MANIFEST_NAME
     _write_json(
         manifest,
