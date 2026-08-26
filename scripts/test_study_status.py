@@ -13,7 +13,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from study_status import StudyStatusError, compute_study_status  # noqa: E402
+from study_status import StudyStatusError, _load_json, compute_study_status  # noqa: E402
 
 ROOT = SCRIPT_DIR.parent
 PLAN = json.loads((ROOT / "corpus" / "study-plan.json").read_text(encoding="utf-8"))
@@ -27,6 +27,16 @@ def _case(case_id: str, strata: list[str], *, double: bool = False) -> dict:
         "review": {"doubleAnnotation": double},
         "source": f"synthetic/{case_id}/case.json",
     }
+
+
+def test_study_plan_loader_rejects_duplicate_json_keys(tmp_path: Path) -> None:
+    path = tmp_path / "study-plan.json"
+    path.write_text('{"studyPlanVersion":"1","studyPlanVersion":"2"}\n', encoding="utf-8")
+
+    with pytest.raises(StudyStatusError) as exc:
+        _load_json(path, label="study plan", code="STUDY001")
+    assert exc.value.code == "STUDY001"
+    assert "duplicate JSON object key" in str(exc.value)
 
 
 def test_in_progress_report_does_not_treat_incomplete_study_as_machine_failure() -> None:
