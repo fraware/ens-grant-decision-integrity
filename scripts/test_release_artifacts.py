@@ -13,6 +13,7 @@ from release_artifacts import (
     VALIDATION_LOCK_NAME,
     ReleaseArtifactError,
     _validate_evidence,
+    _validate_github_records,
     _write_json,
     build_manifest,
     verify_directory,
@@ -20,6 +21,8 @@ from release_artifacts import (
 )
 
 COMMIT = "a" * 40
+RUN_ID = 123456
+RUN_ATTEMPT = 2
 
 
 def _nonrelease_evidence(*, commit: str = COMMIT) -> dict:
@@ -72,12 +75,69 @@ def _eligible_evidence() -> dict:
         "commit": COMMIT,
         "ref": "refs/heads/main",
         "releaseEligible": True,
+        "evidenceKind": "same-run-main-release-validation",
+        "repository": "fraware/ens-grant-decision-integrity",
+        "eventName": "workflow_dispatch",
+        "workflowName": "validate",
+        "runId": RUN_ID,
+        "runAttempt": RUN_ATTEMPT,
         "workflowRunUrl": (
-            "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/1"
+            f"https://github.com/fraware/ens-grant-decision-integrity/actions/runs/{RUN_ID}"
         ),
         "jobs": {name: "success" for name in sorted(REQUIRED_RELEASE_JOBS)},
         "studyStatus": {"readyForFinalReview": True},
     }
+
+
+def _github_run() -> dict:
+    evidence = _eligible_evidence()
+    return {
+        "id": RUN_ID,
+        "run_attempt": RUN_ATTEMPT,
+        "name": "validate",
+        "path": ".github/workflows/validate.yml",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": COMMIT,
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": evidence["workflowRunUrl"],
+        "repository": {"full_name": "fraware/ens-grant-decision-integrity"},
+    }
+
+
+def _github_jobs() -> dict:
+    rows = []
+    for name in sorted(REQUIRED_RELEASE_JOBS):
+        rows.append(
+            {
+                "name": name,
+                "status": "completed",
+                "conclusion": "success",
+                "steps": [
+                    {
+                        "name": "Assert exact validation SHA",
+                        "status": "completed",
+                        "conclusion": "success",
+                    }
+                ],
+            }
+        )
+    rows.append(
+        {
+            "name": "release-assets",
+            "status": "completed",
+            "conclusion": "success",
+            "steps": [
+                {
+                    "name": "Require exact main-branch release commit",
+                    "status": "completed",
+                    "conclusion": "success",
+                }
+            ],
+        }
+    )
+    return {"total_count": len(rows), "jobs": rows}
 
 
 def test_release_directory_verifies_complete_acyclic_checksum_scope(tmp_path: Path) -> None:
@@ -240,3 +300,48 @@ def test_release_eligible_evidence_requires_main_six_green_and_ready_study() -> 
     incomplete_study["studyStatus"]["readyForFinalReview"] = False
     with pytest.raises(ReleaseArtifactError, match="readyForFinalReview=true"):
         _validate_evidence(incomplete_study, commit=COMMIT)
+
+    wrong_run_url = json.loads(json.dumps(evidence))
+    wrong_run_url["workflowRunUrl"] = (
+        "https://github.com/fraware/ens-grant-decision-integrity/actions/runs/999"
+    )
+    with pytest.raises(ReleaseArtifactError, match="runId"):
+        _validate_evidence(wrong_run_url, commit=COMMIT)
+
+
+def test_github_records_bind_completed_release_run_and_all_seven_jobs() -> None:
+    _validate_github_records(
+        _eligible_evidence(),
+        _github_run(),
+        _github_jobs(),
+        commit=COMMIT,
+    )
+
+
+def test_github_records_reject_failed_release_assets_job() -> None:
+    jobs = _github_jobs()
+    for job in jobs["jobs"]:
+        if job["name"] == "release-assets":
+            job["conclusion"] = "failure"
+            break
+
+    with pytest.raises(ReleaseArtifactError, match="unsuccessful jobs"):
+        _validate_github_records(
+            _eligible_evidence(),
+            _github_run(),
+            jobs,
+            commit=COMMIT,
+        )
+
+
+def test_github_records_reject_wrong_head_sha() -> None:
+    run = _github_run()
+    run["head_sha"] = "b" * 40
+
+    with pytest.raises(ReleaseArtifactError, match="identity mismatch"):
+        _validate_github_records(
+            _eligible_evidence(),
+            run,
+            _github_jobs(),
+            commit=COMMIT,
+        )
