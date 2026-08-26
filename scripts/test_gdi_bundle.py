@@ -134,7 +134,7 @@ def test_trust_policy_rejects_invalid_datetime_format(tmp_path: Path) -> None:
     policy["validFor"]["start"] = "not-a-date"
     with pytest.raises(TrustPolicyError) as exc:
         load_trust_policy(_write_policy(tmp_path, policy))
-    assert exc.value.code == "TRUST004"
+    assert exc.value.code == "TRUST007"
 
 
 def test_trust_policy_rejects_duplicate_json_keys(tmp_path: Path) -> None:
