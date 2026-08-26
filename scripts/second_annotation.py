@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -223,8 +224,16 @@ def verify_submission(
         )
 
     elapsed = submission.get("elapsedMinutes")
-    if not isinstance(elapsed, (int, float)) or isinstance(elapsed, bool) or elapsed < 0:
-        raise SecondAnnotationError("annotationSubmission.elapsedMinutes must be a non-negative number", code="ANN005")
+    if (
+        not isinstance(elapsed, (int, float))
+        or isinstance(elapsed, bool)
+        or not math.isfinite(float(elapsed))
+        or elapsed < 0
+    ):
+        raise SecondAnnotationError(
+            "annotationSubmission.elapsedMinutes must be a finite non-negative number",
+            code="ANN005",
+        )
 
     submitted_fields = submission.get("fields")
     if not isinstance(submitted_fields, list):
