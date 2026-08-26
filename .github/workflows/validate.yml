@@ -5,6 +5,13 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Prospective repository release tag (for example v1.0.0)"
+        required: true
+        default: "v1.0.0"
+        type: string
 
 concurrency:
   group: validate-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -229,3 +236,90 @@ jobs:
           test -f docs/BRANCH-PROTECTION.md
           echo "Hash lock is enforced by a clean --require-hashes install and pip check."
           echo "No byte-reproducible-build claim is made without independent evidence."
+
+  release-assets:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [conformance, phase2, schema-02, package, lint-type, security]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VALIDATION_SHA }}
+      - name: Require exact main-branch release commit
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$(git rev-parse HEAD)" = "$VALIDATION_SHA"
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements-dev.txt -r phase2/requirements.txt
+      - run: python -m pip install -e .
+      - name: Require completed empirical study gate
+        run: |
+          set -euo pipefail
+          python scripts/study_status.py > /tmp/study-status.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path("/tmp/study-status.json").read_text(encoding="utf-8"))
+          if status.get("readyForFinalReview") is not True:
+              raise SystemExit(f"study is not ready for final review: {status.get('blockers')}")
+          PY
+      - name: Bind same-run validation evidence
+        env:
+          CONFORMANCE_RESULT: ${{ needs.conformance.result }}
+          PHASE2_RESULT: ${{ needs.phase2.result }}
+          SCHEMA02_RESULT: ${{ needs.schema-02.result }}
+          PACKAGE_RESULT: ${{ needs.package.result }}
+          LINT_TYPE_RESULT: ${{ needs.lint-type.result }}
+          SECURITY_RESULT: ${{ needs.security.result }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          study = json.loads(Path("/tmp/study-status.json").read_text(encoding="utf-8"))
+          evidence = {
+              "commit": os.environ["VALIDATION_SHA"],
+              "ref": os.environ["GITHUB_REF"],
+              "releaseEligible": True,
+              "evidenceKind": "same-run-main-release-validation",
+              "workflowRunUrl": (
+                  f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}"
+                  f"/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+              ),
+              "jobs": {
+                  "conformance": os.environ["CONFORMANCE_RESULT"],
+                  "phase2": os.environ["PHASE2_RESULT"],
+                  "schema-02": os.environ["SCHEMA02_RESULT"],
+                  "package": os.environ["PACKAGE_RESULT"],
+                  "lint-type": os.environ["LINT_TYPE_RESULT"],
+                  "security": os.environ["SECURITY_RESULT"],
+              },
+              "studyStatus": study,
+          }
+          Path("/tmp/release-validation-evidence.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: Assemble releasable payload from exact main commit
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/gdi-release-candidate
+          python scripts/release_artifacts.py assemble \
+            --tag "${{ inputs.release_tag }}" \
+            --commit "$VALIDATION_SHA" \
+            --validation-evidence /tmp/release-validation-evidence.json \
+            --out /tmp/gdi-release-candidate
+          python scripts/release_artifacts.py verify /tmp/gdi-release-candidate
+      - name: Upload verified release-candidate payload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-candidate-${{ inputs.release_tag }}-${{ env.VALIDATION_SHA }}
+          path: /tmp/gdi-release-candidate/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
