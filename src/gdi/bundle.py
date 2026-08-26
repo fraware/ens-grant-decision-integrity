@@ -22,6 +22,7 @@ from gdi.exit_codes import (
     UNSUPPORTED,
     USAGE_ERROR,
 )
+from gdi.jsonutil import StrictJSONError, loads_strict
 from gdi.phase2 import phase2_error_type, verify_graph_bundle
 from gdi.projection import project_record, verify_projection_v2
 from gdi.report import add_check, empty_report, finalize
@@ -112,9 +113,9 @@ def _load_json_file(path: Path, *, label: str) -> Any:
     if len(raw) > MAX_JSON_BYTES:
         raise BundleError(f"{label} exceeds size limit", code="BUNDLE005", exit_code=USAGE_ERROR)
     try:
-        value = json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise BundleError(f"{label} is not valid JSON: {exc}", code="BUNDLE006") from exc
+        value = loads_strict(raw.decode("utf-8"))
+    except (UnicodeDecodeError, StrictJSONError) as exc:
+        raise BundleError(f"{label} is not valid strict JSON: {exc}", code="BUNDLE006") from exc
     if _json_depth(value) > MAX_JSON_DEPTH:
         raise BundleError(
             f"{label} exceeds JSON depth limit",
