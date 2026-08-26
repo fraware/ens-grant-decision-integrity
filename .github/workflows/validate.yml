@@ -314,6 +314,11 @@ jobs:
               "ref": os.environ["GITHUB_REF"],
               "releaseEligible": True,
               "evidenceKind": "same-run-main-release-validation",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "eventName": os.environ["GITHUB_EVENT_NAME"],
+              "workflowName": os.environ["GITHUB_WORKFLOW"],
+              "runId": int(os.environ["GITHUB_RUN_ID"]),
+              "runAttempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
               "workflowRunUrl": (
                   f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}"
                   f"/actions/runs/{os.environ['GITHUB_RUN_ID']}"
