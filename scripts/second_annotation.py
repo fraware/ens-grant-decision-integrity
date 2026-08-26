@@ -194,6 +194,11 @@ def verify_submission(
     annotation_id = _require_nonempty_string(
         submission.get("annotationId"), label="annotationSubmission.annotationId"
     )
+    if annotation_id == primary["annotationId"]:
+        raise SecondAnnotationError(
+            "second annotation must use an annotationId distinct from the primary annotation",
+            code="ANN006",
+        )
     annotator_id = _require_nonempty_string(
         submission.get("annotatorId"), label="annotationSubmission.annotatorId"
     )
