@@ -9,7 +9,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from gdi.jsonutil import StrictJSONError
+REPO_SRC = Path(__file__).resolve().parents[2] / "src"
+if str(REPO_SRC) not in sys.path:
+    sys.path.insert(0, str(REPO_SRC))
+
+from gdi.jsonutil import StrictJSONError  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
