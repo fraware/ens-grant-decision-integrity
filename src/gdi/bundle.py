@@ -23,7 +23,7 @@ from gdi.exit_codes import (
     USAGE_ERROR,
 )
 from gdi.phase2 import phase2_error_type, verify_graph_bundle
-from gdi.projection import project_record, project_record_v2, verify_projection_v2
+from gdi.projection import project_record, verify_projection_v2
 from gdi.report import add_check, empty_report, finalize
 from gdi.resources import resource_path
 from gdi.source.artifact import SourceArtifactError, VerifiedSourceArtifact, verify_artifact
@@ -36,7 +36,13 @@ MAX_JSON_DEPTH = 64
 
 
 class BundleError(Exception):
-    def __init__(self, message: str, *, code: str = "BUNDLE001", exit_code: int = EVIDENCE_FAILURE) -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str = "BUNDLE001",
+        exit_code: int = EVIDENCE_FAILURE,
+    ) -> None:
         super().__init__(message)
         self.code = code
         self.exit_code = exit_code
@@ -110,7 +116,11 @@ def _load_json_file(path: Path, *, label: str) -> Any:
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise BundleError(f"{label} is not valid JSON: {exc}", code="BUNDLE006") from exc
     if _json_depth(value) > MAX_JSON_DEPTH:
-        raise BundleError(f"{label} exceeds JSON depth limit", code="BUNDLE005", exit_code=USAGE_ERROR)
+        raise BundleError(
+            f"{label} exceeds JSON depth limit",
+            code="BUNDLE005",
+            exit_code=USAGE_ERROR,
+        )
     return value
 
 
@@ -173,7 +183,11 @@ def verify_bundle(
             exit_code=UNSUPPORTED,
         )
     if not bundle_dir.is_dir():
-        raise BundleError(f"bundle directory not found: {bundle_dir}", code="BUNDLE007", exit_code=USAGE_ERROR)
+        raise BundleError(
+            f"bundle directory not found: {bundle_dir}",
+            code="BUNDLE007",
+            exit_code=USAGE_ERROR,
+        )
 
     manifest_path = _safe_resolve(bundle_dir, "manifest.json", label="manifest")
     manifest_digest = _sha256_file(manifest_path)
@@ -471,10 +485,12 @@ def verify_bundle(
             except (BundleError, Exception) as exc:  # noqa: BLE001
                 phase_error = phase2_error_type()
                 code = getattr(exc, "code", None)
-                status = "unsupported" if isinstance(exc, (NotImplementedError, phase_error)) and code in {
-                    "RKR263",
-                    "TS3178",
-                } else "fail"
+                unsupported_error = isinstance(exc, NotImplementedError | phase_error)
+                status = (
+                    "unsupported"
+                    if unsupported_error and code in {"RKR263", "TS3178"}
+                    else "fail"
+                )
                 add_check(
                     report,
                     check_id="phase2.bundle",
@@ -511,7 +527,11 @@ def verify_bundle(
                 status="not-run",
                 claim_ids=["PROJ.EXEC.DETERMINISTIC"],
                 evidence=[projection["specPath"], projection["publicRecordPath"]],
-                details={"reason": "confidentialRecordPath is required for deterministic recomputation"},
+                details={
+                    "reason": (
+                        "confidentialRecordPath is required for deterministic recomputation"
+                    )
+                },
                 required=required,
             )
         else:
@@ -574,7 +594,11 @@ def verify_bundle(
                         check_id="projection.execute",
                         status="pass",
                         claim_ids=claims,
-                        evidence=[confidential_rel, projection["specPath"], projection["publicRecordPath"]],
+                        evidence=[
+                            confidential_rel,
+                            projection["specPath"],
+                            projection["publicRecordPath"],
+                        ],
                         details=details,
                         required=required,
                     )
@@ -584,7 +608,11 @@ def verify_bundle(
                     check_id="projection.execute",
                     status="fail",
                     claim_ids=["PROJ.EXEC.DETERMINISTIC"],
-                    evidence=[confidential_rel, projection["specPath"], projection["publicRecordPath"]],
+                    evidence=[
+                        confidential_rel,
+                        projection["specPath"],
+                        projection["publicRecordPath"],
+                    ],
                     details={"error": str(exc), "code": getattr(exc, "code", None)},
                     required=required,
                 )
@@ -617,7 +645,10 @@ def verify_bundle(
                 claim_ids=["FUNDING.STATUS.SNAPSHOT"],
                 evidence=[funding["statusSnapshotPath"]],
                 details={
-                    "reason": "snapshot bytes parsed, but no versioned funding-status verifier is registered"
+                    "reason": (
+                        "snapshot bytes parsed, but no versioned funding-status verifier "
+                        "is registered"
+                    )
                 },
                 required=required,
             )
@@ -648,7 +679,10 @@ def verify_bundle(
         claim_ids=["PHASE2.C4A.AUTHORIZED_SIGNER"],
         evidence=[],
         details={
-            "reason": "C4A requires a separately executed run-signer authorization check against the external policy"
+            "reason": (
+                "C4A requires a separately executed run-signer authorization check "
+                "against the external policy"
+            )
         },
         required=False,
     )
