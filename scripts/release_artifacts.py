@@ -20,6 +20,14 @@ MANIFEST_NAME = "release-manifest.json"
 VALIDATION_NAME = "release-validation.json"
 SBOM_NAME = "sbom.cdx.json"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+REQUIRED_RELEASE_JOBS = {
+    "conformance",
+    "phase2",
+    "schema-02",
+    "package",
+    "lint-type",
+    "security",
+}
 
 
 class ReleaseArtifactError(Exception):
@@ -84,7 +92,8 @@ def _assert_commit(commit: str, *, require_clean: bool) -> None:
 def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
     if evidence.get("commit") != commit:
         raise ReleaseArtifactError("validation evidence commit does not match release commit")
-    if not isinstance(evidence.get("releaseEligible"), bool):
+    release_eligible = evidence.get("releaseEligible")
+    if not isinstance(release_eligible, bool):
         raise ReleaseArtifactError("validation evidence must define boolean releaseEligible")
     run_url = evidence.get("workflowRunUrl")
     if not isinstance(run_url, str) or not run_url.startswith("https://github.com/"):
@@ -97,6 +106,24 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
             raise ReleaseArtifactError("validation job names must be non-empty strings")
         if conclusion not in {"success", "failure", "cancelled", "skipped"}:
             raise ReleaseArtifactError(f"invalid validation conclusion for {name}: {conclusion!r}")
+
+    if release_eligible:
+        if evidence.get("ref") != "refs/heads/main":
+            raise ReleaseArtifactError("release-eligible evidence must be produced from refs/heads/main")
+        if set(jobs) != REQUIRED_RELEASE_JOBS:
+            raise ReleaseArtifactError(
+                "release-eligible evidence must contain exactly the six required release jobs"
+            )
+        failed = sorted(name for name, conclusion in jobs.items() if conclusion != "success")
+        if failed:
+            raise ReleaseArtifactError(
+                f"release-eligible evidence requires all release jobs to succeed: {failed}"
+            )
+        study_status = evidence.get("studyStatus")
+        if not isinstance(study_status, dict) or study_status.get("readyForFinalReview") is not True:
+            raise ReleaseArtifactError(
+                "release-eligible evidence requires studyStatus.readyForFinalReview=true"
+            )
 
 
 def _source_archive(out_dir: Path, *, tag: str, commit: str) -> Path:
