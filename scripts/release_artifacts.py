@@ -18,6 +18,12 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from gdi.jsonutil import StrictJSONError, loads_strict  # noqa: E402
+
 REPOSITORY = "fraware/ens-grant-decision-integrity"
 WORKFLOW_NAME = "validate"
 WORKFLOW_PATH = ".github/workflows/validate.yml"
@@ -71,9 +77,9 @@ def _descriptor(path: Path) -> dict[str, Any]:
 
 def _load_json(path: Path, *, label: str) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise ReleaseArtifactError(f"cannot load {label} {path}: {exc}") from exc
+        value = loads_strict(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
+        raise ReleaseArtifactError(f"cannot load strict {label} {path}: {exc}") from exc
     if not isinstance(value, dict):
         raise ReleaseArtifactError(f"{label} must be a JSON object: {path}")
     return value
@@ -534,11 +540,11 @@ def _github_json(url: str, *, token: str | None) -> dict[str, Any]:
     request = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
-            payload = json.loads(response.read().decode("utf-8"))
+            payload = loads_strict(response.read().decode("utf-8"))
     except (
         OSError,
         UnicodeDecodeError,
-        json.JSONDecodeError,
+        StrictJSONError,
         urllib.error.HTTPError,
         urllib.error.URLError,
     ) as exc:
