@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from gdi.jsonutil import StrictJSONError
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
@@ -23,7 +25,7 @@ from project_v2 import project_record_v2  # noqa: E402
 from project_v2 import verify_projection_v2  # noqa: E402
 from project_v2 import verify_withheld_v2  # noqa: E402
 
-ProjectionError = (ProjectionErrorV1, ProjectionErrorV2)
+ProjectionError = (ProjectionErrorV1, ProjectionErrorV2, StrictJSONError)
 
 
 def _write_out(path: Path, value: Any, *, force: bool, canonical: bool) -> None:
