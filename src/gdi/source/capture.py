@@ -22,10 +22,11 @@ import socket
 import ssl
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import urljoin, urlsplit
 
 from gdi import __version__
@@ -56,7 +57,7 @@ class CaptureResult:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _is_blocked_ip(address: str) -> bool:
@@ -112,7 +113,10 @@ def assert_safe_url(
     try:
         addresses = resolve(host)
     except OSError as exc:
-        raise SourceArtifactError(f"DNS resolution failed for {host!r}: {exc}", code="CAP007") from exc
+        raise SourceArtifactError(
+            f"DNS resolution failed for {host!r}: {exc}",
+            code="CAP007",
+        ) from exc
     if not addresses:
         raise SourceArtifactError(f"no DNS addresses for host {host!r}", code="CAP007")
     for address in addresses:
@@ -178,7 +182,10 @@ def _safe_local_file(path: Path, *, root: Path | None = None) -> Path:
         try:
             resolved.relative_to(root_resolved)
         except ValueError as exc:
-            raise SourceArtifactError("local capture path escapes allowed root", code="CAP009") from exc
+            raise SourceArtifactError(
+                "local capture path escapes allowed root",
+                code="CAP009",
+            ) from exc
     if not resolved.is_file():
         raise SourceArtifactError(
             f"manual-file path is not a regular file: {resolved}",
@@ -325,7 +332,10 @@ def capture_browser_export(
             "browserTool": browser_tool,
             "browserVersion": browser_version,
             "nonClaims": [
-                "Export hash is not a hash of origin raw HTML unless that response was captured separately."
+                (
+                    "Export hash is not a hash of origin raw HTML unless that response "
+                    "was captured separately."
+                )
             ],
         },
     )
@@ -431,7 +441,10 @@ def capture_http(
                 code="CAP012",
             ) from exc
         except urllib.error.URLError as exc:
-            raise SourceArtifactError(f"HTTP capture network error: {exc}", code="CAP013") from exc
+            raise SourceArtifactError(
+                f"HTTP capture network error: {exc}",
+                code="CAP013",
+            ) from exc
 
         with response:
             status = getattr(response, "status", None) or response.getcode()
@@ -508,9 +521,18 @@ def capture_http(
                 "userAgent": f"{TOOL_NAME}/{__version__}",
                 "crossedOrigin": crossed_origin,
                 "nonClaims": [
-                    "HTTP capture metadata is transport observation, not proof of authority or publication time.",
-                    "Redirect destinations are not silently treated as equivalent to the cited policy URI.",
-                    "Hostname validation does not establish immunity to DNS rebinding before connection.",
+                    (
+                        "HTTP capture metadata is transport observation, not proof of "
+                        "authority or publication time."
+                    ),
+                    (
+                        "Redirect destinations are not silently treated as equivalent to "
+                        "the cited policy URI."
+                    ),
+                    (
+                        "Hostname validation does not establish immunity to DNS rebinding "
+                        "before connection."
+                    ),
                 ],
             }
             return store_captured_bytes(
