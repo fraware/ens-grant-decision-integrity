@@ -19,6 +19,25 @@
     "meritOrFairnessInference": false,
     "rule": "All corpus results are descriptive of the checked-in historical reconstructions and supplied evidence sets. Do not generalize estimates to all ENS decisions, all grant programs, or institutional legitimacy."
   },
+  "constructValidity": {
+    "improvementEffectIdentified": false,
+    "administrativeBurdenProportionalityIdentified": false,
+    "improvementLimit": "The current retrospective corpus has no untreated, alternative-workflow, or before/after comparator. It can describe reconstructability under the GDI ontology and expose ontology/tooling failure modes, but it cannot identify the comparative or causal effect implied by the study-plan word 'improve'.",
+    "burdenLimit": "The current design has no predeclared burden comparator or proportionality threshold, and legacy primary elapsedMinutes values were not prospectively standardized. It can report bounded annotation-time observations but cannot establish that total administrative burden is proportionate or lower than an alternative process.",
+    "allowedConclusions": [
+      "descriptive reconstructability and source-observability results for the sampled cases",
+      "descriptive ontology/model failure modes exposed by the sampled cases",
+      "descriptive annotation consistency for the independently double-annotated cases",
+      "bounded annotation-time observations under their stated measurement scopes"
+    ],
+    "prohibitedConclusions": [
+      "GDI improves reconstructability relative to an unspecified baseline",
+      "GDI causally reduces administrative burden",
+      "observed elapsedMinutes establishes institutional proportionality or adoption cost",
+      "the corpus demonstrates superiority to existing ENS decision-record practice"
+    ],
+    "futureEvidenceNeeded": "A comparative improvement or burden claim requires a prospectively specified comparator, outcome definition, measurement protocol, and analysis plan; where causal language is intended, the design must also justify causal identification."
+  },
   "primaryCorpusMetrics": {
     "rule": "Retain the primary metrics declared in study-plan.json. Per-case values remain the direct analysis unit.",
     "aggregateReporting": {
@@ -101,6 +120,7 @@
   "finalReportRules": [
     "Identify the original study plan separately from every post-start addendum.",
     "State the exact repository commit used to regenerate final metrics.",
+    "State explicitly that the present design does not identify an improvement effect or administrative-burden proportionality.",
     "Report all three selected second-annotation cases, including unfavorable or undefined agreement results.",
     "Separate preregistered primary metrics from post-hoc descriptive aggregates.",
     "Separate legacy primary timing observations from prospectively standardized second-annotation timing.",
