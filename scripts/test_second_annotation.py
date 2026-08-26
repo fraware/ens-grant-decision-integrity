@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -15,15 +16,20 @@ from second_annotation import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE_PATH = ROOT / "corpus" / "cases" / "spp3-namespace-2026" / "case.json"
+HANDOFF_PATH = (
+    ROOT
+    / "corpus"
+    / "second-annotation-handoffs"
+    / "spp3-namespace-2026.handoff.json"
+)
+FROZEN_HANDOFF_SHA256 = "48047269447cf331ed76403773d8431bcb44fe39dd3ee3853fff5e555a4d4674"
 
 
 def _case() -> dict:
     return json.loads(CASE_PATH.read_text(encoding="utf-8"))
 
 
-def _completed_unknown_handoff() -> tuple[dict, dict]:
-    case = _case()
-    handoff = build_handoff(case, base_dir=CASE_PATH.parent)
+def _complete_submission(handoff: dict) -> None:
     submission = handoff["annotationSubmission"]
     submission["annotationId"] = "namespace-independent-second-v1"
     submission["annotatorId"] = "independent-reviewer-b"
@@ -34,6 +40,12 @@ def _completed_unknown_handoff() -> tuple[dict, dict]:
         field["classification"] = "unknown"
         field["sourceArtifactIds"] = []
         field["rationale"] = None
+
+
+def _completed_unknown_handoff() -> tuple[dict, dict]:
+    case = _case()
+    handoff = build_handoff(case, base_dir=CASE_PATH.parent)
+    _complete_submission(handoff)
     return case, handoff
 
 
@@ -63,6 +75,20 @@ def test_handoff_exposes_full_classification_vocabulary() -> None:
         "unknown",
         "not-applicable",
     }
+
+
+def test_frozen_handoff_digest_and_current_verifier_compatibility() -> None:
+    frozen_bytes = HANDOFF_PATH.read_bytes()
+    assert hashlib.sha256(frozen_bytes).hexdigest() == FROZEN_HANDOFF_SHA256
+
+    case = _case()
+    handoff = json.loads(frozen_bytes.decode("utf-8"))
+    _complete_submission(handoff)
+    annotation = verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+
+    assert annotation["annotatorId"] == "independent-reviewer-b"
+    assert annotation["independent"] is True
+    assert {field["classification"] for field in annotation["fields"]} == {"unknown"}
 
 
 def test_verify_accepts_complete_independent_unknown_annotation() -> None:
