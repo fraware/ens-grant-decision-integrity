@@ -23,7 +23,7 @@ from gdi.exit_codes import (
 from gdi.phase2 import phase2_error_type, verify_graph_bundle
 from gdi.report import render_text
 from gdi.resources import ResourceError, resource_path
-from gdi.source.artifact import SourceArtifactError, main as source_main, verify_artifact
+from gdi.source import artifact as source_artifact
 from gdi.trust.policy import TrustPolicyError, load_trust_policy
 
 
@@ -144,7 +144,7 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.command == "verify-source":
             metadata = json.loads(args.metadata.read_text(encoding="utf-8"))
-            verified = verify_artifact(metadata, args.file)
+            verified = source_artifact.verify_artifact(metadata, args.file)
             _print_json({"ok": True, "artifactId": verified.artifact_id})
             return OK
 
@@ -152,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
             source_argv = list(args.source_args)
             if source_argv and source_argv[0] == "--":
                 source_argv = source_argv[1:]
-            return int(source_main(source_argv))
+            return int(source_artifact.main(source_argv))
 
         if args.command == "project":
             cli_argv = [
@@ -279,7 +279,12 @@ def main(argv: list[str] | None = None) -> int:
 
         parser.error(f"unknown command {args.command}")
         return USAGE_ERROR
-    except (BundleError, ClaimRegistryError, SourceArtifactError, TrustPolicyError) as exc:
+    except (
+        BundleError,
+        ClaimRegistryError,
+        source_artifact.SourceArtifactError,
+        TrustPolicyError,
+    ) as exc:
         _print_json({"ok": False, "error": str(exc), "code": getattr(exc, "code", "ERROR")})
         return getattr(exc, "exit_code", EVIDENCE_FAILURE)
     except (FileNotFoundError, ResourceError) as exc:
