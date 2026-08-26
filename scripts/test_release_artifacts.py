@@ -6,9 +6,11 @@ from pathlib import Path
 import pytest
 
 from release_artifacts import (
+    BUILD_LOCK_NAME,
     CHECKSUM_NAME,
     MANIFEST_NAME,
     REQUIRED_RELEASE_JOBS,
+    VALIDATION_LOCK_NAME,
     ReleaseArtifactError,
     _validate_evidence,
     _write_json,
@@ -43,6 +45,8 @@ def _release_dir(tmp_path: Path) -> Path:
         "ens_gdi-0.4.0.tar.gz": b"sdist",
         "ens-grant-decision-integrity-v1.0.0.tar.gz": b"source",
         "sbom.cdx.json": b'{"bomFormat":"CycloneDX"}\n',
+        BUILD_LOCK_NAME: b"build==1.3.0 --hash=sha256:" + b"a" * 64 + b"\n",
+        VALIDATION_LOCK_NAME: b"jsonschema==4.26.0 --hash=sha256:" + b"b" * 64 + b"\n",
     }.items():
         path = out / name
         path.write_bytes(content)
@@ -82,9 +86,11 @@ def test_release_directory_verifies_complete_acyclic_checksum_scope(tmp_path: Pa
 
     assert result["ok"] is True
     assert result["releaseEligible"] is False
-    assert result["verifiedPayloadCount"] == 6
+    assert result["verifiedPayloadCount"] == 8
     checksums = (out / CHECKSUM_NAME).read_text(encoding="utf-8")
     assert MANIFEST_NAME in checksums
+    assert BUILD_LOCK_NAME in checksums
+    assert VALIDATION_LOCK_NAME in checksums
     assert CHECKSUM_NAME not in checksums
 
 
@@ -135,6 +141,30 @@ def test_release_manifest_rejects_path_escape_filename(tmp_path: Path) -> None:
     _write_json(manifest, manifest_data)
 
     with pytest.raises(ReleaseArtifactError, match="unsafe asset filename"):
+        verify_directory(out)
+
+
+def test_release_manifest_rejects_missing_required_wheel(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    manifest = out / MANIFEST_NAME
+    manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+    manifest_data["artifacts"] = [
+        item for item in manifest_data["artifacts"] if not item["name"].endswith(".whl")
+    ]
+    _write_json(manifest, manifest_data)
+
+    with pytest.raises(ReleaseArtifactError, match="exactly one package wheel"):
+        verify_directory(out)
+
+
+def test_release_manifest_rejects_toolchain_policy_tampering(tmp_path: Path) -> None:
+    out = _release_dir(tmp_path)
+    manifest = out / MANIFEST_NAME
+    manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+    manifest_data["toolchain"]["pep517Isolation"] = True
+    _write_json(manifest, manifest_data)
+
+    with pytest.raises(ReleaseArtifactError, match="toolchain policy"):
         verify_directory(out)
 
 
