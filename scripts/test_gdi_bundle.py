@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from gdi.bundle import BundleError, verify_bundle  # noqa: E402
+from gdi.core.runtime import validate_record  # noqa: E402
 from gdi.exit_codes import EVIDENCE_FAILURE, OK, USAGE_ERROR  # noqa: E402
 from gdi.report import add_check, empty_report  # noqa: E402
 from gdi.trust.policy import (  # noqa: E402
@@ -76,6 +77,21 @@ def test_verify_bundle_minimal_public_offline(tmp_path: Path) -> None:
     assert report["ok"] is True
     assert "CORE.SCHEMA.STRUCTURE" in report["establishedClaims"]
     assert report["trustPolicy"]["policyId"] == "gdi-test-fixture-policy"
+
+
+def test_core_record_rejects_nonfinite_numeric_values() -> None:
+    record = json.loads(
+        (ROOT / "examples" / "spp3-marketplace-rfp.example.json").read_text(encoding="utf-8")
+    )
+    record["application"]["requestedAmount"] = float("nan")
+
+    findings = validate_record(record)
+    assert any(
+        item.code == "SCHEMA"
+        and item.path == "application.requestedAmount"
+        and "finite JSON numbers" in item.message
+        for item in findings
+    )
 
 
 def test_trust_policy_rejects_invalid_datetime_format(tmp_path: Path) -> None:
