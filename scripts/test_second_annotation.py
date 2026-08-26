@@ -6,7 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from second_annotation import SecondAnnotationError, build_handoff, verify_submission
+from second_annotation import (
+    INDEPENDENCE_ATTESTATION,
+    SecondAnnotationError,
+    build_handoff,
+    verify_submission,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE_PATH = ROOT / "corpus" / "cases" / "spp3-namespace-2026" / "case.json"
@@ -23,6 +28,7 @@ def _completed_unknown_handoff() -> tuple[dict, dict]:
     submission["annotationId"] = "namespace-independent-second-v1"
     submission["annotatorId"] = "independent-reviewer-b"
     submission["independent"] = True
+    submission["independenceAttestation"] = INDEPENDENCE_ATTESTATION
     submission["elapsedMinutes"] = 12.5
     for field in submission["fields"]:
         field["classification"] = "unknown"
@@ -99,6 +105,24 @@ def test_verify_rejects_independence_not_attested() -> None:
     handoff["annotationSubmission"]["independent"] = False
 
     with pytest.raises(SecondAnnotationError, match="independent=true") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN006"
+
+
+def test_verify_rejects_missing_independence_attestation() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"].pop("independenceAttestation")
+
+    with pytest.raises(SecondAnnotationError, match="independenceAttestation") as exc:
+        verify_submission(case, handoff, base_dir=CASE_PATH.parent)
+    assert exc.value.code == "ANN005"
+
+
+def test_verify_rejects_wrong_independence_attestation() -> None:
+    case, handoff = _completed_unknown_handoff()
+    handoff["annotationSubmission"]["independenceAttestation"] = "I agree."
+
+    with pytest.raises(SecondAnnotationError, match="attestation text") as exc:
         verify_submission(case, handoff, base_dir=CASE_PATH.parent)
     assert exc.value.code == "ANN006"
 
