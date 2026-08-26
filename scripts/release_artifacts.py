@@ -28,6 +28,7 @@ SBOM_NAME = "sbom.cdx.json"
 BUILD_LOCK_NAME = "requirements-build.lock.txt"
 VALIDATION_LOCK_NAME = "requirements.lock.txt"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 SAFE_TAG_RE = re.compile(r"^[A-Za-z0-9._-]+$")
 ASSET_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]*$")
 REQUIRED_RELEASE_JOBS = {
@@ -427,6 +428,12 @@ def _require_release_payload_set(
         raise ReleaseArtifactError(
             f"release manifest must contain exactly one package wheel; observed={wheels}"
         )
+    allowed = required | set(wheels)
+    unexpected = sorted(expected - allowed)
+    if unexpected:
+        raise ReleaseArtifactError(
+            f"release manifest contains unexpected payloads: {unexpected}"
+        )
 
 
 def verify_directory(out_dir: Path) -> dict[str, Any]:
@@ -455,7 +462,7 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
             raise ReleaseArtifactError(
                 f"manifest artifact cannot self-reference control file: {name}"
             )
-        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+        if not isinstance(digest, str) or DIGEST_RE.fullmatch(digest) is None:
             raise ReleaseArtifactError(f"invalid SHA-256 for manifest artifact {name}")
         if not isinstance(size, int) or isinstance(size, bool) or size < 0:
             raise ReleaseArtifactError(f"invalid size for manifest artifact {name}")
@@ -630,6 +637,48 @@ def _validate_github_records(
         raise ReleaseArtifactError("release-assets lacks successful main-branch SHA binding")
 
 
+def _validate_github_artifacts(
+    artifacts_document: dict[str, Any],
+    *,
+    tag: str,
+    commit: str,
+    manifest_sha256: str,
+) -> tuple[int, str]:
+    if DIGEST_RE.fullmatch(manifest_sha256) is None:
+        raise ReleaseArtifactError("local release-manifest SHA-256 is invalid")
+    rows = artifacts_document.get("artifacts")
+    total_count = artifacts_document.get("total_count")
+    if not isinstance(rows, list) or not isinstance(total_count, int):
+        raise ReleaseArtifactError("GitHub artifacts response is malformed")
+    if total_count != len(rows):
+        raise ReleaseArtifactError(
+            "GitHub artifacts response is incomplete; expected all artifacts in one response"
+        )
+    expected_name = f"release-candidate-{tag}-{commit}-{manifest_sha256}"
+    if len(rows) != 1:
+        raise ReleaseArtifactError(
+            f"GitHub release run must expose exactly one artifact; observed={len(rows)}"
+        )
+    artifact = rows[0]
+    if not isinstance(artifact, dict):
+        raise ReleaseArtifactError("GitHub artifacts response contains a non-object artifact")
+    artifact_id = artifact.get("id")
+    name = artifact.get("name")
+    if not isinstance(artifact_id, int) or isinstance(artifact_id, bool) or artifact_id <= 0:
+        raise ReleaseArtifactError("GitHub release artifact has an invalid id")
+    if name != expected_name:
+        raise ReleaseArtifactError(
+            f"GitHub release artifact name mismatch: expected={expected_name!r} observed={name!r}"
+        )
+    if artifact.get("expired") is not False:
+        raise ReleaseArtifactError("GitHub release artifact is expired or has unknown expiry state")
+    archive_url = artifact.get("archive_download_url")
+    expected_prefix = f"https://api.github.com/repos/{REPOSITORY}/actions/artifacts/"
+    if not isinstance(archive_url, str) or not archive_url.startswith(expected_prefix):
+        raise ReleaseArtifactError("GitHub release artifact has an invalid archive_download_url")
+    return artifact_id, expected_name
+
+
 def verify_github_evidence(out_dir: Path, *, token: str | None = None) -> dict[str, Any]:
     verification = verify_directory(out_dir)
     if verification["releaseEligible"] is not True:
@@ -644,12 +693,26 @@ def verify_github_evidence(out_dir: Path, *, token: str | None = None) -> dict[s
         f"https://api.github.com/repos/{REPOSITORY}/actions/runs/{run_id}/jobs?per_page=100",
         token=token,
     )
+    artifacts_document = _github_json(
+        f"https://api.github.com/repos/{REPOSITORY}/actions/runs/{run_id}/artifacts?per_page=100",
+        token=token,
+    )
     _validate_github_records(evidence, run, jobs_document, commit=verification["commit"])
+    manifest_sha256 = _sha256(out_dir / MANIFEST_NAME)
+    artifact_id, artifact_name = _validate_github_artifacts(
+        artifacts_document,
+        tag=verification["tag"],
+        commit=verification["commit"],
+        manifest_sha256=manifest_sha256,
+    )
     return {
         **verification,
         "githubEvidenceVerified": True,
         "githubRunId": run_id,
         "githubRunAttempt": evidence["runAttempt"],
+        "githubArtifactId": artifact_id,
+        "githubArtifactName": artifact_name,
+        "releaseManifestSha256": manifest_sha256,
     }
 
 
