@@ -153,7 +153,9 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> tuple[str, str]:
     if not isinstance(package, dict) or set(package) != {"name", "version"}:
         raise ReleaseArtifactError("release manifest package must contain name and version")
     if any(not isinstance(package[key], str) or not package[key] for key in package):
-        raise ReleaseArtifactError("release manifest package name/version must be non-empty strings")
+        raise ReleaseArtifactError(
+            "release manifest package name/version must be non-empty strings"
+        )
     checksum = manifest.get("checksumManifest")
     if not isinstance(checksum, dict):
         raise ReleaseArtifactError("release manifest checksumManifest must be an object")
@@ -304,7 +306,9 @@ def verify_directory(out_dir: Path) -> dict[str, Any]:
         if not isinstance(name, str) or not name or name in expected:
             raise ReleaseArtifactError(f"invalid or duplicate manifest artifact name: {name!r}")
         if name in {MANIFEST_NAME, CHECKSUM_NAME}:
-            raise ReleaseArtifactError(f"manifest artifact cannot self-reference control file: {name}")
+            raise ReleaseArtifactError(
+                f"manifest artifact cannot self-reference control file: {name}"
+            )
         if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ReleaseArtifactError(f"invalid SHA-256 for manifest artifact {name}")
         if not isinstance(size, int) or isinstance(size, bool) or size < 0:
