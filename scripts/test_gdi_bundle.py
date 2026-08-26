@@ -79,6 +79,41 @@ def test_verify_bundle_minimal_public_offline(tmp_path: Path) -> None:
     assert report["trustPolicy"]["policyId"] == "gdi-test-fixture-policy"
 
 
+def test_bundle_manifest_rejects_duplicate_json_keys(tmp_path: Path) -> None:
+    bundle = _minimal_bundle(tmp_path)
+    manifest_path = bundle / "manifest.json"
+    raw = manifest_path.read_text(encoding="utf-8")
+    raw = raw.replace(
+        '"bundleId": "minimal-public-v01",',
+        '"bundleId": "minimal-public-v01",\n  "bundleId": "ambiguous",',
+        1,
+    )
+    manifest_path.write_text(raw, encoding="utf-8")
+
+    with pytest.raises(BundleError) as exc:
+        verify_bundle(bundle)
+    assert exc.value.code == "BUNDLE006"
+    assert "duplicate JSON object key" in str(exc.value)
+
+
+def test_bundle_record_rejects_nonstandard_nan(tmp_path: Path) -> None:
+    bundle = _minimal_bundle(tmp_path)
+    record_path = bundle / "record" / "decision.json"
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    record["application"]["requestedAmount"] = float("nan")
+    record_path.write_text(json.dumps(record), encoding="utf-8")
+
+    manifest_path = bundle / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["record"]["sha256"] = _sha256(record_path)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(BundleError) as exc:
+        verify_bundle(bundle)
+    assert exc.value.code == "BUNDLE006"
+    assert "non-standard JSON numeric constant" in str(exc.value)
+
+
 def test_core_record_rejects_nonfinite_numeric_values() -> None:
     record = json.loads(
         (ROOT / "examples" / "spp3-marketplace-rfp.example.json").read_text(encoding="utf-8")
@@ -100,6 +135,23 @@ def test_trust_policy_rejects_invalid_datetime_format(tmp_path: Path) -> None:
     with pytest.raises(TrustPolicyError) as exc:
         load_trust_policy(_write_policy(tmp_path, policy))
     assert exc.value.code == "TRUST004"
+
+
+def test_trust_policy_rejects_duplicate_json_keys(tmp_path: Path) -> None:
+    source = ROOT / "tests" / "fixtures" / "trust" / "test-trust-policy.json"
+    raw = source.read_text(encoding="utf-8")
+    raw = raw.replace(
+        '"policyId": "gdi-test-fixture-policy",',
+        '"policyId": "gdi-test-fixture-policy",\n  "policyId": "ambiguous",',
+        1,
+    )
+    path = tmp_path / "duplicate-policy.json"
+    path.write_text(raw, encoding="utf-8")
+
+    with pytest.raises(TrustPolicyError) as exc:
+        load_trust_policy(path)
+    assert exc.value.code == "TRUST003"
+    assert "duplicate JSON object key" in str(exc.value)
 
 
 def test_trust_policy_rejects_nonpositive_validity_interval(tmp_path: Path) -> None:
