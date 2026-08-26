@@ -95,7 +95,8 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: python -m pip install -r requirements-dev.txt
+      - name: Install hash-locked release/validation environment
+        run: python -m pip install --require-hashes -r requirements.lock.txt
       - name: Assemble and verify non-release candidate payload
         run: |
           set -euo pipefail
@@ -123,14 +124,16 @@ jobs:
             --validation-evidence /tmp/gdi-validation-smoke.json \
             --out /tmp/gdi-release-smoke
           python scripts/release_artifacts.py verify /tmp/gdi-release-smoke
-      - name: Install assembled wheel into clean venv and smoke-test substantive CLI
+      - name: Install assembled wheel into locked clean venv and smoke-test substantive CLI
         run: |
           set -euo pipefail
           repo="$PWD"
           wheel="$(python -c 'from pathlib import Path; print(next(Path("/tmp/gdi-release-smoke").glob("*.whl")).resolve())')"
           rm -rf /tmp/gdi-wheel /tmp/gdi-smoke
           python -m venv /tmp/gdi-wheel
-          /tmp/gdi-wheel/bin/python -m pip install "$wheel"
+          /tmp/gdi-wheel/bin/python -m pip install \
+            --require-hashes -r "$repo/requirements.lock.txt"
+          /tmp/gdi-wheel/bin/python -m pip install --no-deps "$wheel"
           mkdir -p /tmp/gdi-smoke
           cp "$repo/examples/spp3-marketplace-rfp.example.json" /tmp/gdi-smoke/record.json
           cp "$repo/examples/tier-a-simplified-grant.example.json" /tmp/gdi-smoke/tier.json
@@ -256,7 +259,7 @@ jobs:
           /tmp/gdi-build-lock/bin/python -m pip install \
             --require-hashes -r requirements-build.lock.txt
           /tmp/gdi-build-lock/bin/python -m pip check
-          python -m pip_audit -r requirements-build.lock.txt
+          /tmp/gdi-lock/bin/python -m pip_audit -r requirements-build.lock.txt
       - name: Confirm packaging and branch-protection documentation present
         run: |
           test -f docs/PACKAGING-AND-SECURITY.md
@@ -281,9 +284,11 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: python -m pip install -r requirements-dev.txt -r phase2/requirements.txt
-      - run: python -m pip install -e .
+      - name: Install hash-locked release/validation environment
+        run: python -m pip install --require-hashes -r requirements.lock.txt
       - name: Require completed empirical study gate
+        env:
+          PYTHONPATH: src
         run: |
           set -euo pipefail
           python scripts/study_status.py > /tmp/study-status.json
