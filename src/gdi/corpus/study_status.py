@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from gdi.corpus.metrics import CorpusCaseError, compute_metrics
+from gdi.jsonutil import StrictJSONError, loads_strict
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PLAN = ROOT / "corpus" / "study-plan.json"
@@ -25,9 +26,9 @@ class StudyStatusError(Exception):
 
 def _load_json(path: Path, *, label: str, code: str) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise StudyStatusError(f"cannot load {label} {path}: {exc}", code=code) from exc
+        value = loads_strict(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, StrictJSONError) as exc:
+        raise StudyStatusError(f"cannot load strict {label} {path}: {exc}", code=code) from exc
     if not isinstance(value, dict):
         raise StudyStatusError(f"{label} must be a JSON object: {path}", code=code)
     return value
