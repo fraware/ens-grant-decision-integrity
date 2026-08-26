@@ -10,7 +10,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from gdi.jsonutil import StrictJSONError, loads_strict
+REPO_SRC = Path(__file__).resolve().parents[2] / "src"
+if str(REPO_SRC) not in sys.path:
+    sys.path.insert(0, str(REPO_SRC))
+
+from gdi.jsonutil import StrictJSONError, loads_strict  # noqa: E402
 
 SRC_DIR = Path(__file__).resolve().parent
 if str(SRC_DIR) not in sys.path:
