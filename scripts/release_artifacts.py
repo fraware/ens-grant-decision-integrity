@@ -69,7 +69,11 @@ def _load_json(path: Path, *, label: str) -> dict[str, Any]:
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
-    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def _project_metadata() -> tuple[str, str]:
@@ -82,11 +86,15 @@ def _assert_commit(commit: str, *, require_clean: bool) -> None:
         raise ReleaseArtifactError("commit must be a lowercase 40-hex Git SHA")
     actual = _run("git", "rev-parse", "HEAD", capture=True)
     if actual != commit:
-        raise ReleaseArtifactError(f"checked-out HEAD {actual} does not match requested commit {commit}")
+        raise ReleaseArtifactError(
+            f"checked-out HEAD {actual} does not match requested commit {commit}"
+        )
     if require_clean:
         status = _run("git", "status", "--porcelain", "--untracked-files=all", capture=True)
         if status:
-            raise ReleaseArtifactError("release assembly requires a clean checkout before output creation")
+            raise ReleaseArtifactError(
+                "release assembly requires a clean checkout before output creation"
+            )
 
 
 def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
@@ -109,7 +117,9 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
 
     if release_eligible:
         if evidence.get("ref") != "refs/heads/main":
-            raise ReleaseArtifactError("release-eligible evidence must be produced from refs/heads/main")
+            raise ReleaseArtifactError(
+                "release-eligible evidence must be produced from refs/heads/main"
+            )
         if set(jobs) != REQUIRED_RELEASE_JOBS:
             raise ReleaseArtifactError(
                 "release-eligible evidence must contain exactly the six required release jobs"
@@ -120,7 +130,10 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
                 f"release-eligible evidence requires all release jobs to succeed: {failed}"
             )
         study_status = evidence.get("studyStatus")
-        if not isinstance(study_status, dict) or study_status.get("readyForFinalReview") is not True:
+        if (
+            not isinstance(study_status, dict)
+            or study_status.get("readyForFinalReview") is not True
+        ):
             raise ReleaseArtifactError(
                 "release-eligible evidence requires studyStatus.readyForFinalReview=true"
             )
@@ -129,7 +142,9 @@ def _validate_evidence(evidence: dict[str, Any], *, commit: str) -> None:
 def _source_archive(out_dir: Path, *, tag: str, commit: str) -> Path:
     safe_tag = re.sub(r"[^A-Za-z0-9._-]+", "-", tag).strip("-")
     if not safe_tag or safe_tag != tag:
-        raise ReleaseArtifactError("tag must contain only letters, digits, dot, underscore, or hyphen")
+        raise ReleaseArtifactError(
+            "tag must contain only letters, digits, dot, underscore, or hyphen"
+        )
     path = out_dir / f"ens-grant-decision-integrity-{tag}.tar.gz"
     _run(
         "git",
@@ -146,7 +161,11 @@ def _build_python_distributions(out_dir: Path) -> tuple[Path, Path]:
     _run(sys.executable, "-m", "build", "--outdir", str(out_dir))
     wheels = sorted(out_dir.glob("*.whl"))
     sdists = sorted(out_dir.glob("*.tar.gz"))
-    source_archives = [path for path in sdists if path.name.startswith("ens-grant-decision-integrity-")]
+    source_archives = [
+        path
+        for path in sdists
+        if path.name.startswith("ens-grant-decision-integrity-")
+    ]
     sdists = [path for path in sdists if path not in source_archives]
     if len(wheels) != 1 or len(sdists) != 1:
         raise ReleaseArtifactError(
@@ -219,7 +238,10 @@ def build_manifest(
         "artifacts": [_descriptor(path) for path in sorted(payloads, key=lambda item: item.name)],
         "checksumManifest": {
             "name": CHECKSUM_NAME,
-            "scope": "Every attached payload asset including this release manifest, excluding SHA256SUMS itself.",
+            "scope": (
+                "Every attached payload asset including this release manifest, "
+                "excluding SHA256SUMS itself."
+            ),
             "selfHashExcluded": True,
         },
         "nonClaims": [
@@ -232,7 +254,8 @@ def build_manifest(
 
 def write_checksum_manifest(out_dir: Path, *, payloads: list[Path]) -> Path:
     checksum = out_dir / CHECKSUM_NAME
-    lines = [f"{_sha256(path)}  {path.name}" for path in sorted(payloads, key=lambda item: item.name)]
+    sorted_payloads = sorted(payloads, key=lambda item: item.name)
+    lines = [f"{_sha256(path)}  {path.name}" for path in sorted_payloads]
     checksum.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return checksum
 
