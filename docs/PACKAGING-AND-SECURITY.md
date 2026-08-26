@@ -68,11 +68,13 @@ The release-critical prerequisite job names are:
 | `conformance` | v0.1 contract, source/policy checks, corpus protocol, claims, profiles, adapters, and release-verifier tests |
 | `phase2` | Phase II graph, commitment, replay, disclosure, and anchor-profile tests |
 | `schema-02` | Schema 0.2 and projection tests, including generative coverage |
-| `package` | Exercise release-asset assembly in non-release mode; install the assembled wheel in a clean venv; exercise substantive CLI paths away from the source checkout |
+| `package` | Exercise release-asset assembly in non-release mode; install the assembled wheel in a locked clean venv; exercise substantive CLI paths away from the source checkout |
 | `lint-type` | `ruff` on release-facing modules and adapters; `mypy` on adapters |
 | `security` | Audit development pins; prove validation/build lock coverage and installability; run `pip check`; audit both locked environments |
 
-The manual release run adds the seventh `release-assets` job after all six prerequisites. The historical three semantic contexts remain important for continuity, but the documented `v1.0.0` protection target is all six prerequisite release-critical contexts. Do not describe a three-check configuration as satisfying the final six-check target. The effective GitHub settings remain an administrative fact that must be verified separately; see `docs/BRANCH-PROTECTION.md` and release-control issue #31.
+The manual release run adds the seventh `release-assets` job after all six prerequisites. The historical three semantic contexts remain important for continuity, but the documented `v1.0.0` protection target is all six prerequisite release-critical contexts.
+
+As independently observed on 2026-08-26, classic protection on `main` currently requires only `conformance`, `phase2`, and `schema-02`; the repository Rulesets list is empty. That state does **not** satisfy the final six-check target. The full protection endpoint remains inaccessible to the available integration, so other controls still require authorized settings inspection. See `docs/BRANCH-PROTECTION.md` and release-control issue #31.
 
 ## Release artifact assembler
 
@@ -141,9 +143,7 @@ The SBOM toolchain is part of the validated release environment in `requirements
 
 ## Branch protection (required target)
 
-Documented target for `main` before `v1.0.0`. Do not silently bypass. Maintainers with admin access must verify the effective GitHub settings; this document does not force-change repository settings via API.
-
-Required target:
+The target for `main` before `v1.0.0` is:
 
 1. Require a pull request before merging to `main`
 2. Require all six prerequisite release-critical status contexts: `conformance`, `phase2`, `schema-02`, `package`, `lint-type`, `security`
@@ -154,7 +154,7 @@ Required target:
 7. Minimize administrator/repository-role bypass for release candidates and `main`
 8. Signed commits/tags only if the team can operate that policy reliably
 
-Record any setting that cannot be enforced in release notes rather than implying it is enforced.
+The point-in-time 2026-08-26 observation fails item 2 because only the first three contexts are required. Items 1 and 3–7 remain unverified through the integration because the full protection endpoint returns 403. Maintainers with admin access must strengthen item 2 and verify the remaining effective settings before release. Record any setting that cannot be enforced in release notes rather than implying it is enforced.
 
 See also `docs/BRANCH-PROTECTION.md`.
 
